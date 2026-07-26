@@ -21,13 +21,14 @@ if(!$user_id)
     <title>Auto Caller</title>
     <!-- Tell the browser to be responsive to screen width -->
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-	<link rel="stylesheet" href="css/bootstrap.min.css">
-	<link rel="stylesheet" href="css/font-awesome.min.css">
-	<link rel="stylesheet" href="css/theme.css">
-	<link rel="stylesheet" href="css/login.css">
+	<link rel="stylesheet" href="assets/css/bootstrap.min.css">
+	<link rel="stylesheet" href="assets/css/font-awesome.min.css">
+	<link rel="stylesheet" href="assets/css/theme.css">
+	<link rel="stylesheet" href="assets/css/login.css">
 
-	<link rel="stylesheet" type="text/css" href="toastr/toastr.css">
-	<link rel="icon" href="image/dialer.ico" type="image/x-icon">
+	<link rel="stylesheet" type="text/css" href="assets/css/toastr/toastr.css">
+	<link rel="icon" href="assets/img/brand/favicon.svg" type="image/svg+xml">
+    <link rel="alternate icon" href="assets/img/brand/favicon.ico" type="image/x-icon">
   </head>
   <body>
 
@@ -45,7 +46,7 @@ if(!$user_id)
                 <div class="form-content">
                     <div class="form-items">
                         <div class="website-logo-inside">
-                            <a href="index.php" class="brand-text-logo">Auto<span>Caller</span></a>
+                            <a href="index.php" class="brand-text-logo"><img src="assets/img/brand/logo.svg" alt="Auto Caller" height="40"></a>
                         </div>
 						<h3>ورود</h3>
                         <div class="page-links">
@@ -71,9 +72,9 @@ if(!$user_id)
     </div>
 
 
-    <script src="js/vendor/jquery.min.js"></script>
-    <script src="bootstrap/js/bootstrap.min.js"></script>
-<script type="text/javascript" src="toastr/toastr.min.js"></script>
+    <script src="assets/js/vendor/jquery.min.js"></script>
+    <script src="assets/js/bootstrap/bootstrap.min.js"></script>
+<script type="text/javascript" src="assets/js/toastr/toastr.min.js"></script>
   </body>
   </html>
 <?php

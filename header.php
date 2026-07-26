@@ -58,7 +58,7 @@ var page = path.split("/").pop();
 			 admin_value = "n";
 		}		
 	  </script>
-			<script src="../plugins/jQuery/jQuery-2.1.4.min.js"></script>
+			<script src="plugins/jQuery/jQuery-2.1.4.min.js"></script>
 			<script type="text/javascript" src="dist/js/jWebSocket.js"></script>
 			<script type="text/javascript" src="dist/js/techextension.js"></script>
 			

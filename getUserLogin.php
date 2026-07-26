@@ -73,7 +73,7 @@ $loggedOutCount = count($agentDetails['loggedOut']['user_id']);
 					{
 						if($agentDetails['loggedIn']['profile_pic'][$i] == "")
 						{
-							$agentDetails['loggedIn']['profile_pic'][$i] = "../image/avtar.png";
+							$agentDetails['loggedIn']['profile_pic'][$i] = "assets/img/avtar.png";
 						}
 					?>
                       <li>
@@ -114,7 +114,7 @@ $loggedOutCount = count($agentDetails['loggedOut']['user_id']);
 					{
 						if($agentDetails['loggedOut']['profile_pic'][$i] == "")
 						{
-							$agentDetails['loggedOut']['profile_pic'][$i] = "../image/avtar.png";
+							$agentDetails['loggedOut']['profile_pic'][$i] = "assets/img/avtar.png";
 						}
 					?>
                       <li>

@@ -22,7 +22,7 @@ foreach($files as $file){
 </head>
 
 <body>
-<center><img src="tenor.gif">
+<center><img src="assets/img/tenor.gif">
 <div style="background-color:red">
 <h1 style="color:white"> !با موفقیت حذف شد! </h1>
 </div>

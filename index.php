@@ -44,9 +44,9 @@ function checkTime(i) {
 
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 	<title>Auto Caller</title>
-	<link rel="stylesheet" href="css/style.css" type="text/css" media="all" />
-	<link rel="stylesheet" href="css/theme.css" type="text/css" media="all" />
-	<script src='funciones.js'></script>
+	<link rel="stylesheet" href="assets/css/style.css" type="text/css" media="all" />
+	<link rel="stylesheet" href="assets/css/theme.css" type="text/css" media="all" />
+	<script src='assets/js/funciones.js'></script>
 <script>
 function popup(mylink, windowname)
 {
@@ -73,7 +73,7 @@ return false;
 		<!-- Logo + Top Nav -->
 		
 		<div id="top">
-			<h1><a href="index.php" class="brand-text-logo">Auto<span>Caller</span></a></h1><!--<center><h3 style="color:white;"><div id="txt"></div></h3></center> -->
+			<h1><a href="index.php" class="brand-text-logo"><img src="assets/img/brand/logo.svg" alt="Auto Caller" height="34"></a></h1>
 			<div id="top-navigation">
 			
 				<strong><a href="apii.php"> [ A P I ] # </a></strong>
@@ -198,7 +198,7 @@ $caller_id = $config['callid']['caller_id'];
 		<center><h2>Control Panel</h2></i></center>
 		<div id="borderDemo">
 		<h3>Setting •</h3>
-<script type="text/javascript" src="js/vendor/jquery.min.js"></script>
+<script type="text/javascript" src="assets/js/vendor/jquery.min.js"></script>
 		<script>
 $(document).ready(function(){
 	$("#pause-btn").click(function(){
@@ -398,7 +398,7 @@ function list_logs()
 ?>
 
 <head>
-<link rel="stylesheet" href="css/font-awesome.min.css">
+<link rel="stylesheet" href="assets/css/font-awesome.min.css">
 
 
 
@@ -454,9 +454,9 @@ font-family: 'Lalezar', Lalezar;
 <head>
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 	<title>Auto Caller</title>
-	<link rel="stylesheet" href="css/style.css" type="text/css" media="all" />
-	<link rel="stylesheet" href="css/theme.css" type="text/css" media="all" />
-	<script src='funciones.js'></script>
+	<link rel="stylesheet" href="assets/css/style.css" type="text/css" media="all" />
+	<link rel="stylesheet" href="assets/css/theme.css" type="text/css" media="all" />
+	<script src='assets/js/funciones.js'></script>
 <script>
 function popup(mylink, windowname)
 {
@@ -479,7 +479,7 @@ return false;
 	<div class="shell">
 		<!-- Logo + Top Nav -->
 		<div id="top">
-			<h1><a href="index.php" class="brand-text-logo">Auto<span>Caller</span></a></h1>
+			<h1><a href="index.php" class="brand-text-logo"><img src="assets/img/brand/logo.svg" alt="Auto Caller" height="34"></a></h1>
 			<div id="top-navigation">
 				
 				<span>Version:2.1   </span>

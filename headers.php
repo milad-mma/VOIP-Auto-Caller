@@ -96,7 +96,8 @@ $VBCallLimit = getVBCallLimit();
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
     <?php include "header_css.php"; ?>
 
-	<link rel="icon" href="../image/favicon.ico" type="image/x-icon">
+	<link rel="icon" href="assets/img/brand/favicon.svg" type="image/svg+xml">
+	<link rel="alternate icon" href="assets/img/brand/favicon.ico" type="image/x-icon">
   </head>
   <body class="hold-transition skin-blue sidebar-mini">
     <div class="wrapper">
@@ -165,7 +166,7 @@ $VBCallLimit = getVBCallLimit();
 			
 			<div class="navbar-custom-menu">
 		
-		<img src='image/dialer.ico' style='margin-top:12px;' data-toggle="modal" data-target="#abc" height='28px' width='28px' title='Dial Pad'>
+		<img src='assets/img/dialer.ico' style='margin-top:12px;' data-toggle="modal" data-target="#abc" height='28px' width='28px' title='Dial Pad'>
 		
 		</div>
 		<div class="navbar-custom-menu" id='' onclick=''></div>
@@ -174,8 +175,8 @@ $VBCallLimit = getVBCallLimit();
         </nav>
 
 <link rel="stylesheet" type="text/css" href="dist/css/csshack.css">
-		<script type="text/javascript" src="toastr/toastr.min.js"></script>
-		<link rel="stylesheet" type="text/css" href="toastr/toastr.css">
+		<script type="text/javascript" src="assets/js/toastr/toastr.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="assets/css/toastr/toastr.css">
 		
       </header>
 

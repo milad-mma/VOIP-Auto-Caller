@@ -5,8 +5,9 @@
 <head>
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 	<title>Asterisk Dialer</title>
-	<link rel="stylesheet" href="css/styles.css" type="text/css" media="all" />
-	<script src='funciones.js'></script>
+	<link rel="stylesheet" href="assets/css/styles.css" type="text/css" media="all" />
+	<link rel="stylesheet" href="assets/css/theme.css" type="text/css" media="all" />
+	<script src='assets/js/funciones.js'></script>
 <script>
 function popup(mylink, windowname)
 {

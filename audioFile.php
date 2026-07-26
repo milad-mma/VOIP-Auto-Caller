@@ -41,8 +41,8 @@ function checkTime(i) {
 
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 	<title>Manage Voices</title>
-	<link rel="stylesheet" href="css/style.css" type="text/css" media="all" />
-	<script src='funciones.js'></script>
+	<link rel="stylesheet" href="assets/css/style.css" type="text/css" media="all" />
+	<script src='assets/js/funciones.js'></script>
 <script>
 function popup(mylink, windowname)
 {
@@ -253,8 +253,8 @@ function stateHandle() {
 </html>
 
 <head>
-<link rel="stylesheet" href="css/font-awesome.min.css">
-<link rel="stylesheet" href="css/theme.css">
+<link rel="stylesheet" href="assets/css/font-awesome.min.css">
+<link rel="stylesheet" href="assets/css/theme.css">
 
 
 <style>
@@ -359,8 +359,8 @@ border-radius: 28px 28px 0px 0px;
 <head>
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 	<title>Asterisk Dialer</title>
-	<link rel="stylesheet" href="css/style.css" type="text/css" media="all" />
-	<script src='funciones.js'></script>
+	<link rel="stylesheet" href="assets/css/style.css" type="text/css" media="all" />
+	<script src='assets/js/funciones.js'></script>
 <script>
 function popup(mylink, windowname)
 {
@@ -382,9 +382,9 @@ return false;
 <html>
  <head>
   <title></title>
-  <script src="js/vendor/jquery.min.js"></script>
-  <link rel="stylesheet" href="css/bootstrap.min.css" />
-  <script src="bootstrap/js/bootstrap.min.js"></script>
+  <script src="assets/js/vendor/jquery.min.js"></script>
+  <link rel="stylesheet" href="assets/css/bootstrap.min.css" />
+  <script src="assets/js/bootstrap/bootstrap.min.js"></script>
  </head>
  <body>
   <br /><br />

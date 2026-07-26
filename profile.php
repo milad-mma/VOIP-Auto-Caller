@@ -29,7 +29,7 @@
 			<form method='post' enctype="multipart/form-data" id='uploadform'>
 				<div id="btnfile" style='cursor: pointer'><img class="profile-user-img img-responsive img-circle" src="<?php echo $profileDetails[		'profile_image']; ?>" alt="User profile picture" /></div>
 				<div style='display:none'> 
-					<input type="file" name="image" accept="image/*" id="uploadfile" onchange='abc();'/>
+					<input type="file" name="image" accept="assets/img/*" id="uploadfile" onchange='abc();'/>
 				</div>
 			</form>
 				  
@@ -42,17 +42,17 @@
 
                   <ul class="list-group list-group-unbordered">
                      <li class="list-group-item">
-                      <img src="image/company.png" alt="Company Name" title='Company Name'><a class="pull-right" id="c_name"><?php echo $profileDetails['company_name']; ?></a>
+                      <img src="assets/img/company.png" alt="Company Name" title='Company Name'><a class="pull-right" id="c_name"><?php echo $profileDetails['company_name']; ?></a>
                     </li>
 					
 					<li class="list-group-item">
-                      <b><img src="image/email.png" alt="Email" title='Email Address'></b> <a class="pull-right" id="p_email"><?php echo $profileDetails['email']; ?></a>
+                      <b><img src="assets/img/email.png" alt="Email" title='Email Address'></b> <a class="pull-right" id="p_email"><?php echo $profileDetails['email']; ?></a>
                     </li>
                     <li class="list-group-item">
-                      <b><img src="image/phone.png" alt="Phone" title='Phone Number'></b> <a class="pull-right" id="p_phone"><?php echo $profileDetails['contact']; ?></a>
+                      <b><img src="assets/img/phone.png" alt="Phone" title='Phone Number'></b> <a class="pull-right" id="p_phone"><?php echo $profileDetails['contact']; ?></a>
                     </li>
                     <li class="list-group-item">
-                      <b><img src="image/extension.png" alt="Extension" title='Extension Number'></b> <a class="pull-right" id="p_extension"><?php echo $profileDetails['extension']; ?></a>
+                      <b><img src="assets/img/extension.png" alt="Extension" title='Extension Number'></b> <a class="pull-right" id="p_extension"><?php echo $profileDetails['extension']; ?></a>
                     </li>
 					
 					
@@ -737,13 +737,13 @@ function resize($width, $height, $i){
   	$w, $h);
 	/* Save image */
 	switch ($_FILES['image']['type']) {
-		case 'image/jpeg':
+		case 'assets/img/jpeg':
 			imagejpeg($tmp, $path, 100);
 			break;
-		case 'image/png':
+		case 'assets/img/png':
 			imagepng($tmp, $path, 0);
 			break;
-		case 'image/gif':
+		case 'assets/img/gif':
 			imagegif($tmp, $path);
 			break;
 		default:

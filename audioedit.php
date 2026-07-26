@@ -2,10 +2,10 @@
 <html>
  <head>
   <title>PHP Filesystem with Ajax JQuery</title>
-  <script src="js/vendor/jquery.min.js"></script>
-  <link rel="stylesheet" href="bootstrap/css/bootstrap.min.css" />
-  <link rel="stylesheet" href="css/theme.css" />
-  <script src="bootstrap/js/bootstrap.min.js"></script>
+  <script src="assets/js/vendor/jquery.min.js"></script>
+  <link rel="stylesheet" href="assets/css/bootstrap/bootstrap.min.css" />
+  <link rel="stylesheet" href="assets/css/theme.css" />
+  <script src="assets/js/bootstrap/bootstrap.min.js"></script>
  </head>
  <body>
   <br /><br />

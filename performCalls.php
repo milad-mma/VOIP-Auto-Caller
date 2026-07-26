@@ -134,7 +134,7 @@ if($_POST['action']=="Start Campain")
 }
 
 ?>
-<script type="text/javascript" src="js/vendor/jquery.min.js"></script>
+<script type="text/javascript" src="assets/js/vendor/jquery.min.js"></script>
 <script type="text/javascript">
 function updateLogger(file)
 {
@@ -160,8 +160,8 @@ $(document).ready(function(){
 
 <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 	<title>Asterisk Dialer</title>
-	<link rel="stylesheet" href="css/style.css" type="text/css" media="all" />
-	<link rel="stylesheet" href="css/theme.css" type="text/css" media="all" />
+	<link rel="stylesheet" href="assets/css/style.css" type="text/css" media="all" />
+	<link rel="stylesheet" href="assets/css/theme.css" type="text/css" media="all" />
 	</head>
 	
 <style>

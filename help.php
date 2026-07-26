@@ -44,8 +44,8 @@ function checkTime(i) {
 
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 	<title>AutoDialer</title>
-	<link rel="stylesheet" href="css/style.css" type="text/css" media="all" />
-	<script src='funciones.js'></script>
+	<link rel="stylesheet" href="assets/css/style.css" type="text/css" media="all" />
+	<script src='assets/js/funciones.js'></script>
 <script>
 function popup(mylink, windowname)
 {
@@ -188,7 +188,7 @@ $waittime = $config['waittimes']['waittime'];
 		<div id="borderDemo">
 		<a href="index.php" class="button button2 fa fa-reply-all"></a>
 		
-<script type="text/javascript" src="js/vendor/jquery.min.js"></script>
+<script type="text/javascript" src="assets/js/vendor/jquery.min.js"></script>
 		<script>
 $(document).ready(function(){
 	$("#pause-btn").click(function(){
@@ -366,8 +366,8 @@ function list_logs()
 ?>
 
 <head>
-<link rel="stylesheet" href="css/font-awesome.min.css">
-<link rel="stylesheet" href="css/theme.css">
+<link rel="stylesheet" href="assets/css/font-awesome.min.css">
+<link rel="stylesheet" href="assets/css/theme.css">
 
 
 
@@ -423,8 +423,8 @@ font-family: 'Roboto', sans-serif;
 <head>
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 	<title>Asterisk Dialer</title>
-	<link rel="stylesheet" href="css/style.css" type="text/css" media="all" />
-	<script src='funciones.js'></script>
+	<link rel="stylesheet" href="assets/css/style.css" type="text/css" media="all" />
+	<script src='assets/js/funciones.js'></script>
 <script>
 function popup(mylink, windowname)
 {
