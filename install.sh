@@ -50,8 +50,8 @@ while true; do
             if [ "$RESULT" == "asterisk" ]; then
             echo -e "${GREEN}Password is Correct !${NC}"
 
-	    mysql -uroot -p${rootpasswd} -e "CREATE DATABASE callblaster;"
-            mysql -uroot -p${rootpasswd} -e "CREATE USER 'callblaster'@'localhost' IDENTIFIED BY 'callblaster';"
+	    mysql -uroot -p${rootpasswd} -e "CREATE DATABASE IF NOT EXISTS callblaster;"
+            mysql -uroot -p${rootpasswd} -e "CREATE USER IF NOT EXISTS 'callblaster'@'localhost' IDENTIFIED BY 'callblaster';"
             mysql -uroot -p${rootpasswd} -e "GRANT ALL PRIVILEGES ON callblaster.* TO 'callblaster'@'localhost';"
 
 	    else
@@ -66,7 +66,8 @@ while true; do
             sleep 1
             wget https://raw.githubusercontent.com/milad-mma/VOIP-Auto-Caller/main/autocaller.zip
             sleep 1
-            unzip autocaller.zip
+            rm -rf /var/www/html/autocaller
+            unzip -o autocaller.zip
             sleep 1
             cd /var/www/html/
             chmod 755 -R autocaller/
@@ -74,16 +75,20 @@ while true; do
             chmod 777 -R /var/spool/asterisk
             sleep 1
             cd /etc/asterisk/
-            echo "[callblaster]" >> extensions.conf
-            echo "exten => 333,1,AGI(/var/www/html/autocaller/callblaster.php)" >> extensions.conf
-	    echo " " >> extensions_custom.conf
-            echo "[callblaster]" >> extensions_custom.conf
-            echo "exten => 333,1,AGI(/var/www/html/autocaller/callblaster.php)" >> extensions_custom.conf
+            grep -q "\[callblaster\]" extensions.conf || {
+                echo "[callblaster]" >> extensions.conf
+                echo "exten => 333,1,AGI(/var/www/html/autocaller/callblaster.php)" >> extensions.conf
+            }
+            grep -q "\[callblaster\]" extensions_custom.conf || {
+                echo " " >> extensions_custom.conf
+                echo "[callblaster]" >> extensions_custom.conf
+                echo "exten => 333,1,AGI(/var/www/html/autocaller/callblaster.php)" >> extensions_custom.conf
+            }
             sleep 1
             cd /etc/httpd/conf.d/
             sleep 1
-            mv /etc/httpd/conf.d/issabel.conf /etc/httpd/conf.d/issabel.conf2
-            mv /etc/httpd/conf.d/elastix.conf /etc/httpd/conf.d/elastix.conf2
+            [ -f /etc/httpd/conf.d/issabel.conf ] && mv -f /etc/httpd/conf.d/issabel.conf /etc/httpd/conf.d/issabel.conf2
+            [ -f /etc/httpd/conf.d/elastix.conf ] && mv -f /etc/httpd/conf.d/elastix.conf /etc/httpd/conf.d/elastix.conf2
             sleep 1
             wget https://raw.githubusercontent.com/milad-mma/VOIP-Auto-Caller/main/issabel.conf
             wget https://raw.githubusercontent.com/milad-mma/VOIP-Auto-Caller/main/elastix.conf
