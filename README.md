@@ -12,7 +12,7 @@ Attention: You should have a SIP trunk number to use this script. If you have an
 # Install Service: SSH remote on Issabel or Elastix
 
 ```
-wget https://raw.githubusercontent.com/miladonline1/Auto-Caller/main/install.sh && chmod 755 install.sh && sh install.sh
+wget https://raw.githubusercontent.com/miladonline1/VOIP-Auto-Caller/main/install.sh && chmod 755 install.sh && sh install.sh
 ```
 
 Attention: First be sure what your MySQL root password is! If you enter the wrong password, the script can't work.
@@ -21,7 +21,7 @@ Attention: First be sure what your MySQL root password is! If you enter the wron
 
 Open this URL **without https**: `[issabel_or_elastix ip]/autocaller`
 
-![This is an image](https://raw.githubusercontent.com/miladonline1/Auto-Caller/main/ISSABEL-Auto-Dialler.jpg)
+![This is an image](https://raw.githubusercontent.com/miladonline1/VOIP-Auto-Caller/main/ISSABEL-Auto-Dialler.jpg)
 
 # HELP
 
