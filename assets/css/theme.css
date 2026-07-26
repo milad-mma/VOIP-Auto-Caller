@@ -106,7 +106,33 @@ a:hover {
   color: var(--brand-primary-hover);
 }
 
-/* جدول‌ها */
+/* منوی ناوبری اصلی */
+.main-nav {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.main-nav a {
+  color: var(--brand-text-light) !important;
+  text-decoration: none;
+  font-size: 13px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: background 0.2s, color 0.2s;
+  white-space: nowrap;
+}
+
+.main-nav a i {
+  margin-left: 5px;
+}
+
+.main-nav a:hover {
+  background: rgba(255,255,255,0.1);
+  color: var(--brand-accent) !important;
+}
+
 .table th {
   background: var(--brand-bg-dark) !important;
   color: var(--brand-text-light) !important;
