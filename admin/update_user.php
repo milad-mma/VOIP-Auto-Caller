@@ -221,7 +221,7 @@ if(!isset($_GET['id']))
     <!-- jQuery 2.1.4 -->
     <script src="../plugins/jQuery/jQuery-2.1.4.min.js"></script>
     <!-- Bootstrap 3.3.5 -->
-    <script src="../bootstrap/js/bootstrap.min.js"></script>
+    <script src="../assets/js/bootstrap/bootstrap.min.js"></script>
     <!-- DataTables -->
     <script src="../plugins/datatables/jquery.dataTables.min.js"></script>
     <script src="../plugins/datatables/dataTables.bootstrap.min.js"></script>

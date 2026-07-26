@@ -2489,7 +2489,7 @@ function signupUser($value_arr)
 	$email=$value_arr[1]; 
 	$password=$value_arr[2];
 	$original_password=$value_arr[2];
-	$profile_image = "image/avtar.png";
+	$profile_image = "assets/img/avtar.png";
 	if($password)
 	{
 		$password = md5($password);
@@ -2545,7 +2545,7 @@ function createUser($value_arr)
 	$call_log=$value_arr[10];
 	
 	$original_password=$value_arr[2];
-	$profile_image = "image/avtar.png";
+	$profile_image = "assets/img/avtar.png";
 	if($password)
 	{
 		$password = md5($password);

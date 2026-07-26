@@ -116,8 +116,8 @@ $VBCallLimit = getVBCallLimit();
         </nav>
 
 <link rel="stylesheet" type="text/css" href="../dist/css/csshack.css">
-		<script type="text/javascript" src="../toastr/toastr.min.js"></script>
-		<link rel="stylesheet" type="text/css" href="../toastr/toastr.css">
+		<script type="text/javascript" src="../assets/js/toastr/toastr.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="../assets/css/toastr/toastr.css">
 		
       </header>
 

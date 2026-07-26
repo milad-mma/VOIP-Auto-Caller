@@ -1,5 +1,6 @@
-<link rel="stylesheet" href="../bootstrap/css/bootstrap.min.css">
-<link rel="stylesheet" href="../dist/font-awesome/css/font-awesome.css">
+<link rel="stylesheet" href="../assets/css/theme.css">
+<link rel="stylesheet" href="../assets/css/bootstrap/bootstrap.min.css">
+<link rel="stylesheet" href="../assets/css/font-awesome.min.css">
 <link rel="stylesheet" href="../dist/Ionicons/css/ionicons.min.css">
 <link rel="stylesheet" href="../dist/css/skins/_all-skins.min.css">
 <link rel="stylesheet" href="../plugins/morris/morris.css">

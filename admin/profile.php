@@ -3,7 +3,7 @@
 <head>
      <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
 	<title>Asterisk Dialer</title>
-	<link rel="stylesheet" href="../css/style.css" type="text/css" media="all" />
+	<link rel="stylesheet" href="../assets/css/style.css" type="text/css" media="all" />
 	<script src='funciones.js'></script>
 <script>
 function popup(mylink, windowname)
@@ -536,8 +536,8 @@ function resize($width, $height, $i){
 <!DOCTYPE html>
 <html>
 <head>
-<link rel="stylesheet" href="../css/font-awesome.min.css">
-<link rel="stylesheet" href="../css/theme.css">
+<link rel="stylesheet" href="../assets/css/font-awesome.min.css">
+<link rel="stylesheet" href="../assets/css/theme.css">
 
 <style>
 body {

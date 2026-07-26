@@ -18,16 +18,17 @@ if(!$user_id)
   <head>
     <meta charset="utf-8">
    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TechExtension | Log in</title>
+    <title>Auto Caller | Log in</title>
     <!-- Tell the browser to be responsive to screen width -->
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-	<link rel="stylesheet" href="../dist/login/bootstrap.min.css">
-	<link rel="stylesheet" href="../dist/login/fontawesome-all.min.css">
-	<link rel="stylesheet" href="../dist/login/style.css">
-	<link rel="stylesheet" href="../dist/login/theme.css">
+	<link rel="stylesheet" href="../assets/css/bootstrap.min.css">
+	<link rel="stylesheet" href="../assets/css/font-awesome.min.css">
+	<link rel="stylesheet" href="../assets/css/login.css">
+	<link rel="stylesheet" href="../assets/css/theme.css">
 	
-	<link rel="stylesheet" type="text/css" href="../toastr/toastr.css">
-	<link rel="icon" href="../image/favicon.ico" type="image/x-icon">
+	<link rel="stylesheet" type="text/css" href="../assets/css/toastr/toastr.css">
+	<link rel="icon" href="../assets/img/brand/favicon.svg" type="image/svg+xml">
+	<link rel="alternate icon" href="../assets/img/brand/favicon.ico" type="image/x-icon">
   </head>
   <body>
 
@@ -37,9 +38,8 @@ if(!$user_id)
             <div class="img-holder">
                 <div class="bg"></div>
                 <div class="info-holder">
-                    <h3>Above and Beyond The Call.</h3>
-                    <p>Smarter Business Solutions. Better Customer Relations.</p>
-                    <img src="../dist/login/graphic5.svg" alt="">
+                    <h3>Auto Caller</h3>
+                    <p>سامانه تماس‌گیر خودکار - پنل مدیریت</p>
                 </div>
             </div>
             <div class="form-holder">
@@ -48,7 +48,7 @@ if(!$user_id)
                         <div class="website-logo-inside">
                             <a href="index.php">
                                 <div class="logo">
-                                    <img class="logo-size" src="../dist/images/techextension-logo.jpg" alt="">
+                                    <img class="logo-size" src="../assets/img/brand/logo.svg" alt="Auto Caller">
                                 </div>
                             </a>
                         </div>
@@ -76,11 +76,9 @@ if(!$user_id)
     </div>
 
 
-    <script src="../plugins/jQuery/jQuery-2.1.4.min.js"></script>
-    <script src="../bootstrap/js/bootstrap.min.js"></script>
-    <script src="../dist/login/popper.min.js"></script>
-	<script src="../dist/login/main.js"></script>
-<script type="text/javascript" src="../toastr/toastr.min.js"></script>
+    <script src="../assets/js/vendor/jquery.min.js"></script>
+    <script src="../assets/js/bootstrap/bootstrap.min.js"></script>
+<script type="text/javascript" src="../assets/js/toastr/toastr.min.js"></script>
   </body>
   </html>
 <?php
