@@ -24,7 +24,7 @@ $GLOBALS['con']  = mysqli_connect($sql_details['host'],$sql_details['user'],$sql
 			 //echo $query;
 			// exit;
              $res=mysqli_query($GLOBALS['con'],$query);
-             $fet=mysql_fetch_assoc($res); 
+             $fet=mysqli_fetch_assoc($res); 
              return $query;
         }
         function select_mul_records($to_fetch,$where_cond,$tablename){
@@ -100,7 +100,7 @@ $GLOBALS['con']  = mysqli_connect($sql_details['host'],$sql_details['user'],$sql
 		/*---------------------Start of SQL INJECTION PROTECTION---------------------------*/
         function SecureAttack($string)
         {     
-          $cleanstring = mysql_real_escape_string($string);
+          $cleanstring = mysqli_real_escape_string($GLOBALS['con'], $string);
           return $cleanstring;
         }
 		
