@@ -1,6 +1,6 @@
 # Auto Caller
 
- [English Version](https://github.com/miladonline1/VOIP-Auto-Caller#readme)
+ [English Version](https://github.com/milad-mma/VOIP-Auto-Caller#readme)
 
 # تماس گیر خودکار برای ایزابل و الستیکس 
 
@@ -23,7 +23,7 @@
 
 
 ```
-wget https://raw.githubusercontent.com/miladonline1/VOIP-Auto-Caller/main/install.sh && chmod 755 install.sh && sh install.sh
+wget https://raw.githubusercontent.com/milad-mma/VOIP-Auto-Caller/main/install.sh && chmod 755 install.sh && sh install.sh
 
 ```
 

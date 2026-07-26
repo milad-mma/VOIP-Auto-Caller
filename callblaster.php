@@ -33,7 +33,7 @@ $msg = date("r",time()). " -- Call in progress -- Number:$userNumber  -- Audio:$
 file_put_contents($basepath."logs/callLog.txt",$msg,FILE_APPEND);
 
 $query = "update logs set status='Connected' where autoID='$dbid'";
-$result = mysql_query($query) or die("Database Error");
+$result = mysqli_query($connection, $query) or die("Database Error");
 
 $keys="Nil";
 $count=0;
@@ -49,7 +49,7 @@ do
 
 
 $query = "update logs set options='$keys' where autoID='$dbid'";
-$result = mysql_query($query) or die("Database Error");
+$result = mysqli_query($connection, $query) or die("Database Error");
 $msg = date("r",time()). " -- User pressed $keys -- Number:$userNumber  -- Audio:$audio\n";
 file_put_contents($basepath."logs/callLog.txt",$msg,FILE_APPEND);
 if($keys==1 or $keys=="1")
@@ -58,19 +58,19 @@ if($keys==1 or $keys=="1")
 	$agi->exec_goto($context_1,$exten_1,$priority_1);
 
 	$query = "update logs set status='Transferred' where autoID='$dbid'";
-	$result = mysql_query($query) or die("Database Error");
+	$result = mysqli_query($connection, $query) or die("Database Error");
 }
 if($keys==2 or $keys=="2")
 {
 	$agi->exec_goto($context_2,$exten_2,$priority_2);
 	
 	$query = "update logs set status='Transferred' where autoID='$dbid'";
-	$result = mysql_query($query) or die("Database Error");
+	$result = mysqli_query($connection, $query) or die("Database Error");
 
 
 }
 
 $query = "update logs set status='Completed' where autoID='$dbid'";
-$result = mysql_query($query) or die("Database Error");
+$result = mysqli_query($connection, $query) or die("Database Error");
 
 ?>

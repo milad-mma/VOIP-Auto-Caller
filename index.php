@@ -1,3 +1,10 @@
+<?php
+session_start();
+if (!isset($_SESSION['tech_admin_id']) || empty($_SESSION['tech_admin_id'])) {
+    header("Location: login.php");
+    exit;
+}
+?>
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 
@@ -46,6 +53,7 @@ function checkTime(i) {
 	<title>Auto Caller</title>
 	<link rel="stylesheet" href="assets/css/style.css" type="text/css" media="all" />
 	<link rel="stylesheet" href="assets/css/theme.css" type="text/css" media="all" />
+	<link rel="stylesheet" href="assets/css/font-awesome.min.css" type="text/css" media="all" />
 	<script src='assets/js/funciones.js'></script>
 <script>
 function popup(mylink, windowname)
@@ -76,7 +84,15 @@ return false;
 			<h1><a href="index.php" class="brand-text-logo"><img src="assets/img/brand/logo.svg" alt="Auto Caller" height="34"></a></h1>
 			<div id="top-navigation">
 			
-				<strong><a href="apii.php"> [ A P I ] # </a></strong>
+				<nav class="main-nav">
+					<a href="index.php"><i class="fa fa-dashboard"></i> داشبورد</a>
+					<a href="audioFile.php"><i class="fa fa-microphone"></i> فایل‌های صوتی</a>
+					<a href="admins.php"><i class="fa fa-users"></i> مدیریت کاربران</a>
+					<a href="profile.php"><i class="fa fa-user"></i> پروفایل من</a>
+					<a href="help.php"><i class="fa fa-question-circle"></i> راهنما</a>
+					<a href="apii.php"><i class="fa fa-code"></i> API</a>
+					<a href="logout.php"><i class="fa fa-sign-out"></i> خروج</a>
+				</nav>
 				
 			
 				
@@ -482,6 +498,15 @@ return false;
 			<h1><a href="index.php" class="brand-text-logo"><img src="assets/img/brand/logo.svg" alt="Auto Caller" height="34"></a></h1>
 			<div id="top-navigation">
 				
+				<nav class="main-nav">
+					<a href="index.php"><i class="fa fa-dashboard"></i> داشبورد</a>
+					<a href="audioFile.php"><i class="fa fa-microphone"></i> فایل‌های صوتی</a>
+					<a href="admins.php"><i class="fa fa-users"></i> مدیریت کاربران</a>
+					<a href="profile.php"><i class="fa fa-user"></i> پروفایل من</a>
+					<a href="help.php"><i class="fa fa-question-circle"></i> راهنما</a>
+					<a href="apii.php"><i class="fa fa-code"></i> API</a>
+					<a href="logout.php"><i class="fa fa-sign-out"></i> خروج</a>
+				</nav>
 				<span>Version:2.1   </span>
 				<span>  </span>
                                 

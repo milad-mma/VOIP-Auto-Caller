@@ -20,13 +20,13 @@ if($_REQUEST['action']=="getLog")
 	
 	$query = "select * from logs where csvFile='$file' and type='heading'";
 
-	$result = mysql_query($query);
+	$result = mysqli_query($connection, $query);
 	
 	$ret='<table cellspacing="5" cellpadding="5"><thead>';
 
-	if($result and mysql_num_rows($result)>0)
+	if($result and mysqli_num_rows($result)>0)
 	{
-		$row = mysql_fetch_assoc($result);
+		$row = mysqli_fetch_assoc($result);
 		$head = explode(",",$row['fields']);
 		
 		for($i=0;$i<count($head);$i++)
@@ -38,13 +38,13 @@ if($_REQUEST['action']=="getLog")
 	$ret.="</thead>";
 	
 	$query = "select * from logs where csvFile='$file' and type='field' and status!='Completed' and time>DATE_SUB(NOW(),INTERVAL 5 MINUTE)";
-	$result = mysql_query($query);
+	$result = mysqli_query($connection, $query);
 	
-	if($result and mysql_num_rows($result)>0)
+	if($result and mysqli_num_rows($result)>0)
 	{
-		for($i=0;$i<mysql_num_rows($result);$i++)
+		for($i=0;$i<mysqli_num_rows($result);$i++)
 		{
-			$row=mysql_fetch_assoc($result);
+			$row=mysqli_fetch_assoc($result);
 			$fields = explode(",",$row['fields']);
 			$ret.="<tr align='center'>";
 			for($j=0;$j<count($fields);$j++)

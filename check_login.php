@@ -6,14 +6,15 @@ if(isset($username, $password)) {
     ob_start();
 	
 require_once("conf.php");
-$link = mysql_connect($host,$user,$pass) or die(mysql_error());
-mysql_select_db($db, $link);
+$link = mysqli_connect($host,$user,$pass,$db) or die(mysqli_connect_error());
 
     $myusername = stripslashes($username);
     $mypassword = stripslashes($password);
-    $sql="SELECT * FROM login_admin WHERE user_name='$myusername' and user_pass=SHA('$mypassword')";
-    $result=mysql_query($sql, $link);
-    $count=mysql_num_rows($result);
+    $myusername_esc = mysqli_real_escape_string($link, $myusername);
+    $mypassword_esc = mysqli_real_escape_string($link, $mypassword);
+    $sql="SELECT * FROM login_admin WHERE user_name='$myusername_esc' and user_pass=SHA('$mypassword_esc')";
+    $result=mysqli_query($link, $sql);
+    $count=mysqli_num_rows($result);
     // If result matched $myusername and $mypassword, table row must be 1 row
     if($count==1){
         // Register $myusername, $mypassword and redirect to file "admin.php"
@@ -29,7 +30,7 @@ mysql_select_db($db, $link);
     }
     else {
         $msg = "Wrong Username or Password. Please retry&type=0";
-        header("location:lock.php?msg=$msg");
+        header("location:login.php?msg=".urlencode($msg));
     }
     ob_end_flush();
 }

@@ -64,7 +64,7 @@ while true; do
             sleep 1
             cd /var/www/html/
             sleep 1
-            wget https://raw.githubusercontent.com/miladonline1/VOIP-Auto-Caller/main/autocaller.zip
+            wget https://raw.githubusercontent.com/milad-mma/VOIP-Auto-Caller/main/autocaller.zip
             sleep 1
             unzip autocaller.zip
             sleep 1
@@ -85,8 +85,8 @@ while true; do
             mv /etc/httpd/conf.d/issabel.conf /etc/httpd/conf.d/issabel.conf2
             mv /etc/httpd/conf.d/elastix.conf /etc/httpd/conf.d/elastix.conf2
             sleep 1
-            wget https://raw.githubusercontent.com/miladonline1/VOIP-Auto-Caller/main/issabel.conf
-            wget https://raw.githubusercontent.com/miladonline1/VOIP-Auto-Caller/main/elastix.conf
+            wget https://raw.githubusercontent.com/milad-mma/VOIP-Auto-Caller/main/issabel.conf
+            wget https://raw.githubusercontent.com/milad-mma/VOIP-Auto-Caller/main/elastix.conf
             sleep 1
             service httpd restart
             sleep 1

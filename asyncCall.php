@@ -36,7 +36,7 @@ if(file_exists($argv[1]))
 	$itemCount = count($csv,0);
 	$fields=implode(",",$csv[0]);
 	$query = "insert into logs(fields,time,status,options,type,csvFile) values('$fields',NOW(),'upload','Nil','heading','$dest')";
-	$result = mysql_query($query) or die("Database Error");
+	$result = mysqli_query($connection, $query) or die("Database Error");
 
 	
 	
@@ -62,8 +62,8 @@ if(file_exists($argv[1]))
 		$audio = $csv[$i][$audioIndex];
 		$fields = implode(",",$csv[$i]);
 		$query = "insert into logs(fields,time,status,options,type,csvFile) values('$fields',NOW(),'Dialling','Nil','field','$dest')";
-		$result = mysql_query($query) or die("Database Error");
-		$id = mysql_insert_id();
+		$result = mysqli_query($connection, $query) or die("Database Error");
+		$id = mysqli_insert_id($connection);
 		$phone = $number;
 		$phone=substr($phone,0,15);
 		$callFile = "Channel: local/$prefix$phone@from-internal\r\n";
@@ -91,7 +91,7 @@ if(file_exists($argv[1]))
 		}
 		
 		$query = "update logs set status='$status', time=NOW() where autoID='$id'";
-		$result = mysql_query($query) or die("Database Error");
+		$result = mysqli_query($connection, $query) or die("Database Error");
 		file_put_contents("logs/callLog.txt",$msg,FILE_APPEND);
 
 		//sleep($interval);
