@@ -1,0 +1,113 @@
+/* =========================================================
+   Auto Caller - Custom Theme
+   پالت: آبی/تیره حرفه‌ای | فونت: Vazirmatn (لوکال، بدون اینترنت)
+   ========================================================= */
+
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('fonts/Vazirmatn-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('fonts/Vazirmatn-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* پالت آبی/تیره حرفه‌ای (شرکتی) */
+  --brand-bg-dark:      #0b1d33;   /* پس‌زمینه‌ی تیره‌ی اصلی (هدر، ساید‌بار) */
+  --brand-bg-darker:    #071526;   /* تیره‌تر، برای کنتراست بیشتر */
+  --brand-primary:      #1f6feb;   /* آبی روشن اصلی (دکمه‌ها، لینک‌ها) */
+  --brand-primary-hover:#3b82f6;
+  --brand-accent:       #38bdf8;   /* آبی-فیروزه‌ای برای هایلایت */
+  --brand-text-light:   #f5f7fa;   /* متن روی پس‌زمینه‌ی تیره */
+  --brand-text-muted:   #9fb3c8;
+  --brand-bg-light:     #f4f7fb;   /* پس‌زمینه‌ی روشن محتوا */
+  --brand-border:       #1e3a5f;
+  --brand-success:      #22c55e;
+  --brand-danger:       #ef4444;
+}
+
+* {
+  font-family: 'Vazirmatn', Tahoma, Arial, sans-serif;
+}
+
+body {
+  background: var(--brand-bg-light);
+  color: #1a1a1a;
+}
+
+/* هدر / نوار بالا */
+#header {
+  background: var(--brand-bg-dark) !important;
+}
+
+#top-navigation a {
+  color: var(--brand-text-light) !important;
+}
+
+#top-navigation span {
+  color: var(--brand-accent) !important;
+}
+
+#navigation ul li a {
+  color: var(--brand-text-light) !important;
+}
+
+#navigation ul li a.active {
+  color: var(--brand-accent) !important;
+}
+
+/* لوگوی متنی */
+.brand-text-logo {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--brand-text-light);
+  letter-spacing: 0.5px;
+  text-decoration: none;
+}
+
+.brand-text-logo span {
+  color: var(--brand-accent);
+}
+
+/* جعبه‌ها و باکس‌ها */
+.box-head {
+  background: var(--brand-bg-dark) !important;
+}
+
+/* دکمه‌ها */
+.btn,
+button[type="submit"],
+input[type="submit"] {
+  background: var(--brand-primary) !important;
+  color: #fff !important;
+  border: none !important;
+}
+
+.btn:hover,
+button[type="submit"]:hover,
+input[type="submit"]:hover {
+  background: var(--brand-primary-hover) !important;
+}
+
+/* لینک‌ها */
+a {
+  color: var(--brand-primary);
+}
+
+a:hover {
+  color: var(--brand-primary-hover);
+}
+
+/* جدول‌ها */
+.table th {
+  background: var(--brand-bg-dark) !important;
+  color: var(--brand-text-light) !important;
+}
