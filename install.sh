@@ -30,7 +30,8 @@ while true; do
     echo -e "${BLUE}|                      ${GREEN}Main Menu${BLUE}                   |${NC}"
     echo -e "${GREEN}|     ---------------------------------------      |${NC}"
     echo -e "${BLUE}|${YELLOW} 1.${NC} ${CYAN}INSTALL ${NC}                                      ${BLUE}|${NC}"
-    echo -e "${BLUE}|${YELLOW} 2.${NC} ${RED}QUIT${NC}                                          ${BLUE}|${NC}"
+    echo -e "${BLUE}|${YELLOW} 2.${NC} ${RED}UNINSTALL (remove everything)${NC}                ${BLUE}|${NC}"
+    echo -e "${BLUE}|${YELLOW} 3.${NC} ${RED}QUIT${NC}                                          ${BLUE}|${NC}"
     echo -e "${GREEN}|                                                  |${NC}"
     echo -e "${YELLOW}|                                                  |${NC}"
     echo -e "${YELLOW}+--------------------------------------------------+${NC}"
@@ -96,6 +97,49 @@ while true; do
             sleep 12
             ;;
         2)
+            echo -e "${RED}این کار تمام فایل‌های نصب‌شده، دیتابیس و تنظیمات مربوط به Auto Caller رو پاک می‌کنه.${NC}"
+            echo -e "${RED}This will permanently remove all installed files, the database, and related config.${NC}"
+            read -p "برای تایید حذف کامل، عبارت YES را وارد کنید (Type YES to confirm): " confirm
+            if [ "$confirm" != "YES" ]; then
+                echo -e "${YELLOW}لغو شد. Cancelled.${NC}"
+                sleep 2
+            else
+                echo "Please enter MySQL Root Password: "
+                read rootpasswd
+
+                # 1) حذف دیتابیس و کاربر دیتابیس
+                mysql -uroot -p${rootpasswd} -e "DROP DATABASE IF EXISTS callblaster;" 2>/dev/null
+                mysql -uroot -p${rootpasswd} -e "DROP USER IF EXISTS 'callblaster'@'localhost';" 2>/dev/null
+                echo -e "${GREEN}دیتابیس حذف شد.${NC}"
+
+                # 2) حذف فایل‌های نصب‌شده روی وب‌سرور
+                rm -rf /var/www/html/autocaller
+                rm -f /var/www/html/autocaller.zip
+                echo -e "${GREEN}فایل‌های پنل حذف شدن.${NC}"
+
+                # 3) حذف خط دایال‌پلن اضافه‌شده در Asterisk
+                sed -i '/\[callblaster\]/,+1d' /etc/asterisk/extensions.conf 2>/dev/null
+                sed -i '/\[callblaster\]/,+1d' /etc/asterisk/extensions_custom.conf 2>/dev/null
+                echo -e "${GREEN}تنظیمات دایال‌پلن حذف شد.${NC}"
+
+                # 4) بازگرداندن کانفیگ اصلی Apache (اگه نسخه‌ی بک‌آپ‌شده موجود باشه)
+                if [ -f /etc/httpd/conf.d/issabel.conf2 ]; then
+                    mv -f /etc/httpd/conf.d/issabel.conf2 /etc/httpd/conf.d/issabel.conf
+                fi
+                if [ -f /etc/httpd/conf.d/elastix.conf2 ]; then
+                    mv -f /etc/httpd/conf.d/elastix.conf2 /etc/httpd/conf.d/elastix.conf
+                fi
+                echo -e "${GREEN}تنظیمات Apache به حالت اولیه برگشت.${NC}"
+
+                # 5) ری‌استارت سرویس‌ها
+                service httpd restart
+                service asterisk restart
+
+                echo -e "${GREEN}Uninstall کامل شد. انگار هیچ‌وقت نصب نشده بود.${NC}"
+                sleep 3
+            fi
+            ;;
+        3)
             echo ""
             echo -e "${RED}Exiting...${NC}"
             exit 0
