@@ -78,6 +78,8 @@ while true; do
             # مسیرهایی که برنامه در حین اجرا روشون می‌نویسه (تنظیمات، کنترل کمپین، آپلود فایل، لاگ)
             chmod -R 775 "$APP_DIR/files" "$APP_DIR/logs" "$APP_DIR/callFiles" "$APP_DIR/tmp" 2>/dev/null
             chmod 664 "$APP_DIR/config.ini" "$APP_DIR/control.ini" 2>/dev/null
+            # callblaster.php مستقیم توسط Asterisk (AGI) به‌عنوان اسکریپت اجرا می‌شود، پس باید execute داشته باشد
+            chmod 755 "$APP_DIR/callblaster.php" 2>/dev/null
             # SELinux (روی CentOS/Rocky که Issabel/Elastix معمولاً روشه) - اجازه‌ی نوشتن به آپاچی می‌ده
             if command -v chcon >/dev/null 2>&1; then
                 chcon -R -t httpd_sys_rw_content_t "$APP_DIR" 2>/dev/null
