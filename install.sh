@@ -54,12 +54,15 @@ while true; do
             fi
             echo -e "${GREEN}MySQL credentials verified.${NC}"
 
+            echo -e "${CYAN}[1/6] Creating database and user...${NC}"
             mysql -uroot -p"${rootpasswd}" -e "CREATE DATABASE IF NOT EXISTS callblaster;"
             mysql -uroot -p"${rootpasswd}" -e "CREATE USER IF NOT EXISTS 'callblaster'@'localhost' IDENTIFIED BY 'callblaster';"
             mysql -uroot -p"${rootpasswd}" -e "GRANT ALL PRIVILEGES ON callblaster.* TO 'callblaster'@'localhost';"
+            echo -e "${GREEN}      done.${NC}"
 
-            command -v unzip >/dev/null 2>&1 || yum install -y unzip
+            command -v unzip >/dev/null 2>&1 || { echo -e "${CYAN}[2/6] Installing unzip...${NC}"; yum install -y unzip; }
 
+            echo -e "${CYAN}[2/6] Downloading application files...${NC}"
             cd /var/www/html/ || exit 1
             wget -q "https://raw.githubusercontent.com/${REPO}/main/autocaller.zip" -O autocaller.zip
             if [ ! -s autocaller.zip ]; then
@@ -67,11 +70,15 @@ while true; do
                 sleep 3
                 continue
             fi
+            echo -e "${GREEN}      done.${NC}"
 
+            echo -e "${CYAN}[3/6] Extracting files to ${APP_DIR}...${NC}"
             rm -rf "$APP_DIR"
             unzip -o -q autocaller.zip
             rm -f autocaller.zip
+            echo -e "${GREEN}      done.${NC}"
 
+            echo -e "${CYAN}[4/6] Setting file ownership and permissions...${NC}"
             chown -R asterisk:asterisk "$APP_DIR" 2>/dev/null
             find "$APP_DIR" -type d -exec chmod 775 {} \;
             find "$APP_DIR" -type f -exec chmod 664 {} \;
@@ -85,8 +92,9 @@ while true; do
                 chcon -R -t httpd_sys_rw_content_t "$APP_DIR" 2>/dev/null
             fi
             chmod -R 777 /var/spool/asterisk
+            echo -e "${GREEN}      done.${NC}"
 
-            # دایال‌پلن (فقط یک‌بار اضافه می‌شه، در نصب مجدد تکراری نمی‌شه)
+            echo -e "${CYAN}[5/6] Registering Asterisk dialplan...${NC}"
             grep -q "\[callblaster\]" /etc/asterisk/extensions.conf 2>/dev/null || {
                 {
                     echo "[callblaster]"
@@ -100,7 +108,9 @@ while true; do
                     echo "exten => 333,1,AGI(${APP_DIR}/callblaster.php)"
                 } >> /etc/asterisk/extensions_custom.conf
             }
+            echo -e "${GREEN}      done.${NC}"
 
+            echo -e "${CYAN}[6/6] Configuring Apache and restarting services...${NC}"
             # کانفیگ Apache اختصاصی
             [ -f /etc/httpd/conf.d/issabel.conf ] && mv -f /etc/httpd/conf.d/issabel.conf /etc/httpd/conf.d/issabel.conf.bak
             [ -f /etc/httpd/conf.d/elastix.conf ] && mv -f /etc/httpd/conf.d/elastix.conf /etc/httpd/conf.d/elastix.conf.bak
@@ -109,8 +119,10 @@ while true; do
 
             service httpd restart 2>/dev/null || systemctl restart httpd 2>/dev/null
             service asterisk restart 2>/dev/null || systemctl restart asterisk 2>/dev/null
+            echo -e "${GREEN}      done.${NC}"
 
-            echo -e "${GREEN}Installation complete.${NC}"
+            echo ""
+            echo -e "${GREEN}✔ Installation complete.${NC}"
             echo -e "${GREEN}Control panel: http://[server-ip]/autocaller${NC}"
             sleep 3
             ;;
@@ -128,15 +140,19 @@ while true; do
             read -s rootpasswd
             echo ""
 
+            echo -e "${CYAN}Removing database...${NC}"
             mysql -uroot -p"${rootpasswd}" -e "DROP DATABASE IF EXISTS callblaster;" 2>/dev/null
             mysql -uroot -p"${rootpasswd}" -e "DROP USER IF EXISTS 'callblaster'@'localhost';" 2>/dev/null
 
+            echo -e "${CYAN}Removing application files...${NC}"
             rm -rf "$APP_DIR"
             rm -f /var/www/html/autocaller.zip
 
+            echo -e "${CYAN}Removing dialplan entries...${NC}"
             sed -i '/\[callblaster\]/,+1d' /etc/asterisk/extensions.conf 2>/dev/null
             sed -i '/\[callblaster\]/,+1d' /etc/asterisk/extensions_custom.conf 2>/dev/null
 
+            echo -e "${CYAN}Restoring Apache config and restarting services...${NC}"
             [ -f /etc/httpd/conf.d/issabel.conf.bak ] && mv -f /etc/httpd/conf.d/issabel.conf.bak /etc/httpd/conf.d/issabel.conf
             [ -f /etc/httpd/conf.d/elastix.conf.bak ] && mv -f /etc/httpd/conf.d/elastix.conf.bak /etc/httpd/conf.d/elastix.conf
 
