@@ -1,0 +1,15 @@
+<script src="../assets/vendor/bootstrap/js/bootstrap.min.js"></script>
+<script src="../assets/vendor/plugins/chartjs/Chart.min.js"></script>
+<script src="../assets/vendor/plugins/fastclick/fastclick.min.js"></script>
+<script src="../assets/vendor/dist/js/app.min.js"></script>
+<script src="../assets/vendor/plugins/datatables/jquery.dataTables.min.js"></script>
+<script src="../assets/vendor/plugins/datatables/dataTables.bootstrap.min.js"></script>
+<script src="../assets/vendor/plugins/select2/select2.full.min.js"></script>
+<script src="../assets/vendor/plugins/input-mask/jquery.inputmask.js"></script>
+<script src="../assets/vendor/plugins/input-mask/jquery.inputmask.date.extensions.js"></script>
+<script src="../assets/vendor/plugins/input-mask/jquery.inputmask.extensions.js"></script>
+<script src="../assets/vendor/plugins/moment.min.js"></script>
+<script src="../assets/vendor/plugins/daterangepicker/daterangepicker.js"></script>
+<script src="../assets/vendor/plugins/bootstrap-datetimepicker.min.js"></script>
+<script src="../assets/vendor/plugins/iCheck/icheck.min.js"></script>
+ <script src="../assets/vendor/dist/js/dataTables.checkboxes.min.js"></script>
