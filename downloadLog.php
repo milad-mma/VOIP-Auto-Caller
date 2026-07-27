@@ -26,13 +26,13 @@ if(isset($_REQUEST['file']))
 	
 	$query = "select * from logs where csvFile='$file' and type='heading'";
 
-	$result = mysql_query($query);
+	$result = mysqli_query($connection, $query);
 	
 	$ret='';
 
-	if($result and mysql_num_rows($result)>0)
+	if($result and mysqli_num_rows($result)>0)
 	{
-		$row = mysql_fetch_assoc($result);
+		$row = mysqli_fetch_assoc($result);
 		$head = explode(",",$row['fields']);
 		
 		for($i=0;$i<count($head);$i++)
@@ -44,13 +44,13 @@ if(isset($_REQUEST['file']))
 	$ret.="\n";
 	
 	$query = "select * from logs where csvFile='$file' and type='field'";
-	$result = mysql_query($query);
+	$result = mysqli_query($connection, $query);
 	
-	if($result and mysql_num_rows($result)>0)
+	if($result and mysqli_num_rows($result)>0)
 	{
-		for($i=0;$i<mysql_num_rows($result);$i++)
+		for($i=0;$i<mysqli_num_rows($result);$i++)
 		{
-			$row=mysql_fetch_assoc($result);
+			$row=mysqli_fetch_assoc($result);
 			$fields = explode(",",$row['fields']);
 			
 			for($j=0;$j<count($fields);$j++)

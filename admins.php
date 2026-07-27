@@ -79,13 +79,12 @@ return false;
 
 <?php        
              require_once("conf.php");
-             $link = mysql_connect($host,$user,$pass) or die(mysql_error());
-             mysql_select_db($db, $link);
+             $link = mysqli_connect($host,$user,$pass,$db) or die(mysqli_connect_error());
 			// $link = mysql_connect("localhost","dialeruser","dialerpass") or die(mysql_error());
 		    //    mysql_select_db("dialerdb", $link);
 			$sql="SELECT user_name FROM login_admin order by user_name asc";
-			$res=mysql_query($sql,$link) or die (mysql_error());
-			$fields_num = mysql_num_fields($res);		
+			$res=mysqli_query($link, $sql) or die (mysqli_error($link));
+			$fields_num = mysqli_num_fields($res);		
 			
 			echo"	<!-- Content -->
 				<div id='sidebar'>
@@ -105,13 +104,13 @@ return false;
 			echo "<tr>";
 			for($i=0; $i<$fields_num; $i++)
 			{
-				$field = mysql_fetch_field($res);
+				$field = mysqli_fetch_field($res);
 			    	echo "<th><b>{$field->name}</b></th>";
 			}
 			echo "<th>Control</th>";
 			echo "</tr>\n";
 			$id="test";
-			while($row = mysql_fetch_row($res))
+			while($row = mysqli_fetch_row($res))
 			{
 				echo "<tr>";
 
@@ -123,7 +122,7 @@ echo '<a href=\'editadmin.php?desc='.$cell.'\' onclick="return popup(this,\'wind
 			}
 
  			 echo "</table></div></div></div></form></div></div>";
-			mysql_free_result($result);
+			mysqli_free_result($res);
 			?>
 
 			
@@ -156,11 +155,10 @@ echo '<a href=\'editadmin.php?desc='.$cell.'\' onclick="return popup(this,\'wind
      require_once("conf.php");
 
 
-		$link = mysql_connect($host,$user,$pass) or die(mysql_error());
-		mysql_select_db($db, $link);
+		$link = mysqli_connect($host,$user,$pass,$db) or die(mysqli_connect_error());
 
 		$sql1 = "INSERT INTO login_admin (user_name,user_pass) VALUES('$username',SHA('$password'))";
-		$result = mysql_query($sql1,$link) or die(mysql_error());
+		$result = mysqli_query($link, $sql1) or die(mysqli_error($link));
 
 	
 

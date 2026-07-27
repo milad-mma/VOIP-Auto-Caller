@@ -100,7 +100,7 @@ return false;
 * See COPYRIGHT.txt and LICENSE.txt.
 *
 *....................
-* www.nethram.com
+* imapro.ir
 */
 require_once('config.php');
 error_reporting(E_ALL);

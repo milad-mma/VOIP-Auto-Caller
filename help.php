@@ -131,7 +131,7 @@ button {
 * See COPYRIGHT.txt and LICENSE.txt.
 *
 *....................
-* www.nethram.com
+* imapro.ir
 */
 
 require_once ('config.php');

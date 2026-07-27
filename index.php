@@ -139,12 +139,12 @@ button {
 * See COPYRIGHT.txt and LICENSE.txt.
 *
 *....................
-* www.nethram.com
+* imapro.ir
 */
 
 require_once ('config.php');
 
-if($_POST['action']=="Save")
+if(isset($_POST['action']) && $_POST['action']=="Save")
 {
 	$content = "[callblaster]\n"."interval=".$_POST['interval']."\n[press1]\n"."context=".$_POST['context1']."\n"."extension=".$_POST['exten1']."\n";
 	$content.= "[press2]\n"."context=".$_POST['context2']."\n"."extension=".$_POST['exten2']."\n[waittimes]\n"."waittime=".$_POST['waittime']."\n[prefixc]\n"."prefix=".$_POST['prefix']."\n"."\n[callid]\n"."caller_id=".$_POST['caller_id']."\n";

@@ -2,7 +2,7 @@
 session_start();
 
 if (!(isset($_SESSION['login']) && $_SESSION['login'] != '')) {
-header ("Location: lock.php");
+header("Location: login.php");
 }else{ //Continue to current page
 header( 'Content-Type: text/html; charset=utf-8' );
 }
@@ -66,11 +66,10 @@ require_once("conf.php");
 		$username=$_POST["username"];
 		$password=$_POST["password"];
 
-		$link = mysql_connect($host,$user,$pass) or die(mysql_error());
-		mysql_select_db($db, $link);
+		$link = mysqli_connect($host,$user,$pass,$db) or die(mysqli_connect_error());
 
 		$sql1 = "UPDATE login_admin set user_pass=SHA('$password') where user_name='$username'";
-		$result = mysql_query($sql1,$link) or die(mysql_error());
+		$result = mysqli_query($link, $sql1) or die(mysqli_error($link));
 
 
 		$_POST['username'] = '';
@@ -100,12 +99,11 @@ require_once("conf.php");
 						//$link = mysql_connect("localhost","dialeruser","dialerpass") or die (mysql_error());
 					    //   mysql_select_db("dialerdb", $link);
 						require_once("conf.php");
-                        $link = mysql_connect($host,$user,$pass) or die(mysql_error());
-                        mysql_select_db($db, $link);
+                        $link = mysqli_connect($host,$user,$pass,$db) or die(mysqli_connect_error());
 						$sql="SELECT user_name,user_pass FROM login_admin WHERE user_name='$desc'";
 
-						$res = mysql_query($sql,$link) or die(mysql_error());
-						$row = mysql_fetch_assoc($res);
+						$res = mysqli_query($link, $sql) or die(mysqli_error($link));
+						$row = mysqli_fetch_assoc($res);
 						$username=$row['user_name'];
 						$password=$row['password'];
 

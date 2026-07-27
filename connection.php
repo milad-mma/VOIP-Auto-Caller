@@ -11,8 +11,7 @@
 
 require_once'config.php';
 
-$connection = mysql_connect($db_host,$db_user,$db_pass) or die("ERROR connecting to database");
-mysql_select_db($db_name) or die("Error connecting to database");
+$connection = mysqli_connect($db_host,$db_user,$db_pass,$db_name) or die("ERROR connecting to database");
 
 $query="CREATE TABLE IF NOT EXISTS `logs` (
   `autoID` int(11) NOT NULL AUTO_INCREMENT,
@@ -26,7 +25,7 @@ $query="CREATE TABLE IF NOT EXISTS `logs` (
 ) ENGINE=MyISAM  DEFAULT CHARSET=latin1 AUTO_INCREMENT=63089 ;
 ";
 
-mysql_query($query);
+mysqli_query($connection, $query);
 
 
 ?>
