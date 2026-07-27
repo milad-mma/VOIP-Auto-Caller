@@ -1,0 +1,44 @@
+
+
+.techextension-click-to-call-icon	{
+    display:none;
+    position:absolute;
+    z-index:9999;
+    width:27px;
+    height:25px;
+    left:200px;
+    background:url(../images/icon-phone.png) center center no-repeat;
+}
+
+.techextension-message-box{
+    position:fixed !important;
+    z-index:9999 !important;
+    top:20% !important;
+    padding:10px !important;
+    left:50% !important;
+    margin:0 0 0 -250px !important;
+    background: transparent url(../images/pop_up_background.png);
+    height:80px;
+}
+.techextension-message-box div{
+    position:relative !important;
+    width:200px !important;
+
+    padding: 5px 15px 5px 65px !important;
+    color:#333 !important; font:normal 14px Verdana, Geneva, Arial, Helvetica, sans-serif !important;
+    background: transparent url(../images/pop_up_background.png);
+}
+
+.techextension-message-box p{
+    width: 50px !important;
+    height: 50px !important;
+    position: absolute !important;
+    top: -10px !important;
+    margin-right: -10px !important;
+}
+.techextension-message-box p a{	
+    display:inline-block !important;
+    color:#333 !important;
+    text-decoration:none !important;
+ }
+	
