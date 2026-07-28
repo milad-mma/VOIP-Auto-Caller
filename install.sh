@@ -159,7 +159,8 @@ while true; do
             service httpd restart 2>/dev/null || systemctl restart httpd 2>/dev/null
             service asterisk restart 2>/dev/null || systemctl restart asterisk 2>/dev/null
 
-            echo -e "${GREEN}Uninstall complete.${NC}"
+            echo ""
+            echo -e "${GREEN}✔ Uninstall complete.${NC}"
             sleep 3
             ;;
 
