@@ -121,10 +121,20 @@ while true; do
             service asterisk restart 2>/dev/null || systemctl restart asterisk 2>/dev/null
             echo -e "${GREEN}      done.${NC}"
 
+            # از این به بعد خود اسکریپت رو داخل پوشه‌ی پروژه نگه می‌داریم، نه توی /root
+            SCRIPT_PATH="$(readlink -f "$0" 2>/dev/null || echo "$0")"
+            if [ "$SCRIPT_PATH" != "$APP_DIR/install.sh" ]; then
+                cp -f "$SCRIPT_PATH" "$APP_DIR/install.sh" 2>/dev/null
+                chmod 755 "$APP_DIR/install.sh" 2>/dev/null
+                rm -f -- "$SCRIPT_PATH"
+            fi
+
             echo ""
             echo -e "${GREEN}✔ Installation complete.${NC}"
             echo -e "${GREEN}Control panel: http://[server-ip]/autocaller${NC}"
-            sleep 3
+            echo -e "${YELLOW}From now on, manage this app with: cd ${APP_DIR} && ./install.sh${NC}"
+            echo ""
+            read -p "Press Enter to return to the menu..." _
             ;;
 
         2)
@@ -161,7 +171,12 @@ while true; do
 
             echo ""
             echo -e "${GREEN}✔ Uninstall complete.${NC}"
-            sleep 3
+            SCRIPT_PATH="$(readlink -f "$0" 2>/dev/null || echo "$0")"
+            echo -e "${YELLOW}Removing this installer script (${SCRIPT_PATH})...${NC}"
+            echo ""
+            read -p "Press Enter to exit..." _
+            rm -f -- "$SCRIPT_PATH"
+            exit 0
             ;;
 
         3)

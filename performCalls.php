@@ -91,13 +91,23 @@ if($_POST['action']=="Start Campain")
 		{
 			$config = parse_ini_file("config.ini",true);
 			$interval = $config['callblaster']['interval'];
-			$number = $csv[$i][$phoneIndex];
+			$number = trim($csv[$i][$phoneIndex]);
+			$number = preg_replace('/\D/', '', $number); // فقط ارقام (حذف فاصله/خط‌تیره/کاراکتر اضافه)
 			$audio = $csv[$i][$audioIndex];
 			$fields = implode(",",$csv[$i]);
 			$query = "insert into logs(fields,time,status,options,type,csvFile) values('$fields',NOW(),'Dialling','Nil','field','$dest')";
 			$result = mysqli_query($connection, $query) or die("Database Error");
 			$id = mysqli_insert_id($connection);
 			$phone = $number;
+			// اگه شماره با پیشوند خروجی تنظیم‌شده (مثلاً 9) شروع نشده باشه، خودکار اضافه می‌شه
+			// شماره‌ی خام موبایل بدون صفر (مثلاً 9123456789) -> prefix + 0 + شماره (مثلاً 909123456789)
+			if($prefix !== '' && strpos($phone, $prefix) !== 0) {
+				if(substr($phone,0,1) === '0') {
+					$phone = $prefix.$phone;
+				} else {
+					$phone = $prefix.'0'.$phone;
+				}
+			}
 			$phone=substr($phone,0,15);
 			$callFile = "Channel: local/$phone@from-internal\n";
 			$callFile .= "MaxRetries: 2\n";

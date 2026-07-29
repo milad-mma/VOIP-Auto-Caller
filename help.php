@@ -272,7 +272,7 @@ direction:rtl;
   </tr>
   <tr>
   
-    <td>Call Back To Extension Press 1 or 2 *</td>
+    <td>Call Back To Extension: Press 1-9 *</td>
     <td>:Extension</td>
   </tr>
   <tr>

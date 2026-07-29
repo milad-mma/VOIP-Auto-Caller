@@ -146,8 +146,11 @@ require_once ('config.php');
 
 if(isset($_POST['action']) && $_POST['action']=="Save")
 {
-	$content = "[callblaster]\n"."interval=".$_POST['interval']."\n[press1]\n"."context=".$_POST['context1']."\n"."extension=".$_POST['exten1']."\n";
-	$content.= "[press2]\n"."context=".$_POST['context2']."\n"."extension=".$_POST['exten2']."\n[waittimes]\n"."waittime=".$_POST['waittime']."\n[prefixc]\n"."prefix=".$_POST['prefix']."\n"."\n[callid]\n"."caller_id=".$_POST['caller_id']."\n";
+	$content = "[callblaster]\n"."interval=".$_POST['interval']."\n";
+	for($p=1;$p<=9;$p++){
+		$content .= "[press$p]\n"."context=".$_POST["context$p"]."\n"."extension=".$_POST["exten$p"]."\n";
+	}
+	$content.= "[waittimes]\n"."waittime=".$_POST['waittime']."\n[prefixc]\n"."prefix=".$_POST['prefix']."\n"."\n[callid]\n"."caller_id=".$_POST['caller_id']."\n";
 	
 	file_put_contents("config.ini",$content);
 	
@@ -155,10 +158,10 @@ if(isset($_POST['action']) && $_POST['action']=="Save")
 
 $config = parse_ini_file("config.ini",true);
 $interval = $config['callblaster']['interval'];
-$context1 = $config['press1']['context'];
-$exten1 = $config['press1']['extension'];
-$context2 = $config['press2']['context'];
-$exten2 = $config['press2']['extension'];
+for($p=1;$p<=9;$p++){
+	${"context$p"} = isset($config["press$p"]['context']) ? $config["press$p"]['context'] : '';
+	${"exten$p"} = isset($config["press$p"]['extension']) ? $config["press$p"]['extension'] : '';
+}
 $waittime = $config['waittimes']['waittime'];
 $prefix = $config['prefixc']['prefix'];
 $caller_id = $config['callid']['caller_id'];
@@ -253,6 +256,12 @@ $(document).ready(function(){
 			<tr>
 				<td>Context : <input type="text" name="context2" value="<?php echo $context2; ?>" /></td><td>Extension : <input type="text" name="exten2" value="<?php echo $exten2; ?>"/></td>
 			</tr>
+			<?php for($p=3;$p<=9;$p++): ?>
+			<tr><td>Press Number <?php echo $p; ?> : </td></tr>
+			<tr>
+				<td>Context : <input type="text" name="context<?php echo $p; ?>" value="<?php echo ${"context$p"}; ?>" /></td><td>Extension : <input type="text" name="exten<?php echo $p; ?>" value="<?php echo ${"exten$p"}; ?>"/></td>
+			</tr>
+			<?php endfor; ?>
 
 			
 				</div>
