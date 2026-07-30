@@ -43,7 +43,7 @@ function checkTime(i) {
 
 
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
-	<title>AutoDialler</title>
+	<title>سامانه تماس‌گیر خودکار</title>
 	<link rel="stylesheet" href="assets/css/style.css" type="text/css" media="all" />
 	<link rel="stylesheet" href="assets/css/theme.css" type="text/css" media="all" />
 	<script src='assets/js/funciones.js'></script>
@@ -180,7 +180,7 @@ $caller_id = $config['callid']['caller_id'];
 	
 	
 	
-		<title>AutoDialler</title>
+		<title>سامانه تماس‌گیر خودکار</title>
 		</head>
 	<body style="margin-left: 2.8em;padding: 0 3em 1em 0;border-width: 1px;">
 	
@@ -193,7 +193,7 @@ $caller_id = $config['callid']['caller_id'];
 	
 	<div id="loader"></div>
 	
-		<center><h2>Control Panel</h2></i></center>
+		<center><h2>پنل کنترل</h2></i></center>
 		<div id="borderDemo">
 		<h3>Setting •</h3>
 <script type="text/javascript" src="assets/vendor/plugins/jQuery/jQuery-2.1.4.min.js"></script>
@@ -229,7 +229,7 @@ $(document).ready(function(){
 </script>
 <!--
 <div style="float: left">
-<button id="pause-btn" value="pause">Pause</button><button id="stop-btn">Stop</button>
+<button id="pause-btn" value="pause">توقف موقت</button><button id="stop-btn">توقف کامل</button>
 </div>		
 -->
 		<form method="post" action="index.php">
@@ -241,23 +241,23 @@ $(document).ready(function(){
 			
 				
 			<tr>
-				<td> WaitTime : <input type="text" name="waittime" value="<?php echo $waittime; ?>"/></td><td>  Interval <a href="calc.php"> [calculation*] :</a><input type="text" name="interval" value="<?php echo $interval; ?>"/></td> <td> Caller ID : <input type="text" name="caller_id" value="<?php echo $caller_id; ?>"/></td><td><td> Prefix: <input type="text" name="prefix" value="<?php echo $prefix; ?>"/></td>
+				<td> زمان انتظار: <input type="text" name="waittime" value="<?php echo $waittime; ?>"/></td><td>  فاصله بین تماس‌ها <a href="calc.php"> [محاسبه*] :</a><input type="text" name="interval" value="<?php echo $interval; ?>"/></td> <td> کالر آی‌دی: <input type="text" name="caller_id" value="<?php echo $caller_id; ?>"/></td><td><td> پیش‌شماره: <input type="text" name="prefix" value="<?php echo $prefix; ?>"/></td>
 			</tr>
 			
 			
 			<tr>
-				<td>Press Number 1 : </td> 
+				<td>فشردن عدد ۱: </td> 
 			</tr>
 			<tr>
 			     <td>Context : <input type="text" name="context1" value="<?php echo $context1; ?>"/></td><td>Extension : <input type="text" name="exten1" value="<?php echo $exten1; ?>"/></td>
 			</tr>
-			<tr><td>Press Number 2 : </td></tr>
+			<tr><td>فشردن عدد ۲: </td></tr>
 			
 			<tr>
 				<td>Context : <input type="text" name="context2" value="<?php echo $context2; ?>" /></td><td>Extension : <input type="text" name="exten2" value="<?php echo $exten2; ?>"/></td>
 			</tr>
 			<?php for($p=3;$p<=9;$p++): ?>
-			<tr><td>Press Number <?php echo $p; ?> : </td></tr>
+			<tr><td>فشردن عدد <?php echo $p; ?>: </td></tr>
 			<tr>
 				<td>Context : <input type="text" name="context<?php echo $p; ?>" value="<?php echo ${"context$p"}; ?>" /></td><td>Extension : <input type="text" name="exten<?php echo $p; ?>" value="<?php echo ${"exten$p"}; ?>"/></td>
 			</tr>
@@ -279,7 +279,7 @@ $(document).ready(function(){
 
 
 		<div id="borderDemo">
-		<h3>Upload Numbers •</h3> 
+		<h3>آپلود شماره‌ها •</h3> 
 		<h4><a href="numbers-sample.csv" class="fa fa-download"></a><a href="numbers-sample.csv" download> Download Example File </a></h4>
 		<form method="post" action="performCalls.php" enctype="multipart/form-data">
 			
@@ -288,7 +288,7 @@ $(document).ready(function(){
 			
 			
 			
-			<input class="button000 my2Button" type="submit" name="action" value="Start Campain"/>
+			<input class="button000 my2Button" type="submit" name="action" value="شروع کمپین"/>
 			
 
 		
@@ -310,7 +310,7 @@ function stateHandle() {
 		
 		
 		<div id="borderDemo">
-		<h3>History •</h3>
+		<h3>تاریخچه •</h3>
 		<p><span id="dots"></span><span id="more"> <?php list_logs(); ?></span></p>	
         <button onclick="moresFunction()" id="myBtn" class="my1Button"> <i class="fa fa-eye" aria-hidden="true"></i> Show </button>
         <!--This is a comment. Comments are not displayed in the browser--><!--<form action="index.php" method="post"> <input type="submit" name="remve_file" value="Delete All Logs" class="button button1 fa fa-refresh"></form> -->
@@ -323,11 +323,11 @@ function stateHandle() {
   <form class="modal-content" action="/autocaller/action_page.php">
     <div class="container">
       <h1> !!! Warning !!!</h1>
-      <p>All Call History will Be Delete </p>
+      <p>تمام تاریخچه‌ی تماس‌ها پاک خواهد شد</p>
     
       <div class="clearfix">
-        <button type="button" onclick="document.getElementById('id01').style.display='none'" class="cancelbtn">Cancell</button>
-        <button type="submit" onclick="document.getElementById('id01').style.display='none'" class="deletebtn">Confirm</button>
+        <button type="button" onclick="document.getElementById('id01').style.display='none'" class="cancelbtn">انصراف</button>
+        <button type="submit" onclick="document.getElementById('id01').style.display='none'" class="deletebtn">تایید</button>
       </div>
     </div>
   </form>
@@ -341,7 +341,7 @@ function stateHandle() {
 		<div id="borderDemo">
 	
 		<h3>Voices •</h3>
-        <button onclick="document.location='audioFile.php'" class="my2Button">Manage Voices</button>
+        <button onclick="document.location='audioFile.php'" class="my2Button">مدیریت فایل‌های صوتی</button>
 		
 		&nbsp;&nbsp;
 		<h1></h1>
@@ -457,7 +457,7 @@ font-family: 'Lalezar', Lalezar;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
-	<title>Asterisk Dialer</title>
+	<title>سامانه تماس‌گیر خودکار</title>
 	<link rel="stylesheet" href="assets/css/style.css" type="text/css" media="all" />
 	<script src='assets/js/funciones.js'></script>
 <script>
@@ -513,8 +513,10 @@ return false;
 
 
 #borderDemo {
-border-top: 10px solid #000000;
-border-radius: 27px 18px 0px 0px;
+border-top: 3px solid #6d28d9;
+border-radius: 14px 14px 0px 0px;
+background: #ffffff;
+box-shadow: 0 1px 2px rgba(31,34,51,0.06);
 }
 
 

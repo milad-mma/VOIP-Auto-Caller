@@ -2,7 +2,7 @@
 <html>
 <head>
      <meta http-equiv="Content-type" content="text/html; charset=utf-8" />
-	<title>Asterisk Dialer</title>
+	<title>سامانه تماس‌گیر خودکار</title>
 	<link rel="stylesheet" href="../assets/css/style.css" type="text/css" media="all" />
 	<link rel="stylesheet" href="../assets/css/theme.css" type="text/css" media="all" />
 	<script src='funciones.js'></script>
@@ -555,8 +555,10 @@ background: linear-gradient(to bottom, #FFFFFF 0%, #FFFFFF 68%, #1F95FF 100%);
 
 
 #borderDemo {
-border-bottom: 10px solid #134B70;
-border-radius: 25px 18px 21px 23px;
+border-top: 3px solid #6d28d9;
+border-radius: 14px 14px 14px 14px;
+background: #ffffff;
+box-shadow: 0 1px 2px rgba(31,34,51,0.06);
 }
 
 

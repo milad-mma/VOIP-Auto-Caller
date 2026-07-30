@@ -40,7 +40,7 @@ function checkTime(i) {
 
 
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
-	<title>Manage Voices</title>
+	<title>مدیریت فایل‌های صوتی</title>
 	<link rel="stylesheet" href="assets/css/style.css" type="text/css" media="all" />
 	<link rel="stylesheet" href="assets/css/theme.css" type="text/css" media="all" />
 	<script src='assets/js/funciones.js'></script>
@@ -117,7 +117,7 @@ function displayAudio()
     		//$size     = filesize($basepath."/files/$file")/1024;
       		//$filedate = date ("m/d/Y H:i:s", filemtime($basepath."/files/$file"));
         	$link="audio/$file";
-      		echo "<tr><td>$file</td> <td> <a target='_blank' href='$link'>Downlaod</a> </td> <td>
+      		echo "<tr><td>$file</td> <td> <a target='_blank' href='$link'>دانلود</a> </td> <td>
 			
       		
       		<form method='post' action='demoCall.php'>
@@ -170,7 +170,7 @@ endif;
 
 <body>
 <center>
-<h3><b>Manage Voices</b></h3>
+<h3><b>مدیریت فایل‌های صوتی</b></h3>
 
 
 
@@ -180,13 +180,13 @@ endif;
 </center>
 
 
-<h3>Uplaod Voice •</h3>
+<h3>آپلود صدا •</h3>
 <h1> </h1>
 
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Upload your files</title>
+  <title>فایل‌های خود را آپلود کنید</title>
 </head>
 <body>
   <form enctype="multipart/form-data" action="audioFile.php" method="POST">
@@ -346,8 +346,10 @@ table.paleBlueRows tfoot .links a{
 }
   
 #borderDemo {
-border-top: 4px solid #000000;
-border-radius: 28px 28px 0px 0px;
+border-top: 3px solid #0d9488;
+border-radius: 14px 14px 0px 0px;
+background: #ffffff;
+box-shadow: 0 1px 2px rgba(31,34,51,0.06);
 }
 </style>
 </head>
@@ -357,7 +359,7 @@ border-radius: 28px 28px 0px 0px;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
-	<title>Asterisk Dialer</title>
+	<title>سامانه تماس‌گیر خودکار</title>
 	<link rel="stylesheet" href="assets/css/style.css" type="text/css" media="all" />
 	<script src='assets/js/funciones.js'></script>
 <script>
@@ -375,7 +377,7 @@ return false;
 </script>
 
 </head>
-<center><h3><b>File Manager</b></h3></center>
+<center><h3><b>مدیریت فایل</b></h3></center>
 
 <!DOCTYPE html>
 <html>
@@ -406,7 +408,7 @@ return false;
   <div class="modal-content">
    <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal">&times;</button>
-    <h4 class="modal-title"><span id="change_title">Create Folder</span></h4>
+    <h4 class="modal-title"><span id="change_title">ساخت پوشه</span></h4>
    </div>
    <div class="modal-body">
     <p>Enter Folder Name
@@ -418,7 +420,7 @@ return false;
     
    </div>
    <div class="modal-footer">
-    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+    <button type="button" class="btn btn-default" data-dismiss="modal">بستن</button>
    </div>
   </div>
  </div>
@@ -428,7 +430,7 @@ return false;
   <div class="modal-content">
    <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal">&times;</button>
-    <h4 class="modal-title">Upload File</h4>
+    <h4 class="modal-title">آپلود فایل</h4>
    </div>
    <div class="modal-body">
     <form method="post" id="upload_form" enctype='multipart/form-data'>
@@ -440,7 +442,7 @@ return false;
     </form>
    </div>
    <div class="modal-footer">
-    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+    <button type="button" class="btn btn-default" data-dismiss="modal">بستن</button>
    </div>
   </div>
  </div>
@@ -451,13 +453,13 @@ return false;
   <div class="modal-content">
    <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal">&times;</button>
-    <h4 class="modal-title">FileManager</h4>
+    <h4 class="modal-title">مدیریت فایل</h4>
    </div>
    <div class="modal-body" id="file_list">
     
    </div>
    <div class="modal-footer">
-    <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+    <button type="button" class="btn btn-default" data-dismiss="modal">بستن</button>
    </div>
   </div>
  </div>

@@ -43,7 +43,7 @@ function checkTime(i) {
 
 
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
-	<title>AutoDialer</title>
+	<title>سامانه تماس‌گیر خودکار</title>
 	<link rel="stylesheet" href="assets/css/style.css" type="text/css" media="all" />
 	<link rel="stylesheet" href="assets/css/theme.css" type="text/css" media="all" />
 	<script src='assets/js/funciones.js'></script>
@@ -167,7 +167,7 @@ $waittime = $config['waittimes']['waittime'];
 	
 	
 	
-		<title>AutoDialer</title>
+		<title>سامانه تماس‌گیر خودکار</title>
 		</head>
 	<body style="margin-left: 2.8em;padding: 0 3em 1em 0;border-width: 1px;">
 	
@@ -417,7 +417,7 @@ font-family: 'Roboto', sans-serif;
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
-	<title>Asterisk Dialer</title>
+	<title>سامانه تماس‌گیر خودکار</title>
 	<link rel="stylesheet" href="assets/css/style.css" type="text/css" media="all" />
 	<script src='assets/js/funciones.js'></script>
 <script>
@@ -483,8 +483,10 @@ background: linear-gradient(to bottom, #E3EFFF 0%, #F2F9FF 51%, #E3EFFF 100%);
 
 
 #borderDemo {
-border-top: 10px solid #134B70;
-border-radius: 27px 18px 0px 0px;
+border-top: 3px solid #6d28d9;
+border-radius: 14px 14px 0px 0px;
+background: #ffffff;
+box-shadow: 0 1px 2px rgba(31,34,51,0.06);
 }
 
 

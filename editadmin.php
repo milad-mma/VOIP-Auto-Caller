@@ -13,7 +13,7 @@ header( 'Content-Type: text/html; charset=utf-8' );
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 	<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
-	<title>Dialer System</title>
+	<title>سامانه تماس‌گیر خودکار</title>
 	<link rel="stylesheet" href="assets/css/style.css" type="text/css" media="all" />
 	<link rel="stylesheet" href="assets/css/theme.css" type="text/css" media="all" />
 	<script src='assets/js/funciones.js'></script>

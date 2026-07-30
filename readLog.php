@@ -32,7 +32,7 @@ if($_REQUEST['action']=="getLog")
 		for($i=0;$i<count($head);$i++)
 		$ret.="<th>".$head[$i]."</th>";
 		
-		$ret.="<th>Time</th><th>Status</th><th>Option Choosen</th>";
+		$ret.="<th>زمان</th><th>وضعیت</th><th>عدد انتخاب‌شده</th>";
 	}
 	
 	$ret.="</thead>";
@@ -51,7 +51,15 @@ if($_REQUEST['action']=="getLog")
 			{
 				$ret.="<td>".$fields[$j]."</td>";
 			}
-			$ret.="<td>".$row['time']."</td><td>".$row['status']."</td><td>".$row['options']."</td>";
+			$statusMap = array(
+				'Dialled' => 'شماره‌گیری شد',
+				'Dial Failed' => 'شماره‌گیری ناموفق',
+				'Transferred' => 'انتقال یافت',
+				'Completed' => 'تکمیل شد',
+				'Dialling' => 'در حال شماره‌گیری',
+			);
+			$statusFa = isset($statusMap[$row['status']]) ? $statusMap[$row['status']] : $row['status'];
+			$ret.="<td>".$row['time']."</td><td>".$statusFa."</td><td>".$row['options']."</td>";
 			
 			$ret.="</tr>";
 		}

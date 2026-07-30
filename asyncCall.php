@@ -58,15 +58,30 @@ if(file_exists($argv[1]))
 		
 		if(!$controls['pause']):
 			
-		$number = $csv[$i][$phoneIndex];
+		$number = trim($csv[$i][$phoneIndex]);
+		// پاک‌سازی: حذف هر چیزی جز رقم (فاصله، اعشار ناخواسته اکسل مثل 9123456789.0، نماد علمی و غیره)
+		$number = preg_replace('/\.0+$/', '', $number); // حذف .0 انتهایی که اکسل گاهی اضافه می‌کنه
+		$number = preg_replace('/\D/', '', $number);   // فقط ارقام باقی می‌مونه
 		$audio = $csv[$i][$audioIndex];
 		$fields = implode(",",$csv[$i]);
 		$query = "insert into logs(fields,time,status,options,type,csvFile) values('$fields',NOW(),'Dialling','Nil','field','$dest')";
 		$result = mysqli_query($connection, $query) or die("Database Error");
 		$id = mysqli_insert_id($connection);
 		$phone = $number;
+		// اعمال خودکار پیشوند خروجی بر اساس طول شماره:
+		// ۱۰ رقم (موبایل خام بدون صفر، مثل 9123456789)      -> prefix + 0 + شماره
+		// ۱۱ رقم (با صفر ابتدایی، مثل 09123456789)            -> prefix + شماره
+		// ۱۲ رقم یا بیشتر (فرض بر اینه که قبلاً کامله)          -> بدون تغییر
+		$len = strlen($phone);
+		if($prefix !== '' && $len <= 11) {
+			if($len === 11 && substr($phone,0,1) === '0') {
+				$phone = $prefix.$phone;
+			} elseif($len === 10) {
+				$phone = $prefix.'0'.$phone;
+			}
+		}
 		$phone=substr($phone,0,15);
-		$callFile = "Channel: local/$prefix$phone@from-internal\r\n";
+		$callFile = "Channel: local/$phone@from-internal\r\n";
 		$callFile .= "WaitTime: $waittime\r\n";
 		$callFile .= "CallerID: $caller_id\r\n";
 		$callFile .= "Context: callblaster\r\n";

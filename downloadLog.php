@@ -38,7 +38,7 @@ if(isset($_REQUEST['file']))
 		for($i=0;$i<count($head);$i++)
 		$ret.=$head[$i].",";
 		
-		$ret.="Time,Status,Option Choosen";
+		$ret.="زمان,وضعیت,عدد انتخاب‌شده";
 	}
 	
 	$ret.="\n";
@@ -57,7 +57,15 @@ if(isset($_REQUEST['file']))
 			{
 				$ret.=$fields[$j].",";
 			}
-			$ret.=$row['time'].",".$row['status'].",".$row['options'];
+			$statusMap = array(
+				'Dialled' => 'شماره‌گیری شد',
+				'Dial Failed' => 'شماره‌گیری ناموفق',
+				'Transferred' => 'انتقال یافت',
+				'Completed' => 'تکمیل شد',
+				'Dialling' => 'در حال شماره‌گیری',
+			);
+			$statusFa = isset($statusMap[$row['status']]) ? $statusMap[$row['status']] : $row['status'];
+			$ret.=$row['time'].",".$statusFa.",".$row['options'];
 			
 			$ret.="\n";
 		}

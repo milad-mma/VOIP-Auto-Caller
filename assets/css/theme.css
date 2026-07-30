@@ -259,3 +259,13 @@ table thead th {
 .ibtn:hover {
   background: var(--color-accent-hover) !important;
 }
+
+/* --- محدود کردن عرض پنل‌های ادمین (AdminLTE) که پیش‌فرض تمام‌عرض بودن --- */
+.content-wrapper {
+  max-width: 1200px;
+  margin: 0 auto !important;
+}
+
+.content-wrapper .content {
+  padding: var(--space-4) var(--space-5);
+}
