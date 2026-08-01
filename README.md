@@ -33,7 +33,7 @@ Open (HTTP, not HTTPS): `http://[server-ip]/autocaller`
 | Caller ID | Local caller ID label |
 | Prefix | Prefix applied to outbound numbers |
 | Press 1–9 | Transfers the call to a chosen extension if the callee presses that digit (9 independently configurable routes) |
-| Upload Numbers | Import a number list (with per-row voice file) from Excel. ⚠️ Format the phone column as **Text** in Excel — otherwise long numbers get corrupted into scientific notation (e.g. `9.09E+11`). Also, the `audio` column value must match an uploaded voice file's name **exactly** (no typos, no extension). |
+| Upload Numbers | Import a number list (with per-row voice file) from Excel. ⚠️ Format the phone column as **Number, no decimals** (not scientific/general) and include the leading `0` (e.g. `09123456789`) — the configured outbound Prefix is added automatically. Also, the `audio` column value must match an uploaded voice file's name **exactly** (no typos, no extension). |
 | History | Per-call outcome log, exportable to Excel |
 | Manage Voice | Upload WAV/MP3 (8kHz, 16-bit, mono recommended) |
 | API | Trigger/schedule calls externally: `http://[server-ip]/autocaller/api.php?action=democall&phone=[number]&file=[audio.wav]&action=call` |

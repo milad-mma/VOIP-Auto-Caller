@@ -32,10 +32,10 @@ return false;
 			<h1><a href="http://asterisk-pbx.ru/wiki/works/asterisk_autodialer">Asterisk Dialer</a></h1>
 			<div id="top-navigation">
 				Welcome <strong><?php echo $_SESSION[name];?></strong>
+			<span>|</span>
+				<a href="help.php">راهنما</a>
 				<span>|</span>
-				<a href="http://asterisk-pbx.ru/wiki/works/asterisk_autodialer">Help</a>
-				<span>|</span>
-                                <a href="logout.php">logout</a>
+                                <a href="index.php">بازگشت به داشبورد</a>
 
 			</div>
 		</div>
@@ -44,10 +44,10 @@ return false;
 		<!-- Main Nav -->
 		<div id="navigation">
 			<ul>
-  			    <li><a href="upload.php"><span>Create New Campaign</span></a></li>
-                            <li><a href="campaigns.php"><span>Campaigns</span></a></li>
-                            <li><a href="start.php"><span>Start Campaign</span></a></li>
-                            <li><a href="admins.php" class="active"><span>Administrators</span></a></li>
+  			    <li><a href="index.php"><span>داشبورد</span></a></li>
+                            <li><a href="audioFile.php"><span>فایل‌های صوتی</span></a></li>
+                            <li><a href="profile.php"><span>پروفایل من</span></a></li>
+                            <li><a href="admins.php" class="active"><span>مدیریت کاربران</span></a></li>
 			</ul>
 		</div>
 		<!-- End Main Nav -->
