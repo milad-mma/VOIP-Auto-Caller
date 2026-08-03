@@ -56,16 +56,19 @@ if($_POST['action']=="Start Campain")
 	else
 	{
 		$ts=time();
-		$dest = $basepath."files/".$ts.$_FILES['csvFile']['name'];
+		// پاک‌سازی نام فایل: فقط حروف/رقم/نقطه/خط‌تیره/آندرلاین مجاز (فاصله، پرانتز و غیره حذف می‌شن
+		// چون بدون escape داخل دستور exec() میرن و می‌تونن دستور شل رو بشکنن)
+		$safeName = preg_replace('/[^A-Za-z0-9._-]/', '_', $_FILES['csvFile']['name']);
+		$dest = $basepath."files/".$ts.$safeName;
 		move_uploaded_file($_FILES['csvFile']['tmp_name'],$dest);
 		
 		$msg = "Recieved File $dest at ".date("r",time());
 		file_put_contents("logs/uploads.txt",$msg,FILE_APPEND);
 
-		$command = "/usr/bin/php ".$basepath."asyncCall.php $dest";
+		$command = "/usr/bin/php ".escapeshellarg($basepath."asyncCall.php")." ".escapeshellarg($dest);
 		//echo $command;
 
-		spawn("$command","/tmp/".$_FILES['csvFile']['name'],"/tmp/pid_".$_FILES['csvFile']['name']);
+		spawn("$command","/tmp/".$ts.$safeName,"/tmp/pid_".$ts.$safeName);
 		
 		/*
 		
