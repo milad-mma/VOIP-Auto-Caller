@@ -1,0 +1,271 @@
+/* =========================================================
+   Auto Caller — Design System v2
+   پالت روشن و خنثی (بدون تیرگی)، لهجه‌ی رنگ زمردی/بنفش
+   ========================================================= */
+
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('../fonts/Vazirmatn-Regular.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Vazirmatn';
+  src: url('../fonts/Vazirmatn-Bold.woff2') format('woff2');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  /* --- رنگ‌ها: پالت روشن و خنثی --- */
+  --color-bg-page:       #f6f7fb;
+  --color-surface:       #ffffff;
+  --color-surface-alt:   #f0f1f7;
+  --color-header-bg:     #ffffff;
+  --color-border:        #e3e5ee;
+
+  --color-accent:        #6d28d9;   /* بنفش عمیق - رنگ اصلی برند */
+  --color-accent-hover:  #5b21b6;
+  --color-accent-soft:   #f2edfd;
+  --color-teal:          #0d9488;   /* زمردی - رنگ دوم (دکمه‌های موفقیت/تایید) */
+  --color-teal-hover:    #0f766e;
+
+  --color-text-heading:  #1f2233;
+  --color-text-body:     #4b4f63;
+  --color-text-muted:    #8b8fa3;
+
+  --color-success:       #15803d;
+  --color-danger:        #dc2626;
+  --color-warning:       #d97706;
+
+  /* --- تایپوگرافی --- */
+  --font-family-base: 'Vazirmatn', Tahoma, Arial, sans-serif;
+  --font-size-xs:   12px;
+  --font-size-sm:   13px;
+  --font-size-base: 14px;
+  --font-size-md:   16px;
+  --font-size-lg:   20px;
+  --font-size-xl:   26px;
+
+  /* --- فاصله‌گذاری --- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+
+  /* --- شعاع گوشه و سایه --- */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --shadow-sm: 0 1px 2px rgba(31,34,51,0.06), 0 1px 1px rgba(31,34,51,0.04);
+  --shadow-md: 0 8px 24px rgba(31,34,51,0.08);
+
+  --transition-fast: 0.15s ease;
+}
+
+* {
+  font-family: var(--font-family-base);
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--color-bg-page);
+  color: var(--color-text-body);
+  font-size: var(--font-size-base);
+  line-height: 1.65;
+}
+
+/* --- هدر / نوار بالا: روشن، با خط جداکننده به‌جای پس‌زمینه‌ی تیره --- */
+#header, #top {
+  background: var(--color-header-bg) !important;
+  border-bottom: 1px solid var(--color-border);
+}
+
+#top-navigation a,
+#navigation ul li a {
+  color: var(--color-text-body) !important;
+}
+
+#top-navigation span {
+  color: var(--color-text-muted) !important;
+}
+
+#navigation ul li a.active {
+  color: var(--color-accent) !important;
+}
+
+/* --- لوگوی متنی/تصویری --- */
+.brand-text-logo {
+  display: inline-flex;
+  align-items: center;
+  font-size: var(--font-size-lg);
+  font-weight: 700;
+  color: var(--color-text-heading);
+  text-decoration: none;
+}
+
+.brand-text-logo span {
+  color: var(--color-accent);
+}
+
+/* --- جعبه‌ها: کارت‌های روشن با سایه‌ی ملایم --- */
+.box-head {
+  background: var(--color-surface-alt) !important;
+  color: var(--color-text-heading) !important;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.box, .content-wrapper .box {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
+}
+
+/* --- دکمه‌ها --- */
+.btn,
+button[type="submit"],
+input[type="submit"] {
+  background: var(--color-accent) !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-4);
+  font-weight: 600;
+  transition: background var(--transition-fast), box-shadow var(--transition-fast), transform var(--transition-fast);
+}
+
+.btn:hover,
+button[type="submit"]:hover,
+input[type="submit"]:hover {
+  background: var(--color-accent-hover) !important;
+  transform: translateY(-1px);
+}
+
+.btn:focus-visible,
+button[type="submit"]:focus-visible,
+input[type="submit"]:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--color-teal);
+  outline-offset: 2px;
+}
+
+/* --- فرم‌ها --- */
+input[type="text"],
+input[type="password"],
+input[type="email"],
+input[type="number"],
+select,
+textarea {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  padding: var(--space-2) var(--space-3);
+  color: var(--color-text-heading);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus,
+input[type="email"]:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-accent-soft);
+}
+
+/* --- لینک‌ها --- */
+a {
+  color: var(--color-accent);
+}
+
+a:hover {
+  color: var(--color-accent-hover);
+}
+
+/* --- جدول‌ها --- */
+.table th,
+table thead th {
+  background: var(--color-surface-alt) !important;
+  color: var(--color-text-heading) !important;
+  border-bottom: 2px solid var(--color-border) !important;
+}
+
+.table td, table td {
+  border-color: var(--color-border) !important;
+}
+
+/* --- منوی ناوبری اصلی --- */
+.main-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  flex-wrap: wrap;
+}
+
+.main-nav a {
+  color: var(--color-text-body) !important;
+  text-decoration: none;
+  font-size: var(--font-size-sm);
+  font-weight: 500;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-sm);
+  transition: background var(--transition-fast), color var(--transition-fast);
+  white-space: nowrap;
+}
+
+.main-nav a i {
+  margin-left: var(--space-1);
+}
+
+.main-nav a:hover,
+.main-nav a:focus-visible {
+  background: var(--color-accent-soft);
+  color: var(--color-accent) !important;
+}
+
+/* --- Override برای صفحه‌ی لاگین: پالت روشن به‌جای آبی تیره‌ی پیش‌فرض --- */
+.img-holder {
+  background: linear-gradient(135deg, var(--color-accent-soft) 0%, #ffffff 60%, #e6f7f4 130%) !important;
+}
+
+.img-holder .info-holder h3 {
+  color: var(--color-text-heading) !important;
+}
+
+.img-holder .info-holder p {
+  color: var(--color-accent) !important;
+}
+
+.form-holder {
+  background: var(--color-surface) !important;
+}
+
+.form-body {
+  background: var(--color-bg-page);
+}
+
+.ibtn, .form-button button, .form-button input[type="submit"] {
+  background: var(--color-accent) !important;
+}
+
+.ibtn:hover {
+  background: var(--color-accent-hover) !important;
+}
+
+/* --- محدود کردن عرض پنل‌های ادمین (AdminLTE) که پیش‌فرض تمام‌عرض بودن --- */
+.content-wrapper {
+  max-width: 1200px;
+  margin: 0 auto !important;
+}
+
+.content-wrapper .content {
+  padding: var(--space-4) var(--space-5);
+}
