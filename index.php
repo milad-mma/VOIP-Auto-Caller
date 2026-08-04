@@ -317,15 +317,13 @@ function stateHandle() {
 		<p><span id="dots"></span><span id="more"> <?php list_logs(); ?></span></p>	
         <button onclick="moresFunction()" id="myBtn" class="my1Button"> <i class="fa fa-eye" aria-hidden="true"></i> Show </button>
         <!--This is a comment. Comments are not displayed in the browser--><!--<form action="index.php" method="post"> <input type="submit" name="remve_file" value="Delete All Logs" class="button button1 fa fa-refresh"></form> -->
-		<!--<form action="/autocaller/action_page.php" method="post"><button type="submit" class="myButton"><i class="fa fa-remove" aria-hidden="true"></i> پاکسازی </button></form>
-		-->
-		<button class="myButton" onclick="document.getElementById('id01').style.display='block'"><i class="fa fa-remove" aria-hidden="true"></i> Clear </button>
+		<button class="myButton" onclick="document.getElementById('id01').style.display='block'"><i class="fa fa-remove" aria-hidden="true"></i> پاک‌سازی تاریخچه </button>
 
 <div id="id01" class="modal">
   <span onclick="document.getElementById('id01').style.display='none'" class="close" title="Close Modal">×</span>
-  <form class="modal-content" action="/autocaller/action_page.php">
+  <form class="modal-content" action="clearHistory.php" method="post">
     <div class="container">
-      <h1> !!! Warning !!!</h1>
+      <h1> هشدار </h1>
       <p>تمام تاریخچه‌ی تماس‌ها پاک خواهد شد</p>
     
       <div class="clearfix">
