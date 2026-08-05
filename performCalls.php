@@ -137,149 +137,92 @@ if($_POST['action']=="Start Campain")
 }
 
 ?>
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>در حال اجرای کمپین</title>
+<link rel="stylesheet" href="assets/css/bootstrap.min.css">
+<link rel="stylesheet" href="assets/css/style.css" type="text/css" media="all">
+<link rel="stylesheet" href="assets/css/theme.css" type="text/css" media="all">
+<link rel="icon" href="assets/img/brand/favicon.svg" type="image/svg+xml">
+<style>
+	body { font-family: var(--font-family-base); }
+	.run-wrap { max-width: 900px; margin: 32px auto; padding: 0 20px; }
+	.run-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+	.run-header h1 { font-size: var(--font-size-lg); color: var(--color-text-heading); margin: 0; }
+	.run-header a { font-size: var(--font-size-sm); }
+	.run-controls { display: flex; gap: 10px; margin-bottom: 16px; }
+	.run-controls button { padding: 10px 22px; border: none; border-radius: var(--radius-sm); font-weight: 600; font-size: var(--font-size-sm); cursor: pointer; }
+	#pause-btn { background: var(--color-warning); color: #fff; }
+	#stop-btn { background: var(--color-danger); color: #fff; }
+	.run-controls button:disabled { opacity: 0.5; cursor: not-allowed; }
+	#logger { background: var(--color-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); box-shadow: var(--shadow-sm); padding: 16px; min-height: 120px; overflow-x: auto; }
+	#logger table { width: 100%; border-collapse: collapse; }
+	#logger th, #logger td { padding: 8px 10px; text-align: right; border-bottom: 1px solid var(--color-border); font-size: var(--font-size-sm); }
+	.run-footer { text-align: center; margin-top: 24px; font-size: var(--font-size-xs); color: var(--color-text-muted); }
+	.run-footer a { color: var(--color-text-muted); }
+</style>
+</head>
+<body>
+
+<div class="run-wrap">
+	<div class="run-header">
+		<h1>وضعیت زنده‌ی کمپین</h1>
+		<a href="index.php">← بازگشت به داشبورد</a>
+	</div>
+
+	<div class="run-controls">
+		<button id="pause-btn" value="pause">توقف موقت</button>
+		<button id="stop-btn">توقف کامل</button>
+	</div>
+
+	<div id="logger"></div>
+
+	<div class="run-footer">
+		<a href="https://imapro.ir" target="_blank">imapro.ir</a>
+	</div>
+</div>
+
 <script type="text/javascript" src="assets/js/vendor/jQuery-2.1.4.min.js"></script>
 <script type="text/javascript">
 function updateLogger(file)
 {
-	
 	$.post("readLog.php",{action:"getLog",file:file},function(data,status){
-		
-		
 		$('#logger').html(data);
 	});
-	
-
 }
 
 $(document).ready(function(){
-
 	var t = setInterval(function(){updateLogger("<?php echo urlencode($dest); ?>");},1000);
-});
 
-</script>
-<head>
-<link rel="preconnect" href="https://fonts.gstatic.com">
-
-
-
-<meta http-equiv="Content-type" content="text/html; charset=utf-8" />
-	<title>Asterisk Dialer</title>
-	<link rel="stylesheet" href="assets/css/style.css" type="text/css" media="all" />
-	</head>
-	
-<style>
-
-body {
-
-font-family: 'Roboto', sans-serif;
-
-
-  font-size: 16px;
-  direction:rtl;
-  
- 
-  
-  
-}	
-</style>	
-
-<body>
-
-<!-- Header -->
-<div id="header">
-
-	<div class="shell">
-	
-		<!-- Logo + Top Nav -->
-		
-		<div id="top">
-			<h1><a href="http://asterisk-pbx.ru/wiki/works/asterisk_autodialer"></a></h1><center><h3 style="color:white;"><div id="txt"></div></h3></center>
-			<div id="top-navigation">
-			
-				
-				<a href="index.php">Main Page<</a>
-				<span></span>
-                              
-
-			</div>
-		</div>
-		<!-- End Logo + Top Nav -->
-		</div>
-</div>
-
-
-
-
-<!-- End Header -->
-</body>
-</html>
-
-
-
-
-
-
-
-<center>
-<h2>Live Calls</h2></center>
-
-<script>
-$(document).ready(function(){
 	$("#pause-btn").click(function(){
 		var act=$("#pause-btn").val();
-		var chng='Start';
-		var chngval='start';
-	  	$.post("control.php",{action:act},function(data){
-	  		if(act=='start'){
-	  			chngval='pause';
-	  			chng='Pause';
-	  		}
-	  	$("#pause-btn").val(chngval);
-	  	$("#pause-btn").html(chng);
+		var chng='توقف موقت';
+		var chngval='pause';
+		$.post("control.php",{action:act},function(data){
+			if(act=='start'){
+				chngval='pause';
+				chng='توقف موقت';
+			} else {
+				chngval='start';
+				chng='ادامه';
+			}
+			$("#pause-btn").val(chngval);
+			$("#pause-btn").html(chng);
 		});
-	})
-	
+	});
+
 	$("#stop-btn").click(function(){
-	  $.post("control.php",{action:'stop'},function(data){
-	  	$("#pause-btn").attr('disabled','disabled');
-	  	$("#stop-btn").attr('disabled','disabled');
-		alert("Call blasting Stopped");
+		$.post("control.php",{action:'stop'},function(data){
+			$("#pause-btn").attr('disabled','disabled');
+			$("#stop-btn").attr('disabled','disabled');
+			alert("کمپین متوقف شد");
 		});
-	})
-	
-	
-})
-
-	
-	
+	});
+});
 </script>
-<button id="pause-btn" value="pause">Pause</button><button id="stop-btn">Stop</button>
-<div style="border-style:double" id="logger"></div>
 
-
-<h1> </h1>
-<!-- Header -->
-<div id="header">
-	<div class="shell">
-		<!-- Logo + Top Nav -->
-		<div id="top">
-			<h1><a href="http://asterisk-pbx.ru/wiki/works/asterisk_autodialer"></a></h1>
-			<div id="top-navigation">
-				
-				<span>|</span>
-				<a href="https://t.me/amirparsss">Pars-Space.ir</a>
-				<span>|</span>
-                                
-
-			</div>
-		</div>
-		<!-- End Logo + Top Nav -->
-		</div>
-</div>
-<!-- End Header -->
 </body>
-<div style="border-style:double" id="logger"></div>
-
-
-
 </html>
