@@ -51,8 +51,7 @@ if(file_exists($argv[1]))
 		$maxretries = isset($config['retry']['maxretries']) ? $config['retry']['maxretries'] : '0';
 		$retrytime = isset($config['retry']['retrytime']) ? $config['retry']['retrytime'] : '60';
 		//pause-stop controls
-		file_put_contents('control.ini', $reset_controls);
-		$controls=parse_ini_file('control.ini');
+		$controls=file_exists('control.ini') ? parse_ini_file('control.ini') : array('pause'=>false,'stop'=>false);
 		
 		if($controls['stop']){
 			exit();
