@@ -27,9 +27,10 @@ if(file_exists($argv[1]))
 	
 	foreach ($lines as $key => $value)
 	{
-		if(!empty($value))
-	    $csv[$key] = str_getcsv_line($value);
+		if(!empty(trim($value)))
+	    $csv[] = str_getcsv_line($value);
 	}
+	$csv = array_values($csv); // اطمینان از پشت‌سرهم بودن ایندکس‌ها بعد از حذف خطوط خالی
 	
 	$audioIndex = count($csv[0])-2; 
 	$phoneIndex = count($csv[0])-1;
@@ -61,6 +62,14 @@ if(file_exists($argv[1]))
 			
 		$number = $csv[$i][$phoneIndex];
 		$audio = $csv[$i][$audioIndex];
+
+		// اگه شماره خالی باشه (مثلاً به‌خاطر یه ردیف خالی ناخواسته در فایل)، اصلاً تماس نگیر
+		if(trim($number) === '')
+		{
+			$i++;
+			continue;
+		}
+
 		$fields = implode(",",$csv[$i]);
 		$query = "insert into logs(fields,time,status,options,type,csvFile) values('$fields',NOW(),'Dialling','Nil','field','$dest')";
 		$result = mysqli_query($connection, $query) or die("Database Error");
