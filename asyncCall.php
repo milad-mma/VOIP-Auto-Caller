@@ -51,6 +51,7 @@ if(file_exists($argv[1]))
 		$prefix = $config['prefixc']['prefix'];
 		$maxretries = isset($config['retry']['maxretries']) ? $config['retry']['maxretries'] : '0';
 		$retrytime = isset($config['retry']['retrytime']) ? $config['retry']['retrytime'] : '60';
+		$trunkname = isset($config['trunkname']['name']) ? trim($config['trunkname']['name']) : '';
 		//pause-stop controls
 		$controls=file_exists('control.ini') ? parse_ini_file('control.ini') : array('pause'=>false,'stop'=>false);
 		
@@ -76,7 +77,13 @@ if(file_exists($argv[1]))
 		$id = mysqli_insert_id($connection);
 		$phone = $number;
 		$phone=substr($phone,0,15);
-		$callFile = "Channel: local/$prefix$phone@from-internal\r\n";
+		if($trunkname !== '') {
+			// مستقیم از همین یک ترانک تماس می‌گیریم؛ دیگه از دیالپلن from-internal (و trunk failover خودکار Issabel) عبور نمی‌کنه
+			$callFile = "Channel: SIP/$trunkname/$prefix$phone\r\n";
+		} else {
+			// رفتار پیش‌فرض قبلی (از طریق دیالپلن داخلی Issabel، شامل هر trunk failoutی که خودش تنظیم کرده)
+			$callFile = "Channel: local/$prefix$phone@from-internal\r\n";
+		}
 		$callFile .= "WaitTime: $waittime\r\n";
 		$callFile .= "MaxRetries: $maxretries\r\n";
 		$callFile .= "RetryTime: $retrytime\r\n";

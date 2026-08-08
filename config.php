@@ -22,6 +22,7 @@ $db_pass="callblaster";
 $config = parse_ini_file("config.ini",true);
 $caller_id=$config['callid']['caller_id'];
 $prefix=isset($config['prefixc']['prefix']) ? $config['prefixc']['prefix'] : '';
+$trunkname=isset($config['trunkname']['name']) ? $config['trunkname']['name'] : '';
 $maxretries=isset($config['retry']['maxretries']) ? $config['retry']['maxretries'] : '0';
 $retrytime=isset($config['retry']['retrytime']) ? $config['retry']['retrytime'] : '60';
 //..............................................

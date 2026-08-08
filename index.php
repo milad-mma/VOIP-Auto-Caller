@@ -149,6 +149,7 @@ if(isset($_POST['action']) && $_POST['action']=="Save")
 	}
 	$content.= "[waittimes]\n"."waittime=".$_POST['waittime']."\n[prefixc]\n"."prefix=".$_POST['prefix']."\n"."\n[callid]\n"."caller_id=".$_POST['caller_id']."\n";
 	$content.= "[retry]\n"."maxretries=".$_POST['maxretries']."\n"."retrytime=".$_POST['retrytime']."\n";
+	$content.= "[trunkname]\n"."name=".$_POST['trunkname']."\n";
 	
 	file_put_contents("config.ini",$content);
 	
@@ -163,6 +164,7 @@ for($p=1;$p<=9;$p++){
 $waittime = $config['waittimes']['waittime'];
 $maxretries = isset($config['retry']['maxretries']) ? $config['retry']['maxretries'] : '0';
 $retrytime = isset($config['retry']['retrytime']) ? $config['retry']['retrytime'] : '60';
+$trunkname = isset($config['trunkname']['name']) ? $config['trunkname']['name'] : '';
 $prefix = $config['prefixc']['prefix'];
 $caller_id = $config['callid']['caller_id'];
 ?>
@@ -245,6 +247,9 @@ $(document).ready(function(){
 			</tr>
 			<tr>
 				<td> تعداد تلاش مجدد (در صورت عدم پاسخ/قطع تماس): <input type="text" name="maxretries" value="<?php echo $maxretries; ?>"/></td><td> فاصله بین هر تلاش مجدد (ثانیه): <input type="text" name="retrytime" value="<?php echo $retrytime; ?>"/></td>
+			</tr>
+			<tr>
+				<td colspan="2"> نام ترانک (اختیاری — مثلاً 65743451؛ اگه پر بشه، مستقیم فقط از همین یک ترانک تماس می‌گیره و دیگه Trunk Failover خودکار Issabel اتفاق نمی‌افته؛ اگه خالی بمونه، رفتار پیش‌فرض قبلی حفظ می‌شه): <input type="text" name="trunkname" style="width:200px" value="<?php echo $trunkname; ?>"/></td>
 			</tr>
 			
 			
