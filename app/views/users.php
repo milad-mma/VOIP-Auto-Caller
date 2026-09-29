@@ -1,4 +1,5 @@
-<?php View::$title = t('nav_users'); $me = Auth::user(); ?>
+<?php View::$title = t('nav_users'); $me = Auth::user(); $super = Auth::isSuper(); ?>
+<?php if (!$super): ?><p class="alert alert-info"><?php echo h(t('not_root_notice')); ?></p><?php endif; ?>
 <div class="card" id="issabel">
   <div class="card-head"><h3><?php echo h(t('issabel_users')); ?> <span class="badge badge-muted"><?php echo count($issabel); ?></span></h3>
     <span class="muted small"><?php echo h(t('issabel_users_hint')); ?></span></div>
@@ -20,10 +21,10 @@
           <td><?php echo h(t('role_' . $iu['role'])); ?></td><td><?php echo h($iu['active'] ? t('yes') : t('no')); ?></td>
           <td dir="ltr"><small><?php echo h($iu['last_login_at']); ?></small></td><td><small class="muted"><?php echo h(t('managed_below')); ?></small></td>
         <?php else: ?>
-          <td><select name="role" <?php echo $isMe ? 'disabled' : ''; ?>><?php foreach (array('admin', 'operator', 'viewer') as $r): ?><option value="<?php echo $r; ?>" <?php echo $iu['role'] === $r ? 'selected' : ''; ?>><?php echo h(t('role_' . $r)); ?></option><?php endforeach; ?></select></td>
+          <td><select name="role" <?php echo $isMe ? 'disabled' : ''; ?>><?php foreach (array('admin', 'operator', 'viewer') as $r): if ($r === 'admin' && !$super && $iu['role'] !== 'admin') continue; ?><option value="<?php echo $r; ?>" <?php echo $iu['role'] === $r ? 'selected' : ''; ?>><?php echo h(t('role_' . $r)); ?></option><?php endforeach; ?></select></td>
           <td><select name="is_active" <?php echo $isMe ? 'disabled' : ''; ?>><option value="1" <?php echo $iu['active'] ? 'selected' : ''; ?>><?php echo h(t('yes')); ?></option><option value="0" <?php echo !$iu['active'] ? 'selected' : ''; ?>><?php echo h(t('no')); ?></option></select></td>
           <td dir="ltr"><small><?php echo h($iu['last_login_at']); ?></small></td>
-          <td><?php if (!$isMe): ?><button class="btn btn-sm" type="submit"><?php echo h(t('save')); ?></button><?php endif; ?></td>
+          <td class="actions"><?php if ($super && !$isMe): ?><input type="password" name="password" placeholder="<?php echo h(t('app_password')); ?>" size="10" autocomplete="new-password" title="<?php echo h(t('app_password_hint')); ?>"><?php endif; ?> <?php if (!$isMe): ?><button class="btn btn-sm" type="submit"><?php echo h(t('save')); ?></button><?php endif; ?></td>
         <?php endif; ?>
         </form>
       </tr>
@@ -39,19 +40,19 @@
     <table class="table">
       <thead><tr><th><?php echo h(t('username')); ?></th><th><?php echo h(t('display_name')); ?></th><th><?php echo h(t('role')); ?></th><th><?php echo h(t('source')); ?></th><th><?php echo h(t('active')); ?></th><th><?php echo h(t('last_login')); ?></th><th></th></tr></thead>
       <tbody>
-      <?php foreach ($rows as $u): ?>
+      <?php foreach ($rows as $u): $isRoot = Auth::isSuperRow($u); $locked = ($isRoot && !$super) || (int)$u['id'] === (int)$me['id']; $canPw = $super || ($u['auth_source'] === 'local' && !$isRoot); ?>
         <tr>
           <form method="post" action="<?php echo View::url('/users/' . $u['id']); ?>"><?php echo Auth::csrfField(); ?>
-          <td dir="ltr"><strong><?php echo h($u['username']); ?></strong></td>
-          <td><input type="text" name="display_name" value="<?php echo h($u['display_name']); ?>" size="14"></td>
-          <td><select name="role" <?php echo (int)$u['id'] === (int)$me['id'] ? 'disabled' : ''; ?>><?php foreach (array('admin', 'operator', 'viewer') as $r): ?><option value="<?php echo $r; ?>" <?php echo $u['role'] === $r ? 'selected' : ''; ?>><?php echo h(t('role_' . $r)); ?></option><?php endforeach; ?></select></td>
-          <td><span class="badge badge-muted"><?php echo h($u['auth_source']); ?></span></td>
-          <td><select name="is_active" <?php echo (int)$u['id'] === (int)$me['id'] ? 'disabled' : ''; ?>><option value="1" <?php echo $u['is_active'] ? 'selected' : ''; ?>><?php echo h(t('yes')); ?></option><option value="0" <?php echo !$u['is_active'] ? 'selected' : ''; ?>><?php echo h(t('no')); ?></option></select></td>
+          <td dir="ltr"><strong><?php echo h($u['username']); ?></strong><?php if ($isRoot): ?> <span class="badge badge-running" title="<?php echo h(t('root_protected')); ?>">superuser</span><?php endif; ?></td>
+          <td><?php if ($locked && !$super): ?><?php echo h($u['display_name']); ?><?php else: ?><input type="text" name="display_name" value="<?php echo h($u['display_name']); ?>" size="14"><?php endif; ?></td>
+          <td><?php if ($locked || $isRoot): ?><?php echo h(t('role_' . $u['role'])); ?><?php else: ?><select name="role"><?php foreach (array('admin', 'operator', 'viewer') as $r): if ($r === 'admin' && !$super && $u['role'] !== 'admin') continue; ?><option value="<?php echo $r; ?>" <?php echo $u['role'] === $r ? 'selected' : ''; ?>><?php echo h(t('role_' . $r)); ?></option><?php endforeach; ?></select><?php endif; ?></td>
+          <td><span class="badge badge-muted"><?php echo h($u['auth_source']); ?></span><?php if ($u['auth_source'] === 'issabel' && $u['password_hash'] !== ''): ?> <small class="muted">+<?php echo h(t('app_password')); ?></small><?php endif; ?></td>
+          <td><?php if ($locked || $isRoot): ?><?php echo h($u['is_active'] ? t('yes') : t('no')); ?><?php else: ?><select name="is_active"><option value="1" <?php echo $u['is_active'] ? 'selected' : ''; ?>><?php echo h(t('yes')); ?></option><option value="0" <?php echo !$u['is_active'] ? 'selected' : ''; ?>><?php echo h(t('no')); ?></option></select><?php endif; ?></td>
           <td dir="ltr"><small><?php echo h($u['last_login_at']); ?><br><?php echo h($u['last_login_ip']); ?></small></td>
-          <td class="actions"><input type="password" name="password" placeholder="<?php echo h(t('new_password')); ?>" size="10" autocomplete="new-password"> <button class="btn btn-sm" type="submit"><?php echo h(t('save')); ?></button></td>
+          <td class="actions"><?php if ($isRoot && !$super): ?><small class="muted"><?php echo h(t('root_protected')); ?></small><?php else: ?><?php if ($canPw && (int)$u['id'] !== (int)$me['id']): ?><input type="password" name="password" placeholder="<?php echo h(t('new_password')); ?>" size="10" autocomplete="new-password"> <?php endif; ?><button class="btn btn-sm" type="submit"><?php echo h(t('save')); ?></button><?php endif; ?></td>
           </form>
         </tr>
-        <?php if ((int)$u['id'] !== (int)$me['id']): ?><tr class="sub"><td colspan="7"><form method="post" class="inline" action="<?php echo View::url('/users/' . $u['id'] . '/delete'); ?>" onsubmit="return confirm('<?php echo h(t('confirm_delete')); ?>')"><?php echo Auth::csrfField(); ?><button class="btn btn-sm btn-ghost" type="submit"><?php echo h(t('delete')); ?></button></form></td></tr><?php endif; ?>
+        <?php if ((int)$u['id'] !== (int)$me['id'] && !$isRoot): ?><tr class="sub"><td colspan="7"><form method="post" class="inline" action="<?php echo View::url('/users/' . $u['id'] . '/delete'); ?>" onsubmit="return confirm('<?php echo h(t('confirm_delete')); ?>')"><?php echo Auth::csrfField(); ?><button class="btn btn-sm btn-ghost" type="submit"><?php echo h(t('delete')); ?></button></form></td></tr><?php endif; ?>
       <?php endforeach; ?>
       </tbody>
     </table>
@@ -62,7 +63,7 @@
       <label><?php echo h(t('username')); ?> *<input type="text" name="username" dir="ltr" required pattern="[A-Za-z0-9_.@\-]{2,64}"></label>
       <label><?php echo h(t('display_name')); ?><input type="text" name="display_name"></label>
       <label><?php echo h(t('password')); ?> *<input type="password" name="password" required minlength="8" autocomplete="new-password"></label>
-      <label><?php echo h(t('role')); ?><select name="role"><?php foreach (array('viewer', 'operator', 'admin') as $r): ?><option value="<?php echo $r; ?>"><?php echo h(t('role_' . $r)); ?></option><?php endforeach; ?></select></label>
+      <label><?php echo h(t('role')); ?><select name="role"><?php foreach (array('viewer', 'operator', 'admin') as $r): if ($r === 'admin' && !$super) continue; ?><option value="<?php echo $r; ?>"><?php echo h(t('role_' . $r)); ?></option><?php endforeach; ?></select></label>
       <button class="btn btn-primary" type="submit"><?php echo h(t('create')); ?></button>
     </form>
     <div class="hint">

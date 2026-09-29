@@ -8,6 +8,18 @@ class Auth
     const ROLE_ADMIN = 'admin';
     const ROLE_OPERATOR = 'operator';
     const ROLE_VIEWER = 'viewer';
+    /** The one protected local superuser of this app */
+    const SUPER_USER = 'root';
+
+    public static function isSuperRow($row)
+    {
+        return is_array($row) && $row['username'] === self::SUPER_USER && $row['auth_source'] === 'local';
+    }
+
+    public static function isSuper()
+    {
+        return self::isSuperRow(self::user());
+    }
 
     private static $user = null;
 
@@ -96,7 +108,8 @@ class Auth
             return 'login_locked';
         }
         $u = $db->one('SELECT * FROM users WHERE username = ?', array($username));
-        if ($u && $u['auth_source'] === 'local' && (int)$u['is_active'] === 1 && password_verify($password, $u['password_hash'])) {
+        // local password: local accounts, and Issabel-linked accounts that root gave an app-only password
+        if ($u && (int)$u['is_active'] === 1 && $u['password_hash'] !== '' && password_verify($password, $u['password_hash'])) {
             self::onLoginOk($u);
             return $u;
         }

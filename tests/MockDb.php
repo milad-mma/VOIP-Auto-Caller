@@ -8,7 +8,7 @@ class MockDb extends Db
         $this->log[] = $sql;
         $s = strtolower($sql);
         if (strpos($s, 'from users where id') !== false || strpos($s, 'from users where username') !== false) {
-            return array('id' => 1, 'username' => 'admin', 'display_name' => 'Admin', 'password_hash' => password_hash('x', 1), 'role' => 'admin', 'auth_source' => 'local', 'is_active' => 1, 'created_at' => '2026-01-01 00:00:00', 'last_login_at' => null, 'last_login_ip' => null);
+            return array('id' => 1, 'username' => 'root', 'display_name' => 'Root', 'password_hash' => password_hash('x', 1), 'role' => 'admin', 'auth_source' => 'local', 'is_active' => 1, 'created_at' => '2026-01-01 00:00:00', 'last_login_at' => null, 'last_login_ip' => null);
         }
         if (strpos($s, 'from call_attempts where id') !== false) {
             return array('id' => 9, 'contact_id' => 7, 'campaign_id' => 5, 'attempt_no' => 1, 'action_id' => 'ac-7-1-x', 'channel' => 'Local/x', 'uniqueid' => null, 'started_at' => date('Y-m-d H:i:s'), 'answered_at' => null, 'ended_at' => null, 'result' => 'dialing', 'reason_code' => null, 'hangup_cause' => null, 'duration_sec' => 0, 'dtmf' => null, 'amd_result' => null);

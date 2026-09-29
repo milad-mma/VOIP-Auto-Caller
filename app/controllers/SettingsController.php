@@ -177,6 +177,19 @@ class UserController extends Controller
         if (!in_array($role, array('admin', 'operator', 'viewer'), true)) {
             $role = 'viewer';
         }
+        if ($role === 'admin' && !Auth::isSuper()) {
+            Flash::set('error', t('only_root_grants_admin'));
+            $this->redirect('/users#issabel');
+        }
+        $pw = (string)Request::post('password', '');
+        if ($pw !== '' && !Auth::isSuper()) {
+            Flash::set('error', t('only_root'));
+            $this->redirect('/users#issabel');
+        }
+        if ($pw !== '' && strlen($pw) < 8) {
+            Flash::set('error', t('password_min'));
+            $this->redirect('/users#issabel');
+        }
         $known = false;
         foreach (Auth::issabelUsers() as $iu) {
             if ($iu['name'] === $name) {
@@ -197,10 +210,16 @@ class UserController extends Controller
             $role = 'admin';
             $active = 1;
         }
+        $data = array('role' => $role, 'is_active' => $active);
+        if ($pw !== '') {
+            $data['password_hash'] = password_hash($pw, PASSWORD_DEFAULT);
+        } elseif (Request::int('clear_password', 0, 0, 1) === 1 && Auth::isSuper()) {
+            $data['password_hash'] = '';
+        }
         if ($row) {
-            $this->db->update('users', array('role' => $role, 'is_active' => $active), 'id = ?', array((int)$row['id']));
+            $this->db->update('users', $data, 'id = ?', array((int)$row['id']));
         } else {
-            $this->db->insert('users', array('username' => $name, 'display_name' => $known['description'] !== '' ? $known['description'] : $name, 'password_hash' => '', 'role' => $role, 'auth_source' => 'issabel', 'is_active' => $active, 'created_at' => Util::now()));
+            $this->db->insert('users', array_merge(array('username' => $name, 'display_name' => $known['description'] !== '' ? $known['description'] : $name, 'password_hash' => '', 'auth_source' => 'issabel', 'created_at' => Util::now()), $data));
         }
         Audit::log('user.issabel', 'user', $row ? $row['id'] : $this->db->lastId(), "$name role=$role active=$active");
         Flash::set('success', t('saved'));
@@ -222,6 +241,10 @@ class UserController extends Controller
             Flash::set('error', t('user_exists'));
             $this->redirect('/users');
         }
+        if ($role === 'admin' && !Auth::isSuper()) {
+            Flash::set('error', t('only_root_grants_admin'));
+            $this->redirect('/users');
+        }
         $id = $this->db->insert('users', array('username' => $u, 'display_name' => Request::str('display_name', $u, 128), 'password_hash' => password_hash($pw, PASSWORD_DEFAULT), 'role' => $role, 'auth_source' => 'local', 'is_active' => 1, 'created_at' => Util::now()));
         Audit::log('user.create', 'user', $id, $u);
         Flash::set('success', t('saved'));
@@ -237,13 +260,21 @@ class UserController extends Controller
             $this->notFound();
         }
         $me = Auth::user();
+        if (Auth::isSuperRow($u) && !Auth::isSuper()) {
+            Flash::set('error', t('root_protected'));
+            $this->redirect('/users');
+        }
         $upd = array('display_name' => Request::str('display_name', $u['display_name'], 128));
         $role = Request::str('role', $u['role'], 16);
         if (in_array($role, array('admin', 'operator', 'viewer'), true)) {
+            if ($role === 'admin' && $u['role'] !== 'admin' && !Auth::isSuper()) {
+                Flash::set('error', t('only_root_grants_admin'));
+                $this->redirect('/users');
+            }
             $upd['role'] = $role;
         }
         $active = Request::int('is_active', 1, 0, 1);
-        if ((int)$u['id'] === (int)$me['id']) {
+        if ((int)$u['id'] === (int)$me['id'] || Auth::isSuperRow($u)) {
             $upd['role'] = 'admin';
             $active = 1;
         }
@@ -254,8 +285,11 @@ class UserController extends Controller
                 Flash::set('error', t('password_min'));
                 $this->redirect('/users');
             }
+            if ($u['auth_source'] === 'issabel' && !Auth::isSuper()) {
+                Flash::set('error', t('only_root'));
+                $this->redirect('/users');
+            }
             $upd['password_hash'] = password_hash($pw, PASSWORD_DEFAULT);
-            $upd['auth_source'] = 'local';
         }
         $this->db->update('users', $upd, 'id = ?', array((int)$u['id']));
         Audit::log('user.update', 'user', $u['id'], $u['username']);
@@ -270,6 +304,11 @@ class UserController extends Controller
         $me = Auth::user();
         if ((int)$p['id'] === (int)$me['id']) {
             Flash::set('error', t('cannot_delete_self'));
+            $this->redirect('/users');
+        }
+        $target = $this->db->one('SELECT * FROM users WHERE id = ?', array((int)$p['id']));
+        if ($target && Auth::isSuperRow($target)) {
+            Flash::set('error', t('root_protected'));
             $this->redirect('/users');
         }
         $this->db->exec('DELETE FROM api_keys WHERE user_id = ?', array((int)$p['id']));
@@ -293,7 +332,7 @@ class UserController extends Controller
         $upd = array('display_name' => Request::str('display_name', $me['display_name'], 128));
         $pw = (string)Request::post('password', '');
         if ($pw !== '') {
-            if ($me['auth_source'] !== 'local') {
+            if ($me['auth_source'] !== 'local' && $me['password_hash'] === '') {
                 Flash::set('error', t('issabel_user_no_password'));
                 $this->redirect('/profile');
             }
