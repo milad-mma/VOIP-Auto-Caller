@@ -81,6 +81,35 @@ class Trunks
         }
     }
 
+    /** "Name" <123> / 123 / <123>  ->  123 */
+    public static function cidNumber($cid)
+    {
+        $cid = trim((string)$cid);
+        if (preg_match('/<([^>]*)>/', $cid, $m)) {
+            $cid = $m[1];
+        }
+        return Util::dialSafe($cid);
+    }
+
+    /** username / fromuser / defaultuser of a SIP or PJSIP trunk in the Issabel asterisk db */
+    private static function peerUsername(PDO $pdo, $tech, $chan)
+    {
+        try {
+            if ($tech === 'sip') {
+                // sip table rows of a trunk have id = tr-peer-<trunkid>
+                $st = $pdo->prepare("SELECT s.keyword, s.data FROM sip s JOIN trunks t ON s.id = CONCAT('tr-peer-', t.trunkid) WHERE t.channelid = ? AND s.keyword IN ('fromuser','username','defaultuser') ORDER BY FIELD(s.keyword,'fromuser','username','defaultuser')");
+                $st->execute(array('SIP/' . $chan));
+            } else {
+                $st = $pdo->prepare("SELECT p.keyword, p.data FROM pjsip p JOIN trunks t ON p.id = t.trunkid WHERE t.channelid = ? AND p.keyword IN ('from_user','username') ORDER BY FIELD(p.keyword,'from_user','username')");
+                $st->execute(array('PJSIP/' . $chan));
+            }
+            $row = $st->fetch();
+            return $row ? Util::dialSafe($row['data']) : '';
+        } catch (Exception $e) {
+            return '';
+        }
+    }
+
     public static function markUsed($id, $failed = false)
     {
         Db::get()->run('UPDATE trunks SET last_used_at = NOW(), calls_total = calls_total + 1' . ($failed ? ', calls_failed = calls_failed + 1' : '') . ' WHERE id = ?', array((int)$id));
@@ -95,14 +124,20 @@ class Trunks
         }
         try {
             $pdo = new PDO('mysql:host=localhost;dbname=asterisk;charset=utf8', 'root', $root, array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_TIMEOUT => 2, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC));
-            $rows = $pdo->query('SELECT trunkid, name, tech, channelid, disabled FROM trunks ORDER BY trunkid')->fetchAll();
+            $rows = $pdo->query('SELECT trunkid, name, tech, channelid, outcid, disabled FROM trunks ORDER BY trunkid')->fetchAll();
             $out = array();
             foreach ($rows as $r) {
                 $tech = strtolower($r['tech']);
                 if (!in_array($tech, array('sip', 'pjsip', 'custom', 'iax', 'dahdi'), true)) {
                     continue;
                 }
-                $out[] = array('name' => $r['name'], 'tech' => $tech === 'pjsip' ? 'pjsip' : ($tech === 'sip' ? 'sip' : 'custom'), 'channel_id' => preg_replace('#^[A-Za-z]+/#', '', $r['channelid']), 'raw' => $r['channelid'], 'disabled' => $r['disabled'] === 'on');
+                $chan = preg_replace('#^[A-Za-z]+/#', '', $r['channelid']);
+                $cid = self::cidNumber(isset($r['outcid']) ? $r['outcid'] : '');
+                // no Outbound CID on the trunk: most providers expect the account/username as From user
+                if ($cid === '' && ($tech === 'sip' || $tech === 'pjsip')) {
+                    $cid = self::peerUsername($pdo, $tech, $chan);
+                }
+                $out[] = array('name' => $r['name'], 'tech' => $tech === 'pjsip' ? 'pjsip' : ($tech === 'sip' ? 'sip' : 'custom'), 'channel_id' => $chan, 'raw' => $r['channelid'], 'callerid' => $cid, 'disabled' => $r['disabled'] === 'on');
             }
             return $out;
         } catch (Exception $e) {

@@ -140,6 +140,7 @@ class SettingsController extends Controller
             'channel_id' => preg_replace('/[^A-Za-z0-9_\-\.@]/', '', Request::str('channel_id', '', 64)),
             'dial_template' => Util::oneLine(Request::str('dial_template', '', 160), 160),
             'dial_prefix' => Util::dialSafe(Request::str('dial_prefix', '', 16)),
+            'callerid' => Util::dialSafe(Request::str('callerid', '', 64)),
             'max_channels' => Request::int('max_channels', 1, 1, 500),
             'is_enabled' => Request::int('is_enabled', 1, 0, 1),
             'sort' => Request::int('sort', 0, -1000, 1000),
@@ -181,15 +182,25 @@ class SettingsController extends Controller
         $this->requireRole(Auth::ROLE_ADMIN);
         $this->csrf();
         $n = 0;
+        $u = 0;
         foreach (Trunks::fromIssabel() as $t) {
             if ($t['disabled'] || $t['channel_id'] === '') {
                 continue;
             }
-            if ($this->db->val('SELECT id FROM trunks WHERE channel_id = ?', array($t['channel_id']))) {
+            $ex = $this->db->one('SELECT id, callerid FROM trunks WHERE channel_id = ?', array($t['channel_id']));
+            if ($ex) {
+                // existing trunk without a caller id: fill it from Issabel
+                if ($ex['callerid'] === '' && $t['callerid'] !== '') {
+                    $this->db->update('trunks', array('callerid' => $t['callerid']), 'id = ?', array((int)$ex['id']));
+                    $u++;
+                }
                 continue;
             }
-            $this->db->insert('trunks', array('name' => $t['name'] !== '' ? $t['name'] : $t['channel_id'], 'tech' => $t['tech'], 'channel_id' => $t['channel_id'], 'max_channels' => 1, 'is_enabled' => 1, 'sort' => $n));
+            $this->db->insert('trunks', array('name' => $t['name'] !== '' ? $t['name'] : $t['channel_id'], 'tech' => $t['tech'], 'channel_id' => $t['channel_id'], 'callerid' => $t['callerid'], 'max_channels' => 1, 'is_enabled' => 1, 'sort' => $n));
             $n++;
+        }
+        if ($u) {
+            Flash::set('success', t('trunk_cids_updated', $u));
         }
         Audit::log('trunk.import', 'trunk', null, "$n added");
         Flash::set('success', t('trunks_imported', $n));

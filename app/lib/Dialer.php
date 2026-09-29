@@ -234,7 +234,9 @@ class Dialer
         } else {
             $channel = Campaign::channelFor($eff, $contact['phone']);
         }
-        $callerId = self::callerIdString($eff['callerid_name'], $eff['callerid_number']);
+        // pool: the trunk's own caller-id number wins (providers reject a From user that is not the line's number)
+        $cidNumber = ($trunk && $trunk['callerid'] !== '') ? $trunk['callerid'] : $eff['callerid_number'];
+        $callerId = self::callerIdString($eff['callerid_name'], $cidNumber);
         $attemptNo = (int)$contact['attempts'] + 1;
         $actionId = 'ac-' . $contact['id'] . '-' . $attemptNo . '-' . substr(md5(uniqid('', true)), 0, 6);
 

@@ -292,7 +292,10 @@ switch ($cmd) {
                 fail('trunk pool is empty or all channels busy (Settings > Trunk pool)');
             }
             $channel = Trunks::channelFor($tr, $phone);
-            out("trunk   : #{$tr['id']} {$tr['name']}");
+            out("trunk   : #{$tr['id']} {$tr['name']}" . ($tr['callerid'] !== '' ? " (cid {$tr['callerid']})" : ' (no trunk cid -> global)'));
+            if ($tr['callerid'] !== '') {
+                $eff['callerid_number'] = $tr['callerid'];
+            }
         } else {
             $channel = Campaign::channelFor($eff, $phone);
         }
