@@ -38,6 +38,8 @@ curl -fsSL https://raw.githubusercontent.com/milad-mma/VOIP-Auto-Caller/main/ins
 
 Purge stops and deletes the service, cron and logrotate entries, removes the AMI user and dialplan context from the `_custom.conf` files (and the `#include` line only if the installer added it), removes the Apache alias, drops the `autocaller` database and MySQL user, removes the Apache user from the `asterisk` group if the installer added it, deletes `/opt/autocaller` (config, audio, logs) and, if `sox` was installed by the installer, removes it too.
 
+**Upgrading from the old v1 (callblaster) version:** the installer detects `/var/www/html/autocaller`, asks once (or `AUTO_YES=1`), then removes it completely — old files, the `callblaster` database/user, its `[callblaster]` dialplan entries, restores the original `issabel.conf`/`elastix.conf` that v1 had replaced, and resets the `/var/spool/asterisk` permissions v1 had opened to 777. Its audio files are imported into v2 automatically; old call history is not migrated (export it from the old panel first if you need it).
+
 Offline install from the zip: `unzip autocaller-v2.zip && cd autocaller && sudo ./install.sh install`.
 
 Open `http://SERVER-IP/autocaller` (or https, like your Issabel panel) and sign in as `admin` with the password you typed, or with any Issabel panel user.
@@ -150,6 +152,8 @@ curl -fsSL https://raw.githubusercontent.com/milad-mma/VOIP-Auto-Caller/main/ins
 curl -fsSL https://raw.githubusercontent.com/milad-mma/VOIP-Auto-Caller/main/install.sh | sudo bash -s purge
 ```
 سرویس، cron، logrotate، یوزر AMI و کانتکست dialplan (فقط بلوک خودمان در فایل‌های `_custom.conf`)، فایل Apache، دیتابیس و یوزر MySQL، عضویت گروه apache (اگر نصاب اضافه کرده باشد)، کل `/opt/autocaller` و حتی `sox` (اگر نصاب نصبش کرده باشد) پاک می‌شوند.
+
+**ارتقا از نسخه‌ی قدیمی (v1 / callblaster):** نصاب پوشه‌ی `/var/www/html/autocaller` را تشخیص می‌دهد، یک بار می‌پرسد (یا با `AUTO_YES=1` نمی‌پرسد) و کامل پاکش می‌کند: فایل‌ها، دیتابیس و یوزر `callblaster`، بلوک `[callblaster]` در dialplan، بازگرداندن `issabel.conf` اصلی که v1 جایگزین کرده بود، و اصلاح مجوز 777 که v1 روی `/var/spool/asterisk` گذاشته بود. فایل‌های صوتی قدیمی خودکار وارد v2 می‌شوند؛ تاریخچه‌ی تماس‌های قدیمی منتقل نمی‌شود (اگر لازم دارید قبل از نصب از پنل قدیمی اکسل بگیرید).
 
 نصب آفلاین از zip: `unzip autocaller-v2.zip && cd autocaller && sudo ./install.sh install`
 سپس `http://IP-سرور/autocaller` را باز کنید و با کاربر `admin` (رمزی که وارد کردید) یا هر کاربر پنل Issabel وارد شوید.

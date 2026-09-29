@@ -14,6 +14,10 @@
 #   sudo ./install.sh uninstall    remove, asking about database/files
 #   sudo ./install.sh doctor       health check
 #   ADMIN_PASS=secret sudo -E ./install.sh install   # non-interactive admin password
+#   AUTO_YES=1 ... install                            # do not ask before removing an old v1 installation
+#
+# If the old AutoCaller v1 (callblaster, /var/www/html/autocaller) is present, install removes it
+# (its audio files are imported, its issabel.conf backup restored, /var/spool/asterisk permissions fixed).
 #
 set -u
 APP_DIR="/opt/autocaller"
@@ -158,11 +162,75 @@ mysql_q()   { "$MYSQL_BIN" -uroot ${MYSQL_ROOT_PW:+-p"$MYSQL_ROOT_PW"} -e "$1"; 
 
 rand() { tr -dc 'A-Za-z0-9' </dev/urandom | head -c "${1:-24}"; }
 
+# ------------------------------------------------------------------ legacy v1 (callblaster) cleanup
+LEGACY_DIR="/var/www/html/autocaller"
+legacy_present() {
+    [ -f "$LEGACY_DIR/callblaster.php" ] || [ -f "$LEGACY_DIR/asyncCall.php" ] || grep -qs '^\[callblaster\]' /etc/asterisk/extensions.conf /etc/asterisk/extensions_custom.conf
+}
+# legacy_remove KEEP_AUDIO_DIR -> removes the old Callblaster-based AutoCaller v1 completely
+legacy_remove() {
+    local keep_audio="${1:-}"
+    say "Removing old AutoCaller v1 (callblaster)"
+    # old audio files: keep a copy for import into v2
+    if [ -n "$keep_audio" ] && [ -d "$LEGACY_DIR/audio" ]; then
+        mkdir -p "$keep_audio"
+        find "$LEGACY_DIR/audio" -maxdepth 1 -type f \( -iname '*.wav' -o -iname '*.mp3' -o -iname '*.gsm' \) -exec cp -f {} "$keep_audio/" \; 2>/dev/null
+        ok "old audio files saved for import ($(ls "$keep_audio" 2>/dev/null | wc -l) files)"
+    fi
+    # stale background dialers of v1
+    pkill -f "$LEGACY_DIR/asyncCall.php" 2>/dev/null || true
+    # dialplan: the v1 installer appended "[callblaster]" + one exten line to both files
+    for f in /etc/asterisk/extensions.conf /etc/asterisk/extensions_custom.conf; do
+        [ -f "$f" ] && sed -i '/^\[callblaster\]$/,/^exten => 333,1,AGI(.*callblaster\.php)$/d' "$f"
+    done
+    # v1 replaced Issabel's own Apache config with its copy (and disabled the https redirect); restore the original
+    for c in issabel elastix; do
+        if [ -f /etc/httpd/conf.d/$c.conf.bak ]; then
+            mv -f /etc/httpd/conf.d/$c.conf.bak /etc/httpd/conf.d/$c.conf && ok "restored original /etc/httpd/conf.d/$c.conf"
+        fi
+    done
+    # v1 did chmod -R 777 /var/spool/asterisk
+    if [ -d /var/spool/asterisk ]; then
+        chown -R $AST_USER:$AST_USER /var/spool/asterisk
+        find /var/spool/asterisk -type d -exec chmod 750 {} \; 2>/dev/null
+        find /var/spool/asterisk -type f -exec chmod 640 {} \; 2>/dev/null
+        ok "/var/spool/asterisk permissions restored (750/640, $AST_USER)"
+    fi
+    # database
+    if mysql_try || mysql_root_quiet; then
+        mysql_q "DROP DATABASE IF EXISTS callblaster;" 2>/dev/null
+        mysql_q "DROP USER IF EXISTS 'callblaster'@'localhost';" 2>/dev/null || mysql_q "DROP USER 'callblaster'@'localhost';" 2>/dev/null || true
+        mysql_q "FLUSH PRIVILEGES;" 2>/dev/null
+        ok "database/user callblaster dropped"
+    else
+        warn "MySQL root not available - drop manually: DROP DATABASE callblaster; DROP USER 'callblaster'@'localhost';"
+    fi
+    rm -rf "$LEGACY_DIR" /var/www/html/autocaller.zip /root/install.sh.v1 2>/dev/null
+    rm -f /var/spool/asterisk/outgoing/demoCall.call 2>/dev/null
+    "${AST_BIN:-asterisk}" -rx "dialplan reload" >/dev/null 2>&1 || true
+    ok "old files removed"
+}
+
 # ------------------------------------------------------------------ install
 do_install() {
     detect_env; print_env; check_php; mysql_root; fetch_source
     UPGRADE=0; [ -f "$APP_DIR/config/config.php" ] && UPGRADE=1
     mkdir -p "$APP_DIR"; touch "$STATE_FILE"
+
+    LEGACY_AUDIO=""
+    if legacy_present; then
+        warn "An old AutoCaller v1 (callblaster) installation was found in $LEGACY_DIR."
+        local ans="Y"
+        if [ -z "${AUTO_YES:-}" ] && has_tty; then
+            echo -n "Remove it now (its audio files will be imported into v2, call history is NOT migrated)? [Y/n] "; ans="$(ask)"
+        fi
+        if [ "$ans" = "n" ] || [ "$ans" = "N" ]; then
+            warn "old version kept; the new panel still takes over the /autocaller URL"
+        else
+            LEGACY_AUDIO="$(mktemp -d /tmp/autocaller-oldaudio.XXXXXX)"
+            legacy_remove "$LEGACY_AUDIO"
+        fi
+    fi
 
     say "Copying files to $APP_DIR"
     mkdir -p "$APP_DIR"
@@ -403,6 +471,13 @@ EOF
         su -s /bin/bash $AST_USER -c "cd $APP_DIR && $PHP_BIN bin/console.php user:create admin admin '$pw'" >/dev/null && ok "user admin created"
     fi
 
+    if [ -n "$LEGACY_AUDIO" ] && [ -n "$(ls -A "$LEGACY_AUDIO" 2>/dev/null)" ]; then
+        say "Importing old audio files"
+        chown -R $AST_USER:$AST_USER "$LEGACY_AUDIO"
+        su -s /bin/bash $AST_USER -c "cd $APP_DIR && $PHP_BIN bin/console.php audio:import '$LEGACY_AUDIO'" || warn "audio import had errors"
+    fi
+    [ -n "$LEGACY_AUDIO" ] && rm -rf "$LEGACY_AUDIO"
+
     IP="$(hostname -I 2>/dev/null | awk '{print $1}')"
     echo
     echo -e "${GREEN}✔ AutoCaller installed.${NC}"
@@ -475,6 +550,7 @@ remove_all() {
 do_purge() {
     echo -e "${RED}Removing AutoCaller completely (files, database, AMI user, dialplan, Apache, service) - no questions asked.${NC}"
     remove_all 1 1
+    if legacy_present; then detect_env 2>/dev/null || true; legacy_remove ""; fi
 }
 
 do_uninstall() {

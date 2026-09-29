@@ -10,6 +10,7 @@
  *   php bin/console.php ami:test
  *   php bin/console.php dialer:status
  *   php bin/console.php cleanup                 apply retention_days
+ *   php bin/console.php audio:import <dir>      import wav/mp3 files as audio prompts (e.g. from v1)
  *   php bin/console.php setting <key> [value]
  */
 define('AC_CLI', true);
@@ -166,6 +167,39 @@ switch ($cmd) {
         out('last error: ' . ($s['last_error'] ? $s['last_error'] : '-'));
         exit(($age !== null && $age < 30) ? 0 : 2);
 
+    case 'audio:import':
+        $dir = isset($argv[2]) ? rtrim($argv[2], '/') : '';
+        if ($dir === '' || !is_dir($dir)) {
+            fail('usage: audio:import <directory with wav/mp3/gsm files>');
+        }
+        $db = Db::get();
+        $n = 0;
+        foreach (glob($dir . '/*') as $f) {
+            if (!is_file($f) || !preg_match('/\.(wav|mp3|gsm|ogg)$/i', $f)) {
+                continue;
+            }
+            $name = Audio::cleanName(pathinfo($f, PATHINFO_FILENAME));
+            if ($db->val('SELECT id FROM audio_files WHERE name = ?', array($name))) {
+                out("skip $name (exists)");
+                continue;
+            }
+            $id = $db->insert('audio_files', array('name' => $name, 'original_name' => basename($f), 'path' => 'audio/pending', 'created_by' => null, 'created_at' => Util::now()));
+            $rel = 'audio/ac_' . $id . '.wav';
+            $dest = Config::storage($rel);
+            try {
+                Audio::convert($f, $dest);
+                @chmod($dest, 0664);
+                $db->update('audio_files', array('path' => $rel, 'duration_sec' => Audio::duration($dest), 'size_bytes' => (int)filesize($dest)), 'id = ?', array($id));
+                out("imported $name (" . Audio::duration($dest) . 's)');
+                $n++;
+            } catch (Exception $e) {
+                $db->exec('DELETE FROM audio_files WHERE id = ?', array($id));
+                out("FAILED $name: " . $e->getMessage());
+            }
+        }
+        out("$n audio files imported");
+        break;
+
     case 'cleanup':
         $days = (int)Settings::get('retention_days', 0);
         if ($days <= 0) {
@@ -244,6 +278,6 @@ switch ($cmd) {
 
     case 'help':
     default:
-        out("usage: console.php migrate | user:create | user:passwd | setting | ami:test | dialer:status | cleanup | doctor");
+        out("usage: console.php migrate | user:create | user:passwd | setting | ami:test | dialer:status | cleanup | audio:import <dir> | doctor");
         break;
 }
