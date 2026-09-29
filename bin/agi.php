@@ -14,5 +14,7 @@ try {
     $ivr->run();
 } catch (Exception $e) {
     Logger::error('agi fatal: ' . $e->getMessage() . ' @' . $e->getFile() . ':' . $e->getLine());
+} catch (Error $e) {
+    Logger::error('agi fatal: ' . $e->getMessage() . ' @' . $e->getFile() . ':' . $e->getLine());
 }
 exit(0);

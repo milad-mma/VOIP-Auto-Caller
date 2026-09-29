@@ -79,6 +79,10 @@ class Dialer
                 Logger::error('tick error: ' . $e->getMessage() . ' @' . $e->getFile() . ':' . $e->getLine());
                 $this->setError($e->getMessage());
                 usleep(500000);
+            } catch (Error $e) { // PHP 7+: TypeError etc. must not kill the daemon (ignored by PHP 5)
+                Logger::error('tick fatal: ' . $e->getMessage() . ' @' . $e->getFile() . ':' . $e->getLine());
+                $this->setError($e->getMessage());
+                usleep(500000);
             }
         }
         Logger::info('dialer stopped');
@@ -420,17 +424,21 @@ class Dialer
 
     // ------------------------------------------------------------------ housekeeping
 
-    /** Anything left in dialing/answered from a previous daemon run is unknown -> retry once or fail */
+    /**
+     * Calls that were in flight when the previous daemon died: their outcome is unknown.
+     * They are NOT blindly re-queued (that would ring people again): the attempt is closed as failed
+     * and the contact follows the campaign's normal retry rules (max_retries / retry_on).
+     */
     private function recoverAfterRestart()
     {
-        $n = $this->db->exec(
-            "UPDATE call_attempts SET result = 'failed', ended_at = NOW(), reason_code = 'restart' WHERE result IN ('dialing','answered')"
-        );
-        $this->db->exec(
-            "UPDATE campaign_contacts SET status = 'pending', next_attempt_at = NOW(), updated_at = NOW(), last_error = 'recovered' WHERE status IN ('dialing','answered')"
-        );
-        if ($n) {
-            Logger::warn("recovered $n in-flight attempts after restart");
+        $rows = $this->db->all("SELECT id FROM call_attempts WHERE result IN ('dialing','answered')");
+        foreach ($rows as $r) {
+            $this->finishAttempt((int)$r['id'], CallStatus::FAILED, array('reason_code' => 'restart', 'hangup_cause' => 'daemon restart'));
+        }
+        // contacts stuck without an open attempt
+        $this->db->exec("UPDATE campaign_contacts SET status = 'failed', updated_at = NOW(), last_error = 'recovered' WHERE status IN ('dialing','answered')");
+        if ($rows) {
+            Logger::warn('closed ' . count($rows) . ' in-flight attempts after restart (not re-dialed unless retry rules allow)');
         }
     }
 

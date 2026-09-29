@@ -41,6 +41,7 @@ return array(
     'skip_for_now' => 'Skip for now', 'map_columns' => 'Map columns', 'rows' => 'rows', 'phone_column' => 'Phone column', 'name_column' => 'Name column', 'audio_column' => 'Audio column', 'column' => 'Column', 'first_row_header' => 'First row is a header', 'skip_dnc' => 'Skip do-not-call numbers', 'dedupe' => 'Skip duplicates', 'preview' => 'Preview', 'import_now' => 'Import',
     'parse_failed' => 'Could not read the file', 'file_empty' => 'The file is empty', 'import_session_expired' => 'Import session expired, upload again', 'import_failed' => 'Import failed', 'import_result' => 'Imported %d · duplicates %d · invalid %d · do-not-call %d · unknown audio %d',
     // quick
+    'call_again' => 'Call this number again',
     'quick_call' => 'Quick call', 'quick_hint' => 'Call one number right now and play a message. Press 1 during the message to transfer (optional).', 'transfer_on_1' => 'Transfer to (on key 1)', 'call_now' => 'Call now', 'call_queued' => 'Call queued, it will be dialed within seconds', 'recent_quick_calls' => 'Recent quick calls',
     // audio
     'audio_files' => 'Audio files', 'no_audio_files' => 'No audio files yet.', 'used_in' => 'Used in', 'upload_audio' => 'Upload audio', 'logical_name' => 'Logical name', 'logical_name_hint' => 'used in the "audio" column of import files and the API; letters, digits, - and _', 'audio_convert_hint' => 'MP3/WAV/OGG… are converted to 8 kHz 16-bit mono WAV automatically (the format Asterisk plays best).',

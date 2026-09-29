@@ -17,7 +17,13 @@ $waitMsg = $c['last_error'] && strpos($c['last_error'], 'wait:') === 0 ? t('wait
     <?php if ($waitMsg): ?><div class="alert alert-warn small" id="c-wait"><?php echo h($waitMsg); ?></div><?php endif; ?>
     <?php if ($c['description']): ?><p class="muted"><?php echo nl2br(h($c['description'])); ?></p><?php endif; ?>
   </div>
-  <?php if ($op): ?>
+  <?php if ($op && $c['kind'] === 'quick'): ?>
+  <div class="head-actions">
+    <?php if (in_array($c['status'], array('running', 'paused', 'scheduled'), true)) echo $act('stop', t('stop'), 'btn-danger', t('confirm_stop')); ?>
+    <a class="btn btn-primary btn-sm" href="<?php echo View::url('/quick?phone=' . urlencode($c['name'] !== '' ? preg_replace('/^.*- /', '', $c['name']) : '')); ?>">📞 <?php echo h(t('call_again')); ?></a>
+    <?php if (Auth::can('admin') && !in_array($c['status'], array('running', 'scheduled'), true)) echo $act('delete', t('delete'), 'btn-sm btn-ghost', t('confirm_delete')); ?>
+  </div>
+  <?php elseif ($op): ?>
   <div class="head-actions">
     <?php if (in_array($c['status'], array('draft', 'completed', 'stopped'), true)) echo $act('start', t('start'), 'btn-primary'); ?>
     <?php if ($c['status'] === 'scheduled') echo $act('start', t('start_now'), 'btn-primary'); ?>
@@ -107,7 +113,7 @@ $waitMsg = $c['last_error'] && strpos($c['last_error'], 'wait:') === 0 ? t('wait
   <div class="pager" id="ct-pager"></div>
 </div>
 
-<?php if ($op): ?>
+<?php if ($op && $c['kind'] !== 'quick'): ?>
 <div class="row2">
   <div class="card">
     <h3><?php echo h(t('add_numbers_manually')); ?></h3>
@@ -128,5 +134,5 @@ $waitMsg = $c['last_error'] && strpos($c['last_error'], 'wait:') === 0 ? t('wait
   </div>
 </div>
 <?php endif; ?>
-<script>window.AC_PAGE = 'campaign-show'; window.AC_CAMPAIGN = <?php echo (int)$c['id']; ?>; window.AC_CAN_OP = <?php echo $op ? 'true' : 'false'; ?>;
+<script>window.AC_PAGE = 'campaign-show'; window.AC_CAMPAIGN = <?php echo (int)$c['id']; ?>; window.AC_CAN_OP = <?php echo ($op && $c['kind'] !== 'quick') ? 'true' : 'false'; ?>;
 window.AC_ST = <?php $m = array(); foreach (CallStatus::all() as $st) { $m[$st] = t('st_' . $st); } echo Util::json($m); ?>;</script>

@@ -549,6 +549,7 @@ class CampaignController extends Controller
             $this->json(array('ok' => false, 'error' => 'not_allowed'), 400);
         }
         Campaign::refreshCounters($c['id']);
+        Audit::log('contact.' . $a, 'contact', $ct['id'], $ct['phone'] . ' (campaign #' . $c['id'] . ')');
         $this->json(array('ok' => true));
     }
 }

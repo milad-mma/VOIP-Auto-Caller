@@ -4,7 +4,7 @@
     <h3><?php echo h(t('quick_call')); ?></h3>
     <p class="hint"><?php echo h(t('quick_hint')); ?></p>
     <form method="post" action="<?php echo View::url('/quick'); ?>"><?php echo Auth::csrfField(); ?>
-      <label><?php echo h(t('phone')); ?> *<input type="text" name="phone" dir="ltr" required placeholder="0912xxxxxxx"></label>
+      <label><?php echo h(t('phone')); ?> *<input type="text" name="phone" dir="ltr" required placeholder="0912xxxxxxx" value="<?php echo h(Util::normalizePhone(Request::get('phone', ''), Settings::get('country_code', '98'))); ?>"></label>
       <label><?php echo h(t('name')); ?><input type="text" name="name"></label>
       <label><?php echo h(t('audio')); ?> *<select name="audio_id" required><?php foreach ($audio as $a): ?><option value="<?php echo $a['id']; ?>"><?php echo h($a['name']); ?> (<?php echo Util::formatDuration($a['duration_sec']); ?>)</option><?php endforeach; ?></select></label>
       <label><?php echo h(t('transfer_on_1')); ?><input type="text" name="transfer" dir="ltr" placeholder="<?php echo h(t('extension_or_queue')); ?>"></label>
