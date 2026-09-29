@@ -116,6 +116,7 @@ curl -X POST http://pbx/autocaller/api/v1/campaigns -H "X-API-Key: ack_…" -H "
 ## Troubleshooting
 
 * `sudo ./install.sh doctor` — checks PHP, DB, AMI login, dialplan, daemon heartbeat.
+* `sudo -u asterisk php /opt/autocaller/bin/console.php call:test 0912xxxxxxx [audio-name]` — places ONE call through the exact channel/caller-ID the dialer would use and prints Asterisk's answer (reason code). Run `asterisk -rvvv` in another terminal to see the dialplan. This is the fastest way to find out whether the problem is the outbound route / prefix / caller ID rather than the app.
 * Dialer log: `storage/logs/dialer.log`; IVR log: `storage/logs/agi.log`; web: `storage/logs/app.log`.
 * `asterisk -rvvv` and `manager show connected` to confirm the daemon is logged in.
 * No calls placed → check campaign status "waiting: outside calling hours", global max concurrent, and that the outbound route accepts `<prefix><number>`.
@@ -169,6 +170,7 @@ curl -fsSL https://raw.githubusercontent.com/milad-mma/VOIP-Auto-Caller/main/ins
 
 ### رفع اشکال
 * `sudo ./install.sh doctor`
+* `sudo -u asterisk php /opt/autocaller/bin/console.php call:test 0912xxxxxxx [نام-فایل-صوتی]` — یک تماس با همان کانال و کالر آی‌دی که شماره‌گیر استفاده می‌کند می‌گیرد و جواب Asterisk را چاپ می‌کند؛ هم‌زمان `asterisk -rvvv` را باز کنید. سریع‌ترین راه برای فهمیدن اینکه مشکل از Outbound Route / پیش‌شماره / کالر آی‌دی است یا از برنامه.
 * لاگ‌ها: `storage/logs/dialer.log` (شماره‌گیر)، `agi.log` (IVR)، `app.log` (وب).
 * تماسی گرفته نمی‌شود → وضعیت کمپین («در انتظار: خارج از ساعت تماس»)، سقف هم‌زمانی، و اینکه Outbound Route شماره‌ی `پیش‌شماره+شماره` را قبول می‌کند.
 

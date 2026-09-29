@@ -100,10 +100,13 @@ class Auth
             self::onLoginOk($u);
             return $u;
         }
-        // Issabel / Elastix panel users
-        if (Settings::get('issabel_login') === '1' && ($u === null || $u['auth_source'] === 'issabel')) {
+        // Issabel / Elastix panel users (also accepted for a same-named local user whose local password did not match)
+        if (Settings::get('issabel_login') === '1') {
             $iu = self::issabelCheck($username, $password);
             if ($iu) {
+                if ($u && $u['auth_source'] === 'local') {
+                    Logger::info("login: local user '$username' authenticated with Issabel panel credentials");
+                }
                 if (!$u) {
                     $role = $iu['is_admin'] ? Settings::get('issabel_admin_role', 'admin') : self::ROLE_VIEWER;
                     $id = $db->insert('users', array(
@@ -176,6 +179,7 @@ class Auth
     {
         $root = self::pbxRootPassword();
         if ($root === null) {
+            Logger::warn('issabel login: cannot read mysqlrootpwd (config issabel.mysql_root empty and /etc/issabel.conf not readable by ' . (function_exists('posix_geteuid') ? posix_geteuid() : 'web user') . ')');
             return null;
         }
         try {
@@ -188,6 +192,7 @@ class Auth
             $st->execute(array($username));
             $row = $st->fetch();
             if (!$row) {
+                Logger::info("issabel login: no acl_user named '$username'");
                 return null;
             }
             $ok = false;
@@ -203,6 +208,7 @@ class Auth
                 $ok = password_verify($password, $row['password']) || hash_equals((string)$row['password'], md5($password));
             }
             if (!$ok) {
+                Logger::info("issabel login: wrong password for '$username'");
                 return null;
             }
             $isAdmin = ($username === 'admin');

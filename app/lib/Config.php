@@ -109,6 +109,7 @@ class Settings
             'api_enabled' => '1',
             'ui_lang' => 'fa',
             'retention_days' => '0',        // 0 = keep forever
+            'default_ivr' => '',            // JSON, pre-fills the IVR table of new campaigns
         );
     }
 

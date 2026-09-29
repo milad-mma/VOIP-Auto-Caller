@@ -122,6 +122,23 @@ switch ($cmd) {
         out($n ? 'password updated' : 'user not found');
         break;
 
+    case 'user:has-admin':
+        $n = (int)Db::get()->val("SELECT COUNT(*) FROM users WHERE role = 'admin' AND auth_source = 'local' AND is_active = 1 AND password_hash <> ''");
+        out($n ? "yes ($n)" : 'no');
+        exit($n ? 0 : 1);
+
+    case 'issabel:test':
+        $name = isset($argv[2]) ? $argv[2] : 'admin';
+        $pass = isset($argv[3]) ? $argv[3] : readSecret("Issabel password for $name: ");
+        $rp = Auth::pbxRootPassword();
+        out('mysql root password: ' . ($rp === null ? 'NOT READABLE (config issabel.mysql_root empty and /etc/issabel.conf unreadable)' : 'ok'));
+        $r = Auth::issabelCheck($name, $pass);
+        out($r ? "OK: $name is " . ($r['is_admin'] ? 'an Issabel admin' : 'a normal Issabel user') . " -> role " . ($r['is_admin'] ? Settings::get('issabel_admin_role', 'admin') : 'viewer') : 'FAILED (see storage/logs/app.log)');
+        $local = Db::get()->one('SELECT username, role, auth_source, is_active FROM users WHERE username = ?', array($name));
+        out('local user with this name: ' . ($local ? $local['auth_source'] . '/' . $local['role'] . ($local['is_active'] ? '' : ' (inactive)') : 'none'));
+        out('issabel_login setting: ' . Settings::get('issabel_login'));
+        exit($r ? 0 : 1);
+
     case 'setting':
         $k = isset($argv[2]) ? $argv[2] : '';
         if ($k === '') {
@@ -166,6 +183,112 @@ switch ($cmd) {
         out('active calls: ' . $s['active_calls']);
         out('last error: ' . ($s['last_error'] ? $s['last_error'] : '-'));
         exit(($age !== null && $age < 30) ? 0 : 2);
+
+    case 'legacy:import-config':
+        $f = isset($argv[2]) ? $argv[2] : '';
+        $ini = $f && is_file($f) ? @parse_ini_file($f, true) : false;
+        if (!$ini) {
+            fail('usage: legacy:import-config <old config.ini>');
+        }
+        $g = function ($sec, $key) use ($ini) {
+            return isset($ini[$sec][$key]) ? trim((string)$ini[$sec][$key]) : '';
+        };
+        $applied = array();
+        $prefix = Util::dialSafe($g('prefixc', 'prefix'));
+        Settings::set('dial_prefix', $prefix);
+        $applied[] = "dial_prefix=" . ($prefix === '' ? '(none)' : $prefix);
+        $cid = $g('callid', 'caller_id');
+        if ($cid !== '') {
+            if (preg_match('/^[0-9+*#]+$/', $cid)) {
+                Settings::set('callerid_number', $cid);
+                $applied[] = "callerid_number=$cid";
+            } else {
+                Settings::set('callerid_name', Util::oneLine($cid, 64));
+                $applied[] = "callerid_name=$cid";
+            }
+        }
+        $wt = (int)$g('waittimes', 'waittime');
+        if ($wt >= 5 && $wt <= 120) {
+            Settings::set('default_ring_timeout', (string)$wt);
+            $applied[] = "default_ring_timeout=$wt";
+        }
+        $iv = (float)$g('callblaster', 'interval');
+        if ($iv > 0 && $iv <= 600) {
+            Settings::set('default_gap_ms', (string)(int)round($iv * 1000));
+            $applied[] = "default_gap_ms=" . (int)round($iv * 1000);
+        }
+        $mr = $g('retry', 'maxretries');
+        if ($mr !== '' && ctype_digit($mr)) {
+            Settings::set('default_max_retries', (string)min(10, (int)$mr));
+            $applied[] = "default_max_retries=$mr";
+        }
+        $rt = (int)$g('retry', 'retrytime');
+        if ($rt >= 60) {
+            Settings::set('default_retry_delay_min', (string)max(1, (int)round($rt / 60)));
+            $applied[] = "default_retry_delay_min=" . max(1, (int)round($rt / 60));
+        }
+        $trunk = $g('trunkname', 'name');
+        if ($trunk !== '') {
+            Settings::set('trunk_name', Util::oneLine($trunk, 64));
+            Settings::set('channel_tech', 'sip');
+            $applied[] = "channel_tech=sip trunk_name=$trunk";
+        }
+        $ivr = Campaign::defaultIvr();
+        for ($i = 1; $i <= 9; $i++) {
+            $ext = Util::dialSafe($g("press$i", 'extension'));
+            if ($ext !== '') {
+                $ctx = preg_replace('/[^A-Za-z0-9_\-]/', '', $g("press$i", 'context'));
+                $ivr['digits'][(string)$i] = array('action' => 'transfer', 'target' => $ext, 'context' => $ctx !== '' ? $ctx : 'from-internal', 'tag' => '');
+                $applied[] = "press$i -> $ext";
+            }
+        }
+        Settings::set('default_ivr', Util::json(Campaign::cleanIvr($ivr)));
+        out('applied: ' . implode(', ', $applied));
+        break;
+
+    case 'call:test':
+        // Originate one call synchronously through AMI, exactly like the dialer does, and print the outcome.
+        $phone = isset($argv[2]) ? Util::normalizePhone($argv[2], Settings::get('country_code', '98')) : '';
+        if ($phone === '') {
+            fail('usage: call:test <phone> [audio-name]   (dials the number and plays the audio, or a demo prompt)');
+        }
+        $audioName = isset($argv[3]) ? $argv[3] : '';
+        $file = 'demo-congrats';
+        if ($audioName !== '') {
+            $a = Db::get()->one('SELECT * FROM audio_files WHERE name = ? OR id = ?', array($audioName, (int)$audioName));
+            if (!$a) {
+                fail("audio '$audioName' not found");
+            }
+            $file = preg_replace('/\.[A-Za-z0-9]+$/', '', Config::storage($a['path']));
+        }
+        $eff = Campaign::effective(array('callerid_name' => null, 'callerid_number' => null, 'dial_prefix' => null, 'channel_tech' => null, 'trunk_name' => null));
+        $channel = Campaign::channelFor($eff, $phone);
+        $cid = Dialer::callerIdString($eff['callerid_name'], $eff['callerid_number']);
+        out("channel : $channel");
+        out("callerid: $cid");
+        out("audio   : $file");
+        try {
+            $ami = Ami::fromConfig();
+            $ami->connect(5);
+        } catch (Exception $e) {
+            fail('AMI: ' . $e->getMessage());
+        }
+        $timeout = (int)Settings::get('default_ring_timeout', 30);
+        out("dialing (up to {$timeout}s)...");
+        $r = $ami->action('Originate', array(
+            'Channel' => $channel, 'Application' => 'Playback', 'Data' => $file,
+            'Timeout' => $timeout * 1000, 'CallerID' => $cid, 'Account' => 'autocaller-test', 'Async' => 'false',
+        ), $timeout + 10);
+        $ami->close();
+        if (!$r) {
+            fail('no response from AMI within ' . ($timeout + 10) . 's');
+        }
+        out('response: ' . $r['Response'] . (isset($r['Message']) ? ' - ' . $r['Message'] : '') . (isset($r['Reason']) ? ' (reason ' . $r['Reason'] . ' = ' . CallStatus::fromReason($r['Reason']) . ')' : ''));
+        if (strtolower($r['Response']) !== 'success') {
+            out('hint: watch "asterisk -rvvv" while running this; check outbound routes accept ' . $eff['dial_prefix'] . $phone . ' and that the caller id number is allowed');
+            exit(1);
+        }
+        break;
 
     case 'audio:import':
         $dir = isset($argv[2]) ? rtrim($argv[2], '/') : '';
@@ -273,11 +396,23 @@ switch ($cmd) {
         }
         $rp = Auth::pbxRootPassword();
         out(($rp !== null ? '  [ok] ' : '  [warn] ') . 'PBX mysql root password readable (Issabel login / CDR lookup)');
+        if ($rp !== null) {
+            try {
+                $pdo = new PDO('mysql:host=localhost;dbname=acl;charset=utf8', 'root', $rp, array(PDO::ATTR_TIMEOUT => 3));
+                $n = (int)$pdo->query('SELECT COUNT(*) FROM acl_user')->fetchColumn();
+                out("  [ok] Issabel acl database reachable ($n panel users)");
+            } catch (Exception $e) {
+                out('  [warn] Issabel acl database: ' . $e->getMessage());
+            }
+        }
+        $admins = (int)Db::get()->val("SELECT COUNT(*) FROM users WHERE role = 'admin' AND is_active = 1");
+        out(($admins ? '  [ok] ' : '  [warn] ') . "$admins active admin user(s)" . ($admins ? '' : ' - create one: console.php user:create admin admin'));
+        out('  running as uid ' . (function_exists('posix_geteuid') ? posix_geteuid() : '?') . ', /etc/issabel.conf readable: ' . (is_readable('/etc/issabel.conf') ? 'yes' : 'no') . ', config.php readable: ' . (is_readable(APP_ROOT . '/config/config.php') ? 'yes' : 'no'));
         out($ok ? 'RESULT: OK' : 'RESULT: PROBLEMS FOUND');
         exit($ok ? 0 : 1);
 
     case 'help':
     default:
-        out("usage: console.php migrate | user:create | user:passwd | setting | ami:test | dialer:status | cleanup | audio:import <dir> | doctor");
+        out("usage: console.php migrate | user:create | user:passwd | user:has-admin | issabel:test [user] | setting | ami:test | call:test <phone> [audio] | dialer:status | cleanup | audio:import <dir> | legacy:import-config <ini> | doctor");
         break;
 }

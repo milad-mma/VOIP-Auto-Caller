@@ -210,7 +210,7 @@ class Dialer
         }
         $eff = Campaign::effective($c);
         $channel = Campaign::channelFor($eff, $contact['phone']);
-        $callerId = '"' . str_replace('"', '', $eff['callerid_name']) . '" <' . Util::dialSafe($eff['callerid_number']) . '>';
+        $callerId = self::callerIdString($eff['callerid_name'], $eff['callerid_number']);
         $attemptNo = (int)$contact['attempts'] + 1;
         $actionId = 'ac-' . $contact['id'] . '-' . $attemptNo . '-' . substr(md5(uniqid('', true)), 0, 6);
 
@@ -247,6 +247,20 @@ class Dialer
         $this->db->update('campaigns', array('last_dial_at' => $now), 'id = ?', array((int)$c['id']));
         Logger::info("originate #$attemptId contact {$contact['id']} -> {$contact['phone']} via $channel");
         return true;
+    }
+
+    /** "Name" <number>, number-only, or name-only - never an empty <> which some dialplans/trunks choke on */
+    public static function callerIdString($name, $number)
+    {
+        $name = trim(str_replace(array('"', '<', '>', "\r", "\n"), '', (string)$name));
+        $number = Util::dialSafe($number);
+        if ($number !== '' && $name !== '') {
+            return '"' . $name . '" <' . $number . '>';
+        }
+        if ($number !== '') {
+            return $number;
+        }
+        return $name !== '' ? $name : 'AutoCaller';
     }
 
     // ------------------------------------------------------------------ events

@@ -85,6 +85,12 @@ detect_env() {
     AST_BIN="$(command -v asterisk || echo /usr/sbin/asterisk)"
     HTTPD_USER="$(grep -hiE '^\s*User\s+' /etc/httpd/conf/httpd.conf /etc/httpd/conf.d/*.conf 2>/dev/null | tail -1 | awk '{print $2}')"
     [ -n "$HTTPD_USER" ] || HTTPD_USER="apache"
+    # PHP may run inside php-fpm under a different user (Issabel 5 / Rocky 8)
+    FPM_USER=""
+    if systemctl is-active --quiet php-fpm 2>/dev/null; then
+        FPM_USER="$(grep -hE '^\s*user\s*=' /etc/php-fpm.d/*.conf 2>/dev/null | head -1 | cut -d= -f2 | tr -d ' \t')"
+    fi
+    WEB_USERS="$HTTPD_USER"; [ -n "$FPM_USER" ] && [ "$FPM_USER" != "$HTTPD_USER" ] && WEB_USERS="$HTTPD_USER $FPM_USER"
     MYSQL_BIN="$(command -v mysql || true)"
     [ -n "$MYSQL_BIN" ] || die "mysql client not found"
 }
@@ -93,7 +99,7 @@ print_env() {
     say "Environment"
     ok "OS: $OS_ID $OS_VER   PBX: $PBX ${PBX_VER:+($PBX_VER)}"
     ok "PHP: $PHP_VER ($PHP_BIN)   Asterisk: $($AST_BIN -rx 'core show version' 2>/dev/null | head -1 | cut -c1-40)"
-    ok "Apache user: $HTTPD_USER"
+    ok "Apache user: $HTTPD_USER${FPM_USER:+   php-fpm user: $FPM_USER}"
 }
 
 check_php() {
@@ -217,7 +223,7 @@ do_install() {
     UPGRADE=0; [ -f "$APP_DIR/config/config.php" ] && UPGRADE=1
     mkdir -p "$APP_DIR"; touch "$STATE_FILE"
 
-    LEGACY_AUDIO=""
+    LEGACY_AUDIO=""; LEGACY_INI=""
     if legacy_present; then
         warn "An old AutoCaller v1 (callblaster) installation was found in $LEGACY_DIR."
         local ans="Y"
@@ -228,6 +234,8 @@ do_install() {
             warn "old version kept; the new panel still takes over the /autocaller URL"
         else
             LEGACY_AUDIO="$(mktemp -d /tmp/autocaller-oldaudio.XXXXXX)"
+            # keep the old config.ini (prefix, caller id, wait time, interval, press 1/2 targets) to apply in v2
+            [ -f "$LEGACY_DIR/config.ini" ] && cp -f "$LEGACY_DIR/config.ini" "$LEGACY_AUDIO/../autocaller-old-config.ini" 2>/dev/null && LEGACY_INI="$LEGACY_AUDIO/../autocaller-old-config.ini"
             legacy_remove "$LEGACY_AUDIO"
         fi
     fi
@@ -279,6 +287,10 @@ EOF
         ok "database autocaller + config written"
     else
         AMI_SECRET="$($PHP_BIN -r 'define("APP_ROOT","'"$APP_DIR"'"); $c=include "'"$APP_DIR"'/config/config.php"; echo $c["ami"]["secret"];')"
+        if ! grep -q "mysql_root" "$APP_DIR/config/config.php"; then
+            MYSQL_ROOT_PW="$MYSQL_ROOT_PW" $PHP_BIN -r '$f="'"$APP_DIR"'/config/config.php"; $c=include $f; $c["issabel"]["mysql_root"]=getenv("MYSQL_ROOT_PW"); file_put_contents($f, "<?php\n// AutoCaller configuration (updated by install.sh)\nreturn ".var_export($c, true).";\n");' \
+                && ok "config.php: mysql_root added (Issabel login / CDR)"
+        fi
         ok "upgrade: existing config and database kept"
     fi
 
@@ -330,12 +342,13 @@ EOF
     chmod -R 775 "$APP_DIR/storage"
     chmod 755 "$APP_DIR"/bin/*.php "$APP_DIR/install.sh"
     sed -i "1s|^#!.*|#!$PHP_BIN|" "$APP_DIR"/bin/*.php
-    if [ "$HTTPD_USER" != "$AST_USER" ]; then
-        if ! id -nG "$HTTPD_USER" 2>/dev/null | tr ' ' '\n' | grep -qx "$AST_USER"; then
-            usermod -a -G $AST_USER "$HTTPD_USER" 2>/dev/null && { echo "ADDED_GROUP=$HTTPD_USER" >> "$STATE_FILE"; warn "apache runs as $HTTPD_USER: added to group $AST_USER"; }
+    for wu in $WEB_USERS; do
+        [ "$wu" = "$AST_USER" ] && continue
+        if ! id -nG "$wu" 2>/dev/null | tr ' ' '\n' | grep -qx "$AST_USER"; then
+            usermod -a -G $AST_USER "$wu" 2>/dev/null && { echo "ADDED_GROUP=$wu" >> "$STATE_FILE"; warn "web runs as $wu: added to group $AST_USER (restart of httpd/php-fpm applies it)"; }
         fi
         chmod g+r "$APP_DIR/config/config.php"; chmod g+rx "$APP_DIR/config"
-    fi
+    done
     if command -v getenforce >/dev/null 2>&1 && [ "$(getenforce 2>/dev/null)" = "Enforcing" ]; then
         chcon -R -t httpd_sys_rw_content_t "$APP_DIR/storage" 2>/dev/null || true
         chcon -R -t httpd_sys_content_t "$APP_DIR/public" "$APP_DIR/app" 2>/dev/null || true
@@ -461,16 +474,43 @@ EOF
         warn "AMI login test failed - check /etc/asterisk/manager.conf (enabled=yes, port 5038, bindaddr) then: systemctl restart $SVC"
     fi
 
-    if [ "$UPGRADE" -eq 0 ]; then
-        say "Admin user"
-        local pw="${ADMIN_PASS:-}"
+    say "Admin user"
+    local pw="${ADMIN_PASS:-}"
+    if su -s /bin/bash $AST_USER -c "cd $APP_DIR && $PHP_BIN bin/console.php user:has-admin" >/dev/null 2>&1; then
+        if [ -n "$pw" ]; then
+            su -s /bin/bash $AST_USER -c "cd $APP_DIR && $PHP_BIN bin/console.php user:create admin admin '$pw'" >/dev/null && ok "admin password reset (ADMIN_PASS)"
+        elif [ "$UPGRADE" -eq 1 ] && has_tty && [ -z "${AUTO_YES:-}" ]; then
+            echo -n "A local admin user already exists. Set a new password for 'admin' now? [y/N] "; ans="$(ask)"
+            if [ "$ans" = "y" ] || [ "$ans" = "Y" ]; then
+                while [ -z "$pw" ]; do
+                    echo -n "New password for 'admin' (min 8 chars): "; pw="$(asks)"; echo
+                    [ ${#pw} -ge 8 ] || { warn "too short"; pw=""; }
+                done
+                su -s /bin/bash $AST_USER -c "cd $APP_DIR && $PHP_BIN bin/console.php user:create admin admin '$pw'" >/dev/null && ok "admin password updated"
+            else
+                ok "existing admin user kept (reset any time: sudo -u $AST_USER $PHP_BIN $APP_DIR/bin/console.php user:passwd admin)"
+            fi
+        else
+            ok "existing admin user kept (reset: sudo -u $AST_USER $PHP_BIN $APP_DIR/bin/console.php user:passwd admin)"
+        fi
+    else
         while [ -z "$pw" ]; do
-            echo -n "Password for web user 'admin' (min 8 chars): "; pw="$(asks)"; echo
-            [ ${#pw} -ge 8 ] || { warn "too short"; pw=""; }
+            if has_tty; then
+                echo -n "Password for web user 'admin' (min 8 chars): "; pw="$(asks)"; echo
+                [ ${#pw} -ge 8 ] || { warn "too short"; pw=""; }
+            else
+                pw="$(rand 12)"; warn "no terminal: generated admin password: $pw"
+            fi
         done
         su -s /bin/bash $AST_USER -c "cd $APP_DIR && $PHP_BIN bin/console.php user:create admin admin '$pw'" >/dev/null && ok "user admin created"
     fi
 
+    if [ -n "$LEGACY_INI" ] && [ -f "$LEGACY_INI" ]; then
+        say "Applying old v1 settings (prefix, caller id, wait time, interval, press-key targets)"
+        cp -f "$LEGACY_INI" "$APP_DIR/storage/tmp/old-config.ini"; chown $AST_USER:$AST_USER "$APP_DIR/storage/tmp/old-config.ini"
+        su -s /bin/bash $AST_USER -c "cd $APP_DIR && $PHP_BIN bin/console.php legacy:import-config storage/tmp/old-config.ini" || warn "could not import old settings"
+        rm -f "$APP_DIR/storage/tmp/old-config.ini" "$LEGACY_INI"
+    fi
     if [ -n "$LEGACY_AUDIO" ] && [ -n "$(ls -A "$LEGACY_AUDIO" 2>/dev/null)" ]; then
         say "Importing old audio files"
         chown -R $AST_USER:$AST_USER "$LEGACY_AUDIO"
@@ -514,9 +554,9 @@ remove_all() {
 
     say "Apache"
     rm -f /etc/httpd/conf.d/zz-autocaller.conf
-    if [ -n "${ADDED_GROUP:-}" ]; then
-        gpasswd -d "$ADDED_GROUP" $AST_USER >/dev/null 2>&1 && ok "removed $ADDED_GROUP from group $AST_USER"
-    fi
+    for g in $(grep -h '^ADDED_GROUP=' "$STATE_FILE" 2>/dev/null | cut -d= -f2 | sort -u); do
+        gpasswd -d "$g" $AST_USER >/dev/null 2>&1 && ok "removed $g from group $AST_USER"
+    done
     (systemctl restart httpd 2>/dev/null || service httpd restart >/dev/null 2>&1) && ok "httpd restarted"
     # PHP sessions created by our panel (cookie name ACSESSID) - session files are not distinguishable, leave them to expire
 

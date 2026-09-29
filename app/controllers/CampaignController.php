@@ -37,7 +37,8 @@ class CampaignController extends Controller
     {
         $this->requireRole(Auth::ROLE_OPERATOR);
         $c = $this->defaults();
-        $this->view('campaigns/form', array('c' => $c, 'audio' => $this->audioList(), 'ivr' => Campaign::defaultIvr(), 'isNew' => true));
+        $ivr = Settings::get('default_ivr', '') !== '' ? Campaign::parseIvr(Settings::get('default_ivr')) : Campaign::defaultIvr();
+        $this->view('campaigns/form', array('c' => $c, 'audio' => $this->audioList(), 'ivr' => $ivr, 'isNew' => true));
     }
 
     private function defaults()
