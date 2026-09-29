@@ -133,7 +133,78 @@ class UserController extends Controller
     {
         $this->requireRole(Auth::ROLE_ADMIN);
         $rows = $this->db->all('SELECT * FROM users ORDER BY id');
-        $this->view('users', array('rows' => $rows));
+        $local = array();
+        foreach ($rows as $r) {
+            $local[$r['username']] = $r;
+        }
+        $issabel = array();
+        $issabelEnabled = Settings::get('issabel_login') === '1';
+        if ($issabelEnabled) {
+            $adminRole = Settings::get('issabel_admin_role', 'admin');
+            foreach (Auth::issabelUsers() as $iu) {
+                $row = isset($local[$iu['name']]) ? $local[$iu['name']] : null;
+                if ($row && $row['auth_source'] === 'local') {
+                    // a local account shadows this panel user; panel password is still accepted for it
+                    $iu['state'] = 'local';
+                    $iu['role'] = $row['role'];
+                    $iu['active'] = (int)$row['is_active'] === 1;
+                    $iu['last_login_at'] = $row['last_login_at'];
+                } elseif ($row) {
+                    $iu['state'] = 'linked';
+                    $iu['role'] = $row['role'];
+                    $iu['active'] = (int)$row['is_active'] === 1;
+                    $iu['last_login_at'] = $row['last_login_at'];
+                } else {
+                    $iu['state'] = 'auto';
+                    $iu['role'] = $iu['is_admin'] ? $adminRole : Auth::ROLE_VIEWER;
+                    $iu['active'] = true;
+                    $iu['last_login_at'] = null;
+                }
+                $issabel[] = $iu;
+            }
+        }
+        $this->view('users', array('rows' => $rows, 'issabel' => $issabel, 'issabelEnabled' => $issabelEnabled, 'aclOk' => $issabelEnabled && Auth::aclPdo() !== null));
+    }
+
+    /** Pre-assign a role / block an Issabel panel user for this app */
+    public function issabel()
+    {
+        $this->requireRole(Auth::ROLE_ADMIN);
+        $this->csrf();
+        $name = Request::str('username', '', 64);
+        $role = Request::str('role', 'viewer', 16);
+        $active = Request::int('is_active', 1, 0, 1);
+        if (!in_array($role, array('admin', 'operator', 'viewer'), true)) {
+            $role = 'viewer';
+        }
+        $known = false;
+        foreach (Auth::issabelUsers() as $iu) {
+            if ($iu['name'] === $name) {
+                $known = $iu;
+            }
+        }
+        if (!$known) {
+            Flash::set('error', t('invalid_input'));
+            $this->redirect('/users');
+        }
+        $me = Auth::user();
+        $row = $this->db->one('SELECT * FROM users WHERE username = ?', array($name));
+        if ($row && $row['auth_source'] === 'local') {
+            Flash::set('error', t('issabel_user_shadowed', $name));
+            $this->redirect('/users');
+        }
+        if ($row && (int)$row['id'] === (int)$me['id']) {
+            $role = 'admin';
+            $active = 1;
+        }
+        if ($row) {
+            $this->db->update('users', array('role' => $role, 'is_active' => $active), 'id = ?', array((int)$row['id']));
+        } else {
+            $this->db->insert('users', array('username' => $name, 'display_name' => $known['description'] !== '' ? $known['description'] : $name, 'password_hash' => '', 'role' => $role, 'auth_source' => 'issabel', 'is_active' => $active, 'created_at' => Util::now()));
+        }
+        Audit::log('user.issabel', 'user', $row ? $row['id'] : $this->db->lastId(), "$name role=$role active=$active");
+        Flash::set('success', t('saved'));
+        $this->redirect('/users#issabel');
     }
 
     public function store()

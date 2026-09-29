@@ -1,7 +1,41 @@
 <?php View::$title = t('nav_users'); $me = Auth::user(); ?>
+<div class="card" id="issabel">
+  <div class="card-head"><h3><?php echo h(t('issabel_users')); ?> <span class="badge badge-muted"><?php echo count($issabel); ?></span></h3>
+    <span class="muted small"><?php echo h(t('issabel_users_hint')); ?></span></div>
+  <?php if (!$issabelEnabled): ?><p class="alert alert-warn"><?php echo h(t('issabel_login_disabled')); ?> <a href="<?php echo View::url('/settings'); ?>"><?php echo h(t('nav_settings')); ?></a></p>
+  <?php elseif (!$aclOk): ?><p class="alert alert-error"><?php echo h(t('issabel_acl_unreachable')); ?></p>
+  <?php elseif (!$issabel): ?><p class="muted"><?php echo h(t('nothing_here')); ?></p>
+  <?php else: ?>
+  <table class="table">
+    <thead><tr><th><?php echo h(t('username')); ?></th><th><?php echo h(t('display_name')); ?></th><th><?php echo h(t('issabel_groups')); ?></th><th><?php echo h(t('access_state')); ?></th><th><?php echo h(t('role')); ?></th><th><?php echo h(t('active')); ?></th><th><?php echo h(t('last_login')); ?></th><th></th></tr></thead>
+    <tbody>
+    <?php foreach ($issabel as $iu): $isMe = $iu['name'] === $me['username']; ?>
+      <tr>
+        <form method="post" action="<?php echo View::url('/users/issabel'); ?>"><?php echo Auth::csrfField(); ?><input type="hidden" name="username" value="<?php echo h($iu['name']); ?>">
+        <td dir="ltr"><strong><?php echo h($iu['name']); ?></strong><?php if ($iu['is_admin']): ?> <span class="badge badge-running">Issabel admin</span><?php endif; ?></td>
+        <td><?php echo h($iu['description']); ?><?php echo $iu['extension'] !== '' ? ' <small class="muted">ext ' . h($iu['extension']) . '</small>' : ''; ?></td>
+        <td><small><?php echo h(implode(', ', $iu['groups'])); ?></small></td>
+        <td><span class="badge <?php echo $iu['state'] === 'local' ? 'badge-paused' : ($iu['state'] === 'linked' ? 'badge-completed' : 'badge-muted'); ?>"><?php echo h(t('access_' . $iu['state'])); ?></span></td>
+        <?php if ($iu['state'] === 'local'): ?>
+          <td><?php echo h(t('role_' . $iu['role'])); ?></td><td><?php echo h($iu['active'] ? t('yes') : t('no')); ?></td>
+          <td dir="ltr"><small><?php echo h($iu['last_login_at']); ?></small></td><td><small class="muted"><?php echo h(t('managed_below')); ?></small></td>
+        <?php else: ?>
+          <td><select name="role" <?php echo $isMe ? 'disabled' : ''; ?>><?php foreach (array('admin', 'operator', 'viewer') as $r): ?><option value="<?php echo $r; ?>" <?php echo $iu['role'] === $r ? 'selected' : ''; ?>><?php echo h(t('role_' . $r)); ?></option><?php endforeach; ?></select></td>
+          <td><select name="is_active" <?php echo $isMe ? 'disabled' : ''; ?>><option value="1" <?php echo $iu['active'] ? 'selected' : ''; ?>><?php echo h(t('yes')); ?></option><option value="0" <?php echo !$iu['active'] ? 'selected' : ''; ?>><?php echo h(t('no')); ?></option></select></td>
+          <td dir="ltr"><small><?php echo h($iu['last_login_at']); ?></small></td>
+          <td><?php if (!$isMe): ?><button class="btn btn-sm" type="submit"><?php echo h(t('save')); ?></button><?php endif; ?></td>
+        <?php endif; ?>
+        </form>
+      </tr>
+    <?php endforeach; ?>
+    </tbody>
+  </table>
+  <?php endif; ?>
+</div>
+
 <div class="row2">
   <div class="card">
-    <h3><?php echo h(t('users')); ?></h3>
+    <h3><?php echo h(t('local_users')); ?></h3>
     <table class="table">
       <thead><tr><th><?php echo h(t('username')); ?></th><th><?php echo h(t('display_name')); ?></th><th><?php echo h(t('role')); ?></th><th><?php echo h(t('source')); ?></th><th><?php echo h(t('active')); ?></th><th><?php echo h(t('last_login')); ?></th><th></th></tr></thead>
       <tbody>

@@ -76,6 +76,7 @@ $r->post('/settings/holidays/{id}/delete', 'SettingsController@holidayDelete');
 // users & api keys
 $r->get('/users', 'UserController@index');
 $r->post('/users', 'UserController@store');
+$r->post('/users/issabel', 'UserController@issabel');
 $r->post('/users/{id}', 'UserController@update');
 $r->post('/users/{id}/delete', 'UserController@delete');
 $r->get('/profile', 'UserController@profile');

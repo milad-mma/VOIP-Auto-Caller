@@ -223,6 +223,43 @@ class Auth
     }
 
     /**
+     * All Issabel/Elastix panel users with their groups.
+     * @return array of array(name, description, groups[], is_admin)
+     */
+    public static function issabelUsers()
+    {
+        $pdo = self::aclPdo();
+        if (!$pdo) {
+            return array();
+        }
+        try {
+            $users = $pdo->query('SELECT id, name, description, extension FROM acl_user ORDER BY name')->fetchAll();
+            $groups = array();
+            try {
+                foreach ($pdo->query('SELECT m.id_user, g.name FROM acl_membership m JOIN acl_group g ON g.id = m.id_group')->fetchAll() as $g) {
+                    $groups[$g['id_user']][] = $g['name'];
+                }
+            } catch (Exception $e) {
+            }
+            $out = array();
+            foreach ($users as $u) {
+                $gs = isset($groups[$u['id']]) ? $groups[$u['id']] : array();
+                $isAdmin = $u['name'] === 'admin';
+                foreach ($gs as $g) {
+                    if (in_array(strtolower($g), array('administrator', 'admin'), true)) {
+                        $isAdmin = true;
+                    }
+                }
+                $out[] = array('name' => $u['name'], 'description' => (string)$u['description'], 'extension' => (string)$u['extension'], 'groups' => $gs, 'is_admin' => $isAdmin);
+            }
+            return $out;
+        } catch (Exception $e) {
+            Logger::warn('issabel user list: ' . $e->getMessage());
+            return array();
+        }
+    }
+
+    /**
      * Connection to the Issabel/Elastix ACL store.
      * Issabel 4 & 5 and Elastix keep panel users in SQLite (/var/www/db/acl.db); a MySQL 'acl' db is tried as a fallback.
      * @return PDO|null
