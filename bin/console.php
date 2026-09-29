@@ -130,8 +130,11 @@ switch ($cmd) {
     case 'issabel:test':
         $name = isset($argv[2]) ? $argv[2] : 'admin';
         $pass = isset($argv[3]) ? $argv[3] : readSecret("Issabel password for $name: ");
+        $acl = Config::get('issabel', 'acl_db', '/var/www/db/acl.db');
+        out("acl store: $acl " . (is_file($acl) ? (is_readable($acl) ? '(readable)' : '(NOT readable by uid ' . (function_exists('posix_geteuid') ? posix_geteuid() : '?') . ')') : '(missing -> mysql acl fallback)'));
+        out('pdo_sqlite: ' . (in_array('sqlite', PDO::getAvailableDrivers(), true) ? 'yes' : 'NO - install php-pdo'));
         $rp = Auth::pbxRootPassword();
-        out('mysql root password: ' . ($rp === null ? 'NOT READABLE (config issabel.mysql_root empty and /etc/issabel.conf unreadable)' : 'ok'));
+        out('mysql root password: ' . ($rp === null ? 'not readable (only needed for CDR / trunk list)' : 'ok'));
         $r = Auth::issabelCheck($name, $pass);
         out($r ? "OK: $name is " . ($r['is_admin'] ? 'an Issabel admin' : 'a normal Issabel user') . " -> role " . ($r['is_admin'] ? Settings::get('issabel_admin_role', 'admin') : 'viewer') : 'FAILED (see storage/logs/app.log)');
         $local = Db::get()->one('SELECT username, role, auth_source, is_active FROM users WHERE username = ?', array($name));
@@ -396,14 +399,16 @@ switch ($cmd) {
         }
         $rp = Auth::pbxRootPassword();
         out(($rp !== null ? '  [ok] ' : '  [warn] ') . 'PBX mysql root password readable (Issabel login / CDR lookup)');
-        if ($rp !== null) {
-            try {
-                $pdo = new PDO('mysql:host=localhost;dbname=acl;charset=utf8', 'root', $rp, array(PDO::ATTR_TIMEOUT => 3));
+        try {
+            $pdo = Auth::aclPdo();
+            if ($pdo) {
                 $n = (int)$pdo->query('SELECT COUNT(*) FROM acl_user')->fetchColumn();
-                out("  [ok] Issabel acl database reachable ($n panel users)");
-            } catch (Exception $e) {
-                out('  [warn] Issabel acl database: ' . $e->getMessage());
+                out("  [ok] Issabel ACL store reachable ($n panel users)");
+            } else {
+                out('  [warn] Issabel ACL store not reachable (see storage/logs/app.log) - panel-user login disabled');
             }
+        } catch (Exception $e) {
+            out('  [warn] Issabel ACL store: ' . $e->getMessage());
         }
         $admins = (int)Db::get()->val("SELECT COUNT(*) FROM users WHERE role = 'admin' AND is_active = 1");
         out(($admins ? '  [ok] ' : '  [warn] ') . "$admins active admin user(s)" . ($admins ? '' : ' - create one: console.php user:create admin admin'));

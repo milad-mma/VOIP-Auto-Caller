@@ -177,17 +177,11 @@ class Auth
      */
     public static function issabelCheck($username, $password)
     {
-        $root = self::pbxRootPassword();
-        if ($root === null) {
-            Logger::warn('issabel login: cannot read mysqlrootpwd (config issabel.mysql_root empty and /etc/issabel.conf not readable by ' . (function_exists('posix_geteuid') ? posix_geteuid() : 'web user') . ')');
+        $pdo = self::aclPdo();
+        if (!$pdo) {
             return null;
         }
         try {
-            $pdo = new PDO('mysql:host=localhost;dbname=acl;charset=utf8', 'root', $root, array(
-                PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-                PDO::ATTR_TIMEOUT => 3,
-            ));
             $st = $pdo->prepare('SELECT * FROM acl_user WHERE name = ? LIMIT 1');
             $st->execute(array($username));
             $row = $st->fetch();
@@ -203,9 +197,6 @@ class Auth
                 } else {
                     $ok = hash_equals(strtolower($stored), md5($password));
                 }
-            }
-            if (!$ok && isset($row['password']) && (string)$row['password'] !== '') {
-                $ok = password_verify($password, $row['password']) || hash_equals((string)$row['password'], md5($password));
             }
             if (!$ok) {
                 Logger::info("issabel login: wrong password for '$username'");
@@ -223,10 +214,45 @@ class Auth
             } catch (Exception $e) {
                 // ignore, membership table layout may differ
             }
-            $display = isset($row['description']) && $row['description'] !== '' ? $row['description'] : $username;
+            $display = isset($row['description']) && $row['description'] !== '' && $row['description'] !== null ? $row['description'] : $username;
             return array('display_name' => $display, 'is_admin' => $isAdmin);
         } catch (Exception $e) {
             Logger::warn('issabel login check failed: ' . $e->getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Connection to the Issabel/Elastix ACL store.
+     * Issabel 4 & 5 and Elastix keep panel users in SQLite (/var/www/db/acl.db); a MySQL 'acl' db is tried as a fallback.
+     * @return PDO|null
+     */
+    public static function aclPdo()
+    {
+        $opts = array(PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC, PDO::ATTR_TIMEOUT => 3);
+        $sqlite = Config::get('issabel', 'acl_db', '/var/www/db/acl.db');
+        if ($sqlite && is_file($sqlite)) {
+            if (!is_readable($sqlite)) {
+                Logger::warn("issabel login: $sqlite exists but is not readable by this process");
+            } elseif (!in_array('sqlite', PDO::getAvailableDrivers(), true)) {
+                Logger::warn('issabel login: PHP pdo_sqlite extension missing (Issabel 4: yum install php-pdo ; Issabel 5: dnf install php-pdo)');
+            } else {
+                try {
+                    return new PDO('sqlite:' . $sqlite, null, null, $opts);
+                } catch (Exception $e) {
+                    Logger::warn('issabel login: sqlite open failed: ' . $e->getMessage());
+                }
+            }
+        }
+        $root = self::pbxRootPassword();
+        if ($root === null) {
+            Logger::warn('issabel login: no acl.db and no mysql root password available');
+            return null;
+        }
+        try {
+            return new PDO('mysql:host=localhost;dbname=acl;charset=utf8', 'root', $root, $opts);
+        } catch (Exception $e) {
+            Logger::warn('issabel login: no ACL store found (' . $sqlite . ' missing, mysql: ' . $e->getMessage() . ')');
             return null;
         }
     }

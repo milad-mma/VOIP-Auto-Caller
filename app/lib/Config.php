@@ -36,6 +36,7 @@ class Config
                 // mysql root credentials of the PBX, used only for "login with Issabel user"
                 'conf_file' => '/etc/issabel.conf',
                 'mysql_root' => '',
+                'acl_db' => '/var/www/db/acl.db',
             ),
         );
         foreach ($defaults as $k => $v) {

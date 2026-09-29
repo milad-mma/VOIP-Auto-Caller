@@ -105,7 +105,7 @@ print_env() {
 check_php() {
     $PHP_BIN -r 'exit(version_compare(PHP_VERSION, "5.4.0", ">=") ? 0 : 1);' || die "PHP >= 5.4 required (found $PHP_VER)"
     local missing=""
-    for m in pdo_mysql mbstring json; do
+    for m in pdo_mysql pdo_sqlite mbstring json; do
         $PHP_BIN -m 2>/dev/null | grep -qi "^$m\$" || missing="$missing $m"
     done
     if [ -n "$missing" ]; then
@@ -114,6 +114,7 @@ check_php() {
         for m in $missing; do
             case $m in
                 pdo_mysql) pk="$pk php-pdo php-mysql php-mysqlnd";;
+                pdo_sqlite) pk="$pk php-pdo";;
                 mbstring)  pk="$pk php-mbstring";;
                 json)      pk="$pk php-json";;
             esac
@@ -354,6 +355,9 @@ EOF
         chcon -R -t httpd_sys_content_t "$APP_DIR/public" "$APP_DIR/app" 2>/dev/null || true
         setsebool -P httpd_can_network_connect_db on 2>/dev/null || true
         warn "SELinux is enforcing: contexts set best-effort; if the web UI fails check audit.log"
+    fi
+    if [ -f /var/www/db/acl.db ] && ! su -s /bin/bash $AST_USER -c "test -r /var/www/db/acl.db"; then
+        warn "/var/www/db/acl.db is not readable by $AST_USER - Issabel panel-user login will not work"
     fi
     ok "owner $AST_USER, storage writable"
 
