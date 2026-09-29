@@ -480,7 +480,11 @@ EOF
 
     say "Superuser (local web user 'root')"
     # keep the username 'admin' free for the Issabel panel administrator
-    su -s /bin/bash $AST_USER -c "cd $APP_DIR && $PHP_BIN bin/console.php user:rename admin root" 2>/dev/null | grep -q renamed && ok "existing local user 'admin' renamed to 'root' ('admin' now = Issabel panel admin)"
+    RN="$(su -s /bin/bash $AST_USER -c "cd $APP_DIR && $PHP_BIN bin/console.php user:rename admin root" 2>/dev/null)"
+    case "$RN" in
+        renamed*) ok "existing local user 'admin' renamed to 'root' ('admin' now = Issabel panel admin)";;
+        *"already exists"*) warn "a local user 'admin' AND 'root' both exist: 'admin' shadows the Issabel admin. Delete or rename it in the panel (or: console.php user:rename admin admin_local)";;
+    esac
     local pw="${ADMIN_PASS:-}"
     if su -s /bin/bash $AST_USER -c "cd $APP_DIR && $PHP_BIN bin/console.php user:has-admin" >/dev/null 2>&1; then
         if [ -n "$pw" ]; then

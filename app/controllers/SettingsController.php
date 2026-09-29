@@ -154,6 +154,8 @@ class UserController extends Controller
                     $iu['role'] = $row['role'];
                     $iu['active'] = (int)$row['is_active'] === 1;
                     $iu['last_login_at'] = $row['last_login_at'];
+                    $iu['row_id'] = (int)$row['id'];
+                    $iu['has_pw'] = $row['password_hash'] !== '';
                 } else {
                     $iu['state'] = 'auto';
                     $iu['role'] = $iu['is_admin'] ? $adminRole : Auth::ROLE_VIEWER;
@@ -163,6 +165,9 @@ class UserController extends Controller
                 $issabel[] = $iu;
             }
         }
+        $rows = array_values(array_filter($rows, function ($r) {
+            return $r['auth_source'] === 'local';
+        }));
         $this->view('users', array('rows' => $rows, 'issabel' => $issabel, 'issabelEnabled' => $issabelEnabled, 'aclOk' => $issabelEnabled && Auth::aclPdo() !== null));
     }
 
@@ -209,6 +214,25 @@ class UserController extends Controller
         if ($row && (int)$row['id'] === (int)$me['id']) {
             $role = 'admin';
             $active = 1;
+        }
+        if ($row && $row['role'] === 'admin' && (int)$row['id'] !== (int)$me['id'] && !Auth::isSuper()) {
+            Flash::set('error', t('only_root_manages_admins'));
+            $this->redirect('/users#issabel');
+        }
+        if (!$row && $known['is_admin'] && !Auth::isSuper()) {
+            Flash::set('error', t('only_root_manages_admins'));
+            $this->redirect('/users#issabel');
+        }
+        if (Request::int('reset', 0, 0, 1) === 1) {
+            if (!Auth::isSuper() || !$row || (int)$row['id'] === (int)$me['id']) {
+                Flash::set('error', t('only_root'));
+                $this->redirect('/users#issabel');
+            }
+            $this->db->exec('DELETE FROM api_keys WHERE user_id = ?', array((int)$row['id']));
+            $this->db->exec('DELETE FROM users WHERE id = ?', array((int)$row['id']));
+            Audit::log('user.issabel.reset', 'user', $row['id'], $name);
+            Flash::set('success', t('deleted'));
+            $this->redirect('/users#issabel');
         }
         $data = array('role' => $role, 'is_active' => $active);
         if ($pw !== '') {
@@ -264,6 +288,10 @@ class UserController extends Controller
             Flash::set('error', t('root_protected'));
             $this->redirect('/users');
         }
+        if ($u['role'] === 'admin' && (int)$u['id'] !== (int)$me['id'] && !Auth::isSuper()) {
+            Flash::set('error', t('only_root_manages_admins'));
+            $this->redirect('/users');
+        }
         $upd = array('display_name' => Request::str('display_name', $u['display_name'], 128));
         $role = Request::str('role', $u['role'], 16);
         if (in_array($role, array('admin', 'operator', 'viewer'), true)) {
@@ -309,6 +337,10 @@ class UserController extends Controller
         $target = $this->db->one('SELECT * FROM users WHERE id = ?', array((int)$p['id']));
         if ($target && Auth::isSuperRow($target)) {
             Flash::set('error', t('root_protected'));
+            $this->redirect('/users');
+        }
+        if ($target && $target['role'] === 'admin' && !Auth::isSuper()) {
+            Flash::set('error', t('only_root_manages_admins'));
             $this->redirect('/users');
         }
         $this->db->exec('DELETE FROM api_keys WHERE user_id = ?', array((int)$p['id']));
@@ -387,8 +419,17 @@ class ApiKeyController extends Controller
         $this->requireRole(Auth::ROLE_OPERATOR);
         $this->csrf();
         $me = Auth::user();
-        $where = Auth::can(Auth::ROLE_ADMIN) ? 'id = ?' : 'id = ? AND user_id = ' . (int)$me['id'];
-        $this->db->exec('DELETE FROM api_keys WHERE ' . $where, array((int)$p['id']));
+        $k = $this->db->one('SELECT k.*, u.username, u.auth_source FROM api_keys k JOIN users u ON u.id = k.user_id WHERE k.id = ?', array((int)$p['id']));
+        if (!$k) {
+            $this->redirect('/apikeys');
+        }
+        $owner = array('username' => $k['username'], 'auth_source' => $k['auth_source']);
+        $mine = (int)$k['user_id'] === (int)$me['id'];
+        if (!$mine && (!Auth::can(Auth::ROLE_ADMIN) || (Auth::isSuperRow($owner) && !Auth::isSuper()))) {
+            Flash::set('error', t('root_protected'));
+            $this->redirect('/apikeys');
+        }
+        $this->db->exec('DELETE FROM api_keys WHERE id = ?', array((int)$p['id']));
         Audit::log('apikey.delete', 'apikey', (int)$p['id']);
         $this->redirect('/apikeys');
     }

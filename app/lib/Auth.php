@@ -113,13 +113,11 @@ class Auth
             self::onLoginOk($u);
             return $u;
         }
-        // Issabel / Elastix panel users (also accepted for a same-named local user whose local password did not match)
-        if (Settings::get('issabel_login') === '1') {
+        // Issabel / Elastix panel users. A LOCAL account (root, or any local user) is never authenticated
+        // through Issabel: otherwise an Issabel admin could create a panel user named "root" and take over.
+        if (Settings::get('issabel_login') === '1' && (!$u || $u['auth_source'] === 'issabel')) {
             $iu = self::issabelCheck($username, $password);
             if ($iu) {
-                if ($u && $u['auth_source'] === 'local') {
-                    Logger::info("login: local user '$username' authenticated with Issabel panel credentials");
-                }
                 if (!$u) {
                     $role = $iu['is_admin'] ? Settings::get('issabel_admin_role', 'admin') : self::ROLE_VIEWER;
                     $id = $db->insert('users', array(
