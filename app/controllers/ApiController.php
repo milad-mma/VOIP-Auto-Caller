@@ -205,7 +205,7 @@ class ApiController extends Controller
             'callerid_number' => isset($b['callerid_number']) ? Util::dialSafe($b['callerid_number']) : null,
             'dial_prefix' => isset($b['dial_prefix']) ? Util::dialSafe($b['dial_prefix']) : null,
             'trunk_name' => isset($b['trunk_name']) ? Util::oneLine($b['trunk_name'], 64) : null,
-            'channel_tech' => isset($b['channel_tech']) && in_array($b['channel_tech'], array('local', 'sip', 'pjsip', 'custom'), true) ? $b['channel_tech'] : null,
+            'channel_tech' => isset($b['channel_tech']) && in_array($b['channel_tech'], array('pool', 'local', 'sip', 'pjsip', 'custom'), true) ? $b['channel_tech'] : null,
             'ivr_config' => Util::json(Campaign::cleanIvr(isset($b['ivr']) && is_array($b['ivr']) ? $b['ivr'] : array())),
             'created_by' => (int)$this->key['user_id'], 'created_at' => $now, 'updated_at' => $now,
         );

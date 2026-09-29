@@ -162,6 +162,12 @@ class Dialer
     private function dialStep()
     {
         $globalMax = (int)Settings::get('global_max_concurrent', 4);
+        if (Settings::get('channel_tech') === 'pool') {
+            $cap = Trunks::capacity();
+            if ($cap > 0) {
+                $globalMax = min($globalMax, $cap);
+            }
+        }
         $globalActive = (int)$this->db->val("SELECT COUNT(*) FROM campaign_contacts WHERE status IN ('dialing','answered')");
         if ($globalActive >= $globalMax) {
             return;
@@ -213,7 +219,21 @@ class Dialer
             return false;
         }
         $eff = Campaign::effective($c);
-        $channel = Campaign::channelFor($eff, $contact['phone']);
+        $trunk = null;
+        if ($eff['channel_tech'] === 'pool') {
+            $trunk = Trunks::pickFree();
+            if (!$trunk) {
+                // every trunk channel is busy (or none defined): wait, do not touch the contact
+                if ($c['last_error'] !== 'wait:trunks_busy') {
+                    $this->db->update('campaigns', array('last_error' => 'wait:trunks_busy'), 'id = ?', array((int)$c['id']));
+                }
+                return false;
+            }
+            // pool: the campaign/global prefix is NOT applied (calls do not pass through outbound routes); trunk prefix is
+            $channel = Trunks::channelFor($trunk, $contact['phone']);
+        } else {
+            $channel = Campaign::channelFor($eff, $contact['phone']);
+        }
         $callerId = self::callerIdString($eff['callerid_name'], $eff['callerid_number']);
         $attemptNo = (int)$contact['attempts'] + 1;
         $actionId = 'ac-' . $contact['id'] . '-' . $attemptNo . '-' . substr(md5(uniqid('', true)), 0, 6);
@@ -224,6 +244,7 @@ class Dialer
             'attempt_no' => $attemptNo,
             'action_id' => $actionId,
             'channel' => $channel,
+            'trunk_id' => $trunk ? (int)$trunk['id'] : null,
             'started_at' => $now,
             'result' => 'dialing',
         ));
@@ -246,6 +267,9 @@ class Dialer
         } catch (AmiException $e) {
             $this->finishAttempt($attemptId, CallStatus::FAILED, array('reason_code' => 'ami', 'hangup_cause' => Util::oneLine($e->getMessage(), 60)));
             throw $e;
+        }
+        if ($trunk) {
+            $this->db->run('UPDATE trunks SET last_used_at = ? WHERE id = ?', array($now, (int)$trunk['id']));
         }
         $this->pendingOriginate[$actionId] = array('attempt' => $attemptId, 'contact' => (int)$contact['id'], 'campaign' => (int)$c['id'], 'at' => time());
         $this->db->update('campaigns', array('last_dial_at' => $now), 'id = ?', array((int)$c['id']));
@@ -414,6 +438,11 @@ class Dialer
                 "cnt_answered = (SELECT COUNT(*) FROM campaign_contacts WHERE campaign_id = ? AND status IN ('completed','dnc','machine')), updated_at = ? WHERE id = ?",
                 array((int)$c['id'], (int)$c['id'], $now, (int)$c['id'])
             );
+        }
+        if (!empty($att['trunk_id'])) {
+            $failed = in_array($status, array(CallStatus::FAILED, CallStatus::CONGESTION, CallStatus::INVALID), true);
+            $this->db->run('UPDATE trunks SET calls_total = calls_total + 1' . ($failed ? ', calls_failed = calls_failed + 1, last_error = ?' : '') . ' WHERE id = ?',
+                $failed ? array(Util::oneLine($status . ' ' . (isset($extra['hangup_cause']) ? $extra['hangup_cause'] : ''), 120), (int)$att['trunk_id']) : array((int)$att['trunk_id']));
         }
         Logger::info("attempt #$attemptId finished: $status (" . (isset($extra['hangup_cause']) ? $extra['hangup_cause'] : '') . ")");
 

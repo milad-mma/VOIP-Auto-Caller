@@ -48,7 +48,7 @@ Upgrade later with the same one-line command (config, database and audio are kep
 
 ## First steps
 
-1. **Settings → Outbound calling**: choose *Local* (uses your Issabel outbound routes and trunk failover — recommended) or a specific SIP/PJSIP trunk; set the dial prefix if your outbound route needs one (e.g. `9`); set the caller ID; set the **global max concurrent calls** to at most your trunk's channel count; set calling hours.
+1. **Settings → Outbound calling**: the default channel type is the **trunk pool**: add your trunks (one click imports them from Issabel), set each trunk's channel count, and the dialer places every call directly on a trunk with a free channel — Issabel outbound routes and their automatic trunk failover are bypassed, so a number rings exactly once and is re-dialed only by the campaign's retry rules; total concurrency = sum of channels. Alternatives: *Local* (goes through your Issabel outbound routes, including their failover) or one fixed SIP/PJSIP trunk; set the dial prefix if your outbound route needs one (e.g. `9`); set the caller ID; set the **global max concurrent calls** to at most your trunk's channel count; set calling hours.
 2. **Audio files**: upload MP3/WAV — it is converted to the format Asterisk plays natively. The *logical name* is what you reference in import files (`audio` column) and the API.
 3. **Campaigns → New campaign**: pick audio, IVR keys (e.g. `1` → transfer to `201`, `2` → do-not-call), concurrency and retries, optional schedule. Then import numbers (CSV/XLSX or paste) and press **Start**.
 4. Watch the dashboard (live calls, progress), export results from the campaign page, or read them from the API.
@@ -161,7 +161,7 @@ curl -fsSL https://raw.githubusercontent.com/milad-mma/VOIP-Auto-Caller/main/ins
 ارتقا با همان دستور یک‌خطی (تنظیمات، دیتابیس و فایل‌های صوتی حفظ می‌شوند)؛ بررسی سلامت: `sudo /opt/autocaller/install.sh doctor`.
 
 ### شروع کار
-۱. **تنظیمات → تماس خروجی**: نوع کانال *Local* (استفاده از Outbound Route خود Issabel — پیشنهادی) یا یک ترانک مشخص؛ پیش‌شماره در صورت نیاز (مثلاً `9`)؛ کالر آی‌دی؛ **حداکثر تماس هم‌زمان سراسری** حداکثر به اندازه‌ی کانال‌های ترانک؛ ساعت کاری.
+۱. **تنظیمات → تماس خروجی**: نوع کانال پیش‌فرض **استخر ترانک** است: ترانک‌ها را اضافه کنید (با یک کلیک از Issabel وارد می‌شوند)، تعداد کانال هر ترانک را بدهید؛ شماره‌گیر هر تماس را مستقیم از ترانکی با کانال آزاد می‌گیرد — مسیر خروجی Issabel و failover خودکارش دور زده می‌شود، هر شماره دقیقاً یک بار زنگ می‌خورد و فقط طبق قوانین تلاش مجدد کمپین دوباره گرفته می‌شود؛ ظرفیت هم‌زمان = مجموع کانال‌ها. گزینه‌های دیگر: *Local* (از Outbound Route خود Issabel با failoverش) یا یک ترانک ثابت؛ پیش‌شماره در صورت نیاز (مثلاً `9`)؛ کالر آی‌دی؛ **حداکثر تماس هم‌زمان سراسری** حداکثر به اندازه‌ی کانال‌های ترانک؛ ساعت کاری.
 ۲. **فایل‌های صوتی**: آپلود MP3/WAV (خودکار به فرمت Asterisk تبدیل می‌شود). «نام منطقی» همان چیزی است که در ستون `audio` فایل ورودی و API استفاده می‌کنید.
 ۳. **کمپین جدید**: فایل صوتی، کلیدهای IVR (مثلاً `1` → انتقال به `201`، `2` → لیست سیاه)، هم‌زمانی و تلاش مجدد، زمان‌بندی. سپس شماره‌ها را وارد کنید (فایل یا دستی) و **شروع** بزنید.
 ۴. داشبورد را ببینید، از صفحه‌ی کمپین خروجی اکسل بگیرید، یا نتایج را با API بخوانید.

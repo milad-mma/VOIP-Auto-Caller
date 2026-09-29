@@ -53,7 +53,7 @@ $fmtDt = function ($v) { return $v ? date('Y-m-d\TH:i', strtotime($v)) : ''; };
         <label><?php echo h(t('callerid_number')); ?><input type="text" name="callerid_number" dir="ltr" value="<?php echo h($c['callerid_number']); ?>" placeholder="<?php echo h($s['callerid_number']); ?>"></label>
         <label><?php echo h(t('channel_tech')); ?>
           <select name="channel_tech"><option value="">— <?php echo h(t('global')); ?> (<?php echo h($s['channel_tech']); ?>) —</option>
-          <?php foreach (array('local', 'sip', 'pjsip', 'custom') as $ct): ?><option value="<?php echo $ct; ?>" <?php echo $c['channel_tech'] === $ct ? 'selected' : ''; ?>><?php echo strtoupper($ct); ?></option><?php endforeach; ?></select>
+          <?php foreach (array('pool', 'local', 'sip', 'pjsip', 'custom') as $ct): ?><option value="<?php echo $ct; ?>" <?php echo $c['channel_tech'] === $ct ? 'selected' : ''; ?>><?php echo $ct === 'pool' ? h(t('trunk_pool')) : strtoupper($ct); ?></option><?php endforeach; ?></select>
         </label>
       </div>
       <div class="row3">

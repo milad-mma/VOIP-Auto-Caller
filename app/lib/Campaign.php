@@ -255,6 +255,9 @@ class Campaign
         $trunk = preg_replace('/[^A-Za-z0-9_\-\.]/', '', (string)$eff['trunk_name']);
         $local = 'Local/' . $num . '@' . $eff['outbound_context'] . '/n';
         switch ($eff['channel_tech']) {
+            case 'pool':
+                // resolved by the dialer per call (Trunks::pickFree); shown here only for display
+                return 'SIP/{' . (Settings::get('ui_lang') === 'fa' ? 'ترانک آزاد از استخر' : 'free trunk from pool') . '}/' . $num;
             case 'sip':
                 return $trunk !== '' ? 'SIP/' . $trunk . '/' . $num : $local;
             case 'pjsip':

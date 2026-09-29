@@ -134,7 +134,7 @@ class CampaignController extends Controller
                 $d[$k] = null;
             }
         }
-        if ($d['channel_tech'] !== null && !in_array($d['channel_tech'], array('local', 'sip', 'pjsip', 'custom'), true)) {
+        if ($d['channel_tech'] !== null && !in_array($d['channel_tech'], array('pool', 'local', 'sip', 'pjsip', 'custom'), true)) {
             $d['channel_tech'] = null;
         }
         if (Request::int('use_global_prefix', 1, 0, 1) === 1) {

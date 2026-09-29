@@ -85,7 +85,7 @@ class Settings
             'callerid_name' => 'AutoCaller',
             'callerid_number' => '',
             'dial_prefix' => '',            // e.g. 9 for outside line
-            'channel_tech' => 'local',      // local | sip | pjsip | custom
+            'channel_tech' => 'pool',       // pool | local | sip | pjsip | custom
             'trunk_name' => '',
             'channel_template' => '',       // custom template e.g. SIP/{trunk}/{number}
             'outbound_context' => 'from-internal',

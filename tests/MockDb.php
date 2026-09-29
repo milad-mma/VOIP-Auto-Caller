@@ -34,7 +34,7 @@ class MockDb extends Db
         return null;
     }
     public function run($sql, array $params = array()) { $this->fake($sql); return new MockStmt(); }
-    public function all($sql, array $params = array()) { $this->fake($sql); return array(); }
+    public function all($sql, array $params = array()) { $this->fake($sql); if (strpos($sql, 'FROM trunks') !== false) { return array(array('id' => 1, 'name' => 'T1', 'tech' => 'sip', 'channel_id' => '65743452', 'dial_template' => '', 'dial_prefix' => '', 'max_channels' => 1, 'is_enabled' => 1, 'sort' => 0, 'calls_total' => 5, 'calls_failed' => 1, 'last_used_at' => null, 'last_error' => 'congestion')); } return array(); }
     public function one($sql, array $params = array()) { return $this->fake($sql); }
     public function val($sql, array $params = array()) { $this->fake($sql); return strpos(strtolower($sql), 'version()') !== false ? '10.3-MariaDB' : 0; }
     public function exec($sql, array $params = array()) { $this->fake($sql); return 0; }

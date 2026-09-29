@@ -181,6 +181,7 @@
     function updCt() {
       var v = ct.value, ft = $('#f-trunk'), fp = $('#f-template');
       if (ft) ft.style.opacity = (v === 'sip' || v === 'pjsip' || v === 'custom') ? '1' : '.45';
+      var tp = $('#trunk-pool'); if (tp) tp.style.outline = v === 'pool' ? '2px solid var(--pri)' : '';
       if (fp) fp.hidden = (v !== 'custom');
     }
     if (ct) { ct.addEventListener('change', updCt); updCt(); }

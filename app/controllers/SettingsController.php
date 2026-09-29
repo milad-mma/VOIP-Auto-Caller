@@ -6,7 +6,7 @@ class SettingsController extends Controller
         // key => array(type, min, max) ; type: text|int|bool|hm|select
         return array(
             'callerid_name' => array('text'), 'callerid_number' => array('dial'), 'dial_prefix' => array('dial'),
-            'channel_tech' => array('select', array('local', 'sip', 'pjsip', 'custom')), 'trunk_name' => array('text'), 'channel_template' => array('text'),
+            'channel_tech' => array('select', array('pool', 'local', 'sip', 'pjsip', 'custom')), 'trunk_name' => array('text'), 'channel_template' => array('text'),
             'outbound_context' => array('ident'), 'country_code' => array('digits'),
             'global_max_concurrent' => array('int', 1, 500), 'default_ring_timeout' => array('int', 5, 120), 'default_gap_ms' => array('int', 0, 600000),
             'default_max_retries' => array('int', 0, 10), 'default_retry_delay_min' => array('int', 1, 1440), 'default_concurrent' => array('int', 1, 200),
@@ -22,7 +22,13 @@ class SettingsController extends Controller
     {
         $this->requireRole(Auth::ROLE_ADMIN);
         $holidays = $this->db->all('SELECT * FROM holidays ORDER BY hdate DESC LIMIT 200');
-        $this->view('settings', array('s' => Settings::all(), 'holidays' => $holidays, 'ami' => Config::get('ami'), 'trunks' => $this->trunks()));
+        $pool = Trunks::all();
+        $active = Trunks::activeCounts();
+        foreach ($pool as &$t) {
+            $t['active'] = isset($active[(int)$t['id']]) ? $active[(int)$t['id']] : 0;
+        }
+        unset($t);
+        $this->view('settings', array('s' => Settings::all(), 'holidays' => $holidays, 'ami' => Config::get('ami'), 'trunks' => $this->trunks(), 'pool' => $pool, 'issabelTrunks' => Trunks::fromIssabel()));
     }
 
     /** Try to list trunks from the Issabel asterisk DB for the dropdown help */
@@ -116,6 +122,78 @@ class SettingsController extends Controller
             Flash::set('success', t('saved'));
         }
         $this->redirect('/settings#holidays');
+    }
+
+    // ---- trunk pool ----
+    public function trunkSave()
+    {
+        $this->requireRole(Auth::ROLE_ADMIN);
+        $this->csrf();
+        $id = Request::int('id', 0, 0);
+        $tech = Request::str('tech', 'sip', 8);
+        if (!in_array($tech, array('sip', 'pjsip', 'custom'), true)) {
+            $tech = 'sip';
+        }
+        $d = array(
+            'name' => Request::str('name', '', 64),
+            'tech' => $tech,
+            'channel_id' => preg_replace('/[^A-Za-z0-9_\-\.@]/', '', Request::str('channel_id', '', 64)),
+            'dial_template' => Util::oneLine(Request::str('dial_template', '', 160), 160),
+            'dial_prefix' => Util::dialSafe(Request::str('dial_prefix', '', 16)),
+            'max_channels' => Request::int('max_channels', 1, 1, 500),
+            'is_enabled' => Request::int('is_enabled', 1, 0, 1),
+            'sort' => Request::int('sort', 0, -1000, 1000),
+        );
+        if ($d['channel_id'] === '') {
+            Flash::set('error', t('invalid_input'));
+            $this->redirect('/settings#trunk-pool');
+        }
+        if ($d['name'] === '') {
+            $d['name'] = $d['channel_id'];
+        }
+        $dup = $this->db->val('SELECT id FROM trunks WHERE channel_id = ? AND id <> ?', array($d['channel_id'], $id));
+        if ($dup) {
+            Flash::set('error', t('trunk_exists'));
+            $this->redirect('/settings#trunk-pool');
+        }
+        if ($id) {
+            $this->db->update('trunks', $d, 'id = ?', array($id));
+        } else {
+            $id = $this->db->insert('trunks', $d);
+        }
+        Audit::log('trunk.save', 'trunk', $id, $d['channel_id']);
+        Flash::set('success', t('saved'));
+        $this->redirect('/settings#trunk-pool');
+    }
+
+    public function trunkDelete($p)
+    {
+        $this->requireRole(Auth::ROLE_ADMIN);
+        $this->csrf();
+        $this->db->exec('DELETE FROM trunks WHERE id = ?', array((int)$p['id']));
+        Audit::log('trunk.delete', 'trunk', (int)$p['id']);
+        $this->redirect('/settings#trunk-pool');
+    }
+
+    /** add every SIP/PJSIP trunk of the PBX that is not in the pool yet */
+    public function trunkImport()
+    {
+        $this->requireRole(Auth::ROLE_ADMIN);
+        $this->csrf();
+        $n = 0;
+        foreach (Trunks::fromIssabel() as $t) {
+            if ($t['disabled'] || $t['channel_id'] === '') {
+                continue;
+            }
+            if ($this->db->val('SELECT id FROM trunks WHERE channel_id = ?', array($t['channel_id']))) {
+                continue;
+            }
+            $this->db->insert('trunks', array('name' => $t['name'] !== '' ? $t['name'] : $t['channel_id'], 'tech' => $t['tech'], 'channel_id' => $t['channel_id'], 'max_channels' => 1, 'is_enabled' => 1, 'sort' => $n));
+            $n++;
+        }
+        Audit::log('trunk.import', 'trunk', null, "$n added");
+        Flash::set('success', t('trunks_imported', $n));
+        $this->redirect('/settings#trunk-pool');
     }
 
     public function holidayImportIran()

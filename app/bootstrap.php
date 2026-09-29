@@ -31,7 +31,7 @@ spl_autoload_register(function ($class) {
         'Importer' => 'Importer', 'XlsxReader' => 'Importer',
         'Exporter' => 'Exporter', 'XlsxWriter' => 'Exporter',
         'Audio' => 'Audio', 'Jalali' => 'Jalali',
-        'Dnc' => 'Dnc',
+        'Dnc' => 'Dnc', 'Trunks' => 'Trunks',
         'Controller' => 'Router',
     );
     if (isset($map[$class])) {

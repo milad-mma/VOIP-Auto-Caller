@@ -274,7 +274,7 @@ switch ($cmd) {
         // Originate one call synchronously through AMI, exactly like the dialer does, and print the outcome.
         $phone = isset($argv[2]) ? Util::normalizePhone($argv[2], Settings::get('country_code', '98')) : '';
         if ($phone === '') {
-            fail('usage: call:test <phone> [audio-name]   (dials the number and plays the audio, or a demo prompt)');
+            fail('usage: call:test <phone> [audio-name] [trunk-id]   (dials the number and plays the audio, or a demo prompt)');
         }
         $audioName = isset($argv[3]) ? $argv[3] : '';
         $file = 'demo-congrats';
@@ -286,7 +286,16 @@ switch ($cmd) {
             $file = preg_replace('/\.[A-Za-z0-9]+$/', '', Config::storage($a['path']));
         }
         $eff = Campaign::effective(array('callerid_name' => null, 'callerid_number' => null, 'dial_prefix' => null, 'channel_tech' => null, 'trunk_name' => null));
-        $channel = Campaign::channelFor($eff, $phone);
+        if ($eff['channel_tech'] === 'pool') {
+            $tr = isset($argv[4]) ? Trunks::find($argv[4]) : Trunks::pickFree();
+            if (!$tr) {
+                fail('trunk pool is empty or all channels busy (Settings > Trunk pool)');
+            }
+            $channel = Trunks::channelFor($tr, $phone);
+            out("trunk   : #{$tr['id']} {$tr['name']}");
+        } else {
+            $channel = Campaign::channelFor($eff, $phone);
+        }
         $cid = Dialer::callerIdString($eff['callerid_name'], $eff['callerid_number']);
         out("channel : $channel");
         out("callerid: $cid");
