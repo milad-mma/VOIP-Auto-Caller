@@ -408,7 +408,7 @@ Alias $WEB_PATH $APP_DIR/public
 <Directory "$APP_DIR/public/assets">
     <IfModule mod_expires.c>
         ExpiresActive On
-        ExpiresDefault "access plus 1 day"
+        ExpiresDefault "access plus 7 days"
     </IfModule>
 </Directory>
 EOF

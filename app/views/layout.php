@@ -20,7 +20,7 @@ $nav = array(
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title><?php echo h(View::$title !== '' ? View::$title . ' · ' : ''); ?>AutoCaller</title>
-<link rel="stylesheet" href="<?php echo View::url('assets/css/app.css?v=' . AC_VERSION); ?>">
+<link rel="stylesheet" href="<?php echo View::asset('assets/css/app.css'); ?>">
 <link rel="icon" href="<?php echo View::url('assets/img/favicon.svg'); ?>" type="image/svg+xml">
 <meta name="csrf" content="<?php echo h(Auth::csrfToken()); ?>">
 <meta name="base" content="<?php echo h(View::url('')); ?>">
@@ -63,7 +63,7 @@ $nav = array(
   <footer class="foot">AutoCaller for Issabel/Elastix · <a href="https://imapro.ir" target="_blank" rel="noopener">imapro.ir</a></footer>
 </div>
 </div>
-<script src="<?php echo View::url('assets/js/datepicker.js?v=' . AC_VERSION); ?>"></script>
-<script src="<?php echo View::url('assets/js/app.js?v=' . AC_VERSION); ?>"></script>
+<script src="<?php echo View::asset('assets/js/datepicker.js'); ?>"></script>
+<script src="<?php echo View::asset('assets/js/app.js'); ?>"></script>
 </body>
 </html>

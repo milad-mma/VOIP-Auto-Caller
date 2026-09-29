@@ -131,6 +131,14 @@ class View
     {
         return rtrim(Config::get('app', 'base_url'), '/') . '/' . ltrim($path, '/');
     }
+
+    /** URL of a static asset with a cache-busting version derived from the file's mtime */
+    public static function asset($path)
+    {
+        $f = APP_ROOT . '/public/' . ltrim($path, '/');
+        $v = is_file($f) ? substr(md5(AC_VERSION . filemtime($f) . filesize($f)), 0, 8) : AC_VERSION;
+        return self::url($path) . '?v=' . $v;
+    }
 }
 
 class I18n
