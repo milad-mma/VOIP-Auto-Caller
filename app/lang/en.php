@@ -5,7 +5,7 @@ return array(
     'nav_reports' => 'Reports', 'nav_settings' => 'Settings', 'nav_users' => 'Users', 'nav_api' => 'API keys', 'nav_system' => 'System',
     // auth
     'login' => 'Sign in', 'logout' => 'Sign out', 'username' => 'Username', 'password' => 'Password', 'login_intro' => 'Outbound campaign manager for Issabel / Elastix',
-    'login_failed' => 'Invalid username or password', 'login_locked' => 'Too many attempts. Try again later.', 'login_issabel_hint' => 'You can also sign in with your Issabel panel user.',
+    'login_failed' => 'Invalid username or password', 'login_locked' => 'Too many attempts. Try again later.', 'login_root_hint' => "Superuser of this app: 'root'.", 'login_issabel_hint' => 'Issabel panel users (e.g. admin) can sign in with their panel password.',
     'forbidden' => 'You do not have permission for this action', 'not_found' => 'Page not found', 'csrf_failed' => 'Form expired, please try again', 'server_error' => 'Internal error, see logs', 'back_home' => 'Back to dashboard',
     'role_admin' => 'Administrator', 'role_operator' => 'Operator', 'role_viewer' => 'Viewer',
     'role_admin_desc' => 'Everything, including settings, users and deleting campaigns.', 'role_operator_desc' => 'Create/run campaigns, audio, DNC, API keys.', 'role_viewer_desc' => 'Read-only access to campaigns and reports.',

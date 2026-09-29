@@ -13,7 +13,7 @@
 #   sudo ./install.sh purge        remove everything, no questions
 #   sudo ./install.sh uninstall    remove, asking about database/files
 #   sudo ./install.sh doctor       health check
-#   ADMIN_PASS=secret sudo -E ./install.sh install   # non-interactive admin password
+#   ADMIN_PASS=secret sudo -E ./install.sh install   # non-interactive password for the local superuser 'root'
 #   AUTO_YES=1 ... install                            # do not ask before removing an old v1 installation
 #
 # If the old AutoCaller v1 (callblaster, /var/www/html/autocaller) is present, install removes it
@@ -478,35 +478,37 @@ EOF
         warn "AMI login test failed - check /etc/asterisk/manager.conf (enabled=yes, port 5038, bindaddr) then: systemctl restart $SVC"
     fi
 
-    say "Admin user"
+    say "Superuser (local web user 'root')"
+    # keep the username 'admin' free for the Issabel panel administrator
+    su -s /bin/bash $AST_USER -c "cd $APP_DIR && $PHP_BIN bin/console.php user:rename admin root" 2>/dev/null | grep -q renamed && ok "existing local user 'admin' renamed to 'root' ('admin' now = Issabel panel admin)"
     local pw="${ADMIN_PASS:-}"
     if su -s /bin/bash $AST_USER -c "cd $APP_DIR && $PHP_BIN bin/console.php user:has-admin" >/dev/null 2>&1; then
         if [ -n "$pw" ]; then
-            su -s /bin/bash $AST_USER -c "cd $APP_DIR && $PHP_BIN bin/console.php user:create admin admin '$pw'" >/dev/null && ok "admin password reset (ADMIN_PASS)"
+            su -s /bin/bash $AST_USER -c "cd $APP_DIR && $PHP_BIN bin/console.php user:create root admin '$pw'" >/dev/null && ok "root password reset (ADMIN_PASS)"
         elif [ "$UPGRADE" -eq 1 ] && has_tty && [ -z "${AUTO_YES:-}" ]; then
-            echo -n "A local admin user already exists. Set a new password for 'admin' now? [y/N] "; ans="$(ask)"
+            echo -n "A local superuser already exists. Set a new password for 'root' now? [y/N] "; ans="$(ask)"
             if [ "$ans" = "y" ] || [ "$ans" = "Y" ]; then
                 while [ -z "$pw" ]; do
-                    echo -n "New password for 'admin' (min 8 chars): "; pw="$(asks)"; echo
+                    echo -n "New password for 'root' (min 8 chars): "; pw="$(asks)"; echo
                     [ ${#pw} -ge 8 ] || { warn "too short"; pw=""; }
                 done
-                su -s /bin/bash $AST_USER -c "cd $APP_DIR && $PHP_BIN bin/console.php user:create admin admin '$pw'" >/dev/null && ok "admin password updated"
+                su -s /bin/bash $AST_USER -c "cd $APP_DIR && $PHP_BIN bin/console.php user:create root admin '$pw'" >/dev/null && ok "root password updated"
             else
-                ok "existing admin user kept (reset any time: sudo -u $AST_USER $PHP_BIN $APP_DIR/bin/console.php user:passwd admin)"
+                ok "existing superuser kept (reset any time: sudo -u $AST_USER $PHP_BIN $APP_DIR/bin/console.php user:passwd root)"
             fi
         else
-            ok "existing admin user kept (reset: sudo -u $AST_USER $PHP_BIN $APP_DIR/bin/console.php user:passwd admin)"
+            ok "existing superuser kept (reset: sudo -u $AST_USER $PHP_BIN $APP_DIR/bin/console.php user:passwd root)"
         fi
     else
         while [ -z "$pw" ]; do
             if has_tty; then
-                echo -n "Password for web user 'admin' (min 8 chars): "; pw="$(asks)"; echo
+                echo -n "Password for web superuser 'root' (min 8 chars): "; pw="$(asks)"; echo
                 [ ${#pw} -ge 8 ] || { warn "too short"; pw=""; }
             else
-                pw="$(rand 12)"; warn "no terminal: generated admin password: $pw"
+                pw="$(rand 12)"; warn "no terminal: generated root password: $pw"
             fi
         done
-        su -s /bin/bash $AST_USER -c "cd $APP_DIR && $PHP_BIN bin/console.php user:create admin admin '$pw'" >/dev/null && ok "user admin created"
+        su -s /bin/bash $AST_USER -c "cd $APP_DIR && $PHP_BIN bin/console.php user:create root admin '$pw'" >/dev/null && ok "superuser 'root' created"
     fi
 
     if [ -n "$LEGACY_INI" ] && [ -f "$LEGACY_INI" ]; then
@@ -526,7 +528,7 @@ EOF
     echo
     echo -e "${GREEN}✔ AutoCaller installed.${NC}"
     echo -e "   Panel:   ${CYAN}http://${IP:-SERVER-IP}$WEB_PATH${NC}   (or https, same as your Issabel panel)"
-    echo -e "   Login:   admin   (Issabel panel users can also sign in)"
+    echo -e "   Login:   root (this app's superuser)   or   admin + your Issabel panel password"
     echo -e "   Service: systemctl status $SVC     Logs: $APP_DIR/storage/logs/"
     echo -e "   Health:  cd $APP_DIR && sudo -u $AST_USER php bin/console.php doctor"
     echo

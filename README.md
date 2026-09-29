@@ -42,7 +42,7 @@ Purge stops and deletes the service, cron and logrotate entries, removes the AMI
 
 Offline install from the zip: `unzip autocaller-v2.zip && cd autocaller && sudo ./install.sh install`.
 
-Open `http://SERVER-IP/autocaller` (or https, like your Issabel panel) and sign in as `admin` with the password you typed, or with any Issabel panel user.
+Open `http://SERVER-IP/autocaller` (or https, like your Issabel panel) and sign in as **`root`** (this app's own superuser, password typed during install) or as **`admin`** / any other user with your **Issabel panel** password.
 
 Upgrade later with the same one-line command (config, database and audio are kept). Health check: `sudo /opt/autocaller/install.sh doctor`. Interactive uninstall that asks whether to keep the database/files: `sudo /opt/autocaller/install.sh uninstall`.
 
@@ -157,7 +157,7 @@ curl -fsSL https://raw.githubusercontent.com/milad-mma/VOIP-Auto-Caller/main/ins
 **ارتقا از نسخه‌ی قدیمی (v1 / callblaster):** نصاب پوشه‌ی `/var/www/html/autocaller` را تشخیص می‌دهد، یک بار می‌پرسد (یا با `AUTO_YES=1` نمی‌پرسد) و کامل پاکش می‌کند: فایل‌ها، دیتابیس و یوزر `callblaster`، بلوک `[callblaster]` در dialplan، بازگرداندن `issabel.conf` اصلی که v1 جایگزین کرده بود، و اصلاح مجوز 777 که v1 روی `/var/spool/asterisk` گذاشته بود. فایل‌های صوتی قدیمی خودکار وارد v2 می‌شوند؛ تاریخچه‌ی تماس‌های قدیمی منتقل نمی‌شود (اگر لازم دارید قبل از نصب از پنل قدیمی اکسل بگیرید).
 
 نصب آفلاین از zip: `unzip autocaller-v2.zip && cd autocaller && sudo ./install.sh install`
-سپس `http://IP-سرور/autocaller` را باز کنید و با کاربر `admin` (رمزی که وارد کردید) یا هر کاربر پنل Issabel وارد شوید.
+سپس `http://IP-سرور/autocaller` را باز کنید و با کاربر **`root`** (سوپریوزر خود برنامه، رمزی که هنگام نصب وارد کردید) یا با **`admin`**/هر کاربر دیگر با رمز **پنل Issabel** وارد شوید.
 ارتقا با همان دستور یک‌خطی (تنظیمات، دیتابیس و فایل‌های صوتی حفظ می‌شوند)؛ بررسی سلامت: `sudo /opt/autocaller/install.sh doctor`.
 
 ### شروع کار

@@ -6,6 +6,7 @@
  *   php bin/console.php migrate                 apply sql/*.sql migrations
  *   php bin/console.php user:create <name> [role] [password]
  *   php bin/console.php user:passwd <name> [password]
+ *   php bin/console.php user:rename <old> <new>
  *   php bin/console.php doctor                  check DB / AMI / asterisk / dirs / php
  *   php bin/console.php ami:test
  *   php bin/console.php dialer:status
@@ -120,6 +121,26 @@ switch ($cmd) {
         }
         $n = Db::get()->update('users', array('password_hash' => password_hash($pass, PASSWORD_DEFAULT), 'auth_source' => 'local', 'is_active' => 1), 'username = ?', array($name));
         out($n ? 'password updated' : 'user not found');
+        break;
+
+    case 'user:rename':
+        $from = isset($argv[2]) ? trim($argv[2]) : '';
+        $to = isset($argv[3]) ? trim($argv[3]) : '';
+        if ($from === '' || !preg_match('/^[A-Za-z0-9_.@\-]{2,64}$/', $to)) {
+            fail('usage: user:rename <old> <new>');
+        }
+        $db = Db::get();
+        $u = $db->one("SELECT id FROM users WHERE username = ? AND auth_source = 'local'", array($from));
+        if (!$u) {
+            out("no local user '$from'");
+            exit(2);
+        }
+        if ($db->val('SELECT id FROM users WHERE username = ?', array($to))) {
+            out("user '$to' already exists");
+            exit(3);
+        }
+        $db->update('users', array('username' => $to), 'id = ?', array((int)$u['id']));
+        out("renamed $from -> $to");
         break;
 
     case 'user:has-admin':
@@ -418,6 +439,6 @@ switch ($cmd) {
 
     case 'help':
     default:
-        out("usage: console.php migrate | user:create | user:passwd | user:has-admin | issabel:test [user] | setting | ami:test | call:test <phone> [audio] | dialer:status | cleanup | audio:import <dir> | legacy:import-config <ini> | doctor");
+        out("usage: console.php migrate | user:create | user:passwd | user:rename | user:has-admin | issabel:test [user] | setting | ami:test | call:test <phone> [audio] | dialer:status | cleanup | audio:import <dir> | legacy:import-config <ini> | doctor");
         break;
 }

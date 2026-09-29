@@ -18,7 +18,7 @@
     <label><?php echo h(t('password')); ?><input type="password" name="password" required dir="ltr"></label>
     <button class="btn btn-primary btn-block" type="submit"><?php echo h(t('login')); ?></button>
   </form>
-  <?php if (Settings::get('issabel_login') === '1'): ?><p class="muted small"><?php echo h(t('login_issabel_hint')); ?></p><?php endif; ?>
+  <p class="muted small"><?php echo h(t('login_root_hint')); ?><?php if (Settings::get('issabel_login') === '1'): ?> <?php echo h(t('login_issabel_hint')); ?><?php endif; ?></p>
   <div class="login-lang"><a href="<?php echo View::url('/lang/' . ($rtl ? 'en' : 'fa')); ?>"><?php echo $rtl ? 'English' : 'فارسی'; ?></a></div>
 </div>
 </body>

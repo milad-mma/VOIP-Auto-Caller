@@ -5,7 +5,7 @@ return array(
     'nav_reports' => 'گزارش‌ها', 'nav_settings' => 'تنظیمات', 'nav_users' => 'کاربران', 'nav_api' => 'کلیدهای API', 'nav_system' => 'سیستم',
     // auth
     'login' => 'ورود', 'logout' => 'خروج', 'username' => 'نام کاربری', 'password' => 'رمز عبور', 'login_intro' => 'سامانه‌ی تماس خودکار برای Issabel / Elastix',
-    'login_failed' => 'نام کاربری یا رمز عبور اشتباه است', 'login_locked' => 'تلاش‌های ناموفق زیاد بود. کمی بعد دوباره امتحان کنید.', 'login_issabel_hint' => 'با کاربر پنل Issabel هم می‌توانید وارد شوید.',
+    'login_failed' => 'نام کاربری یا رمز عبور اشتباه است', 'login_locked' => 'تلاش‌های ناموفق زیاد بود. کمی بعد دوباره امتحان کنید.', 'login_root_hint' => 'سوپریوزر این برنامه: root.', 'login_issabel_hint' => 'با کاربران پنل Issabel (مثل admin) هم می‌توانید وارد شوید.',
     'forbidden' => 'شما اجازه‌ی این کار را ندارید', 'not_found' => 'صفحه پیدا نشد', 'csrf_failed' => 'فرم منقضی شده، دوباره تلاش کنید', 'server_error' => 'خطای داخلی؛ لاگ‌ها را ببینید', 'back_home' => 'بازگشت به داشبورد',
     'role_admin' => 'مدیر', 'role_operator' => 'اپراتور', 'role_viewer' => 'بیننده',
     'role_admin_desc' => 'دسترسی کامل: تنظیمات، کاربران، حذف کمپین.', 'role_operator_desc' => 'ساخت و اجرای کمپین، فایل صوتی، لیست سیاه، کلید API.', 'role_viewer_desc' => 'فقط مشاهده‌ی کمپین‌ها و گزارش‌ها.',
