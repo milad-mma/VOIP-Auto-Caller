@@ -16,10 +16,10 @@ $bool = function ($name, $cur) { return '<select name="' . $name . '"><option va
     </div>
     <div class="row2">
       <label><?php echo h(t('channel_tech')); ?><?php echo $sel('channel_tech', array('local' => 'Local (' . t('via_dialplan') . ')', 'sip' => 'SIP/trunk/number', 'pjsip' => 'PJSIP/number@trunk', 'custom' => t('custom_template')), $s['channel_tech']); ?><small class="hint"><?php echo h(t('channel_tech_hint')); ?></small></label>
-      <label><?php echo h(t('trunk_name')); ?><input type="text" name="trunk_name" dir="ltr" value="<?php echo h($s['trunk_name']); ?>" list="trunks"><datalist id="trunks"><?php foreach ($trunks as $tr): ?><option value="<?php echo h(preg_replace('#^[A-Za-z]+/#', '', $tr['channelid'])); ?>"><?php echo h($tr['name'] . ' (' . $tr['tech'] . ')'); ?></option><?php endforeach; ?></datalist></label>
+      <label id="f-trunk"><?php echo h(t('trunk_name')); ?><input type="text" name="trunk_name" dir="ltr" value="<?php echo h($s['trunk_name']); ?>" list="trunks"><datalist id="trunks"><?php foreach ($trunks as $tr): ?><option value="<?php echo h(preg_replace('#^[A-Za-z]+/#', '', $tr['channelid'])); ?>"><?php echo h($tr['name'] . ' (' . $tr['tech'] . ')'); ?></option><?php endforeach; ?></datalist></label>
     </div>
     <div class="row2">
-      <label><?php echo h(t('channel_template')); ?><input type="text" name="channel_template" dir="ltr" value="<?php echo h($s['channel_template']); ?>" placeholder="SIP/{trunk}/{number}"></label>
+      <label id="f-template"><?php echo h(t('channel_template')); ?><input type="text" name="channel_template" dir="ltr" value="<?php echo h($s['channel_template']); ?>" placeholder="SIP/{trunk}/{number}"></label>
       <label><?php echo h(t('outbound_context')); ?><input type="text" name="outbound_context" dir="ltr" value="<?php echo h($s['outbound_context']); ?>"></label>
     </div>
     <div class="row2">
@@ -84,8 +84,14 @@ $bool = function ($name, $cur) { return '<select name="' . $name . '"><option va
     <form method="post" action="<?php echo View::url('/settings/holidays/add'); ?>" class="filters"><?php echo Auth::csrfField(); ?><input type="date" name="hdate" dir="ltr" required><input type="text" name="title" placeholder="<?php echo h(t('title')); ?>"><button class="btn btn-sm" type="submit"><?php echo h(t('add')); ?></button></form>
   </div>
   <p class="hint"><?php echo h(t('holidays_hint')); ?></p>
+  <form method="post" action="<?php echo View::url('/settings/holidays/iran'); ?>" class="filters"><?php echo Auth::csrfField(); ?>
+    <?php $jy = Jalali::toJalali(date('Y'), date('n'), date('j')); $jy = $jy[0]; ?>
+    <select name="jy"><?php for ($y = $jy - 1; $y <= $jy + 2; $y++): ?><option value="<?php echo $y; ?>" <?php echo $y === $jy ? 'selected' : ''; ?>><?php echo $y; ?></option><?php endfor; ?></select>
+    <button class="btn btn-sm btn-primary" type="submit"><?php echo h(t('import_iran_holidays')); ?></button>
+    <span class="hint"><?php echo h(t('import_iran_holidays_hint')); ?></span>
+  </form>
   <div class="chips">
-    <?php foreach ($holidays as $hd): ?><span class="chip"><span dir="ltr"><?php echo h($hd['hdate']); ?></span> <?php echo h($hd['title']); ?> <form method="post" class="inline" action="<?php echo View::url('/settings/holidays/' . $hd['id'] . '/delete'); ?>"><?php echo Auth::csrfField(); ?><button class="x" type="submit">✕</button></form></span> <?php endforeach; ?>
+    <?php foreach ($holidays as $hd): ?><span class="chip"><span dir="ltr"><?php echo h(Util::fdate($hd['hdate'], false)); ?></span> <?php echo h($hd['title']); ?> <form method="post" class="inline" action="<?php echo View::url('/settings/holidays/' . $hd['id'] . '/delete'); ?>"><?php echo Auth::csrfField(); ?><button class="x" type="submit">✕</button></form></span> <?php endforeach; ?>
     <?php if (!$holidays): ?><span class="muted"><?php echo h(t('nothing_here')); ?></span><?php endif; ?>
   </div>
 </div>

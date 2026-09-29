@@ -24,6 +24,7 @@ $nav = array(
 <link rel="icon" href="<?php echo View::url('assets/img/favicon.svg'); ?>" type="image/svg+xml">
 <meta name="csrf" content="<?php echo h(Auth::csrfToken()); ?>">
 <meta name="base" content="<?php echo h(View::url('')); ?>">
+<script>(function(){try{var t=localStorage.getItem('ac-theme');if(!t&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)t='dark';if(t==='dark')document.documentElement.setAttribute('data-theme','dark');}catch(e){}})();</script>
 </head>
 <body>
 <div class="app">
@@ -39,6 +40,7 @@ $nav = array(
   </nav>
   <div class="side-foot">
     <a href="<?php echo View::url('/lang/' . ($rtl ? 'en' : 'fa')); ?>" class="lang"><?php echo $rtl ? 'English' : 'فارسی'; ?></a>
+    <button type="button" id="theme-toggle" class="theme-toggle" title="<?php echo h(t('toggle_theme')); ?>"><span class="ico-sun">☀</span><span class="ico-moon">☾</span></button>
   </div>
 </aside>
 <div class="main">
@@ -61,6 +63,7 @@ $nav = array(
   <footer class="foot">AutoCaller for Issabel/Elastix · <a href="https://imapro.ir" target="_blank" rel="noopener">imapro.ir</a></footer>
 </div>
 </div>
+<script src="<?php echo View::url('assets/js/datepicker.js?v=' . AC_VERSION); ?>"></script>
 <script src="<?php echo View::url('assets/js/app.js?v=' . AC_VERSION); ?>"></script>
 </body>
 </html>

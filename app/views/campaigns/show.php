@@ -10,9 +10,9 @@ $waitMsg = $c['last_error'] && strpos($c['last_error'], 'wait:') === 0 ? t('wait
 <div class="card head-card">
   <div class="head-left">
     <h2><?php echo h($c['name']); ?> <span class="badge badge-<?php echo h($c['status']); ?>" id="c-status"><?php echo h(t('cs_' . $c['status'])); ?></span></h2>
-    <div class="muted small">#<?php echo (int)$c['id']; ?> · <?php echo h(t('created_at')); ?> <span dir="ltr"><?php echo h($c['created_at']); ?></span>
-      <?php if ($c['started_at']): ?> · <?php echo h(t('started_at')); ?> <span dir="ltr"><?php echo h($c['started_at']); ?></span><?php endif; ?>
-      <?php if ($c['finished_at']): ?> · <?php echo h(t('finished_at')); ?> <span dir="ltr"><?php echo h($c['finished_at']); ?></span><?php endif; ?>
+    <div class="muted small">#<?php echo (int)$c['id']; ?> · <?php echo h(t('created_at')); ?> <span dir="ltr"><?php echo h(Util::fdate($c['created_at'])); ?></span>
+      <?php if ($c['started_at']): ?> · <?php echo h(t('started_at')); ?> <span dir="ltr"><?php echo h(Util::fdate($c['started_at'])); ?></span><?php endif; ?>
+      <?php if ($c['finished_at']): ?> · <?php echo h(t('finished_at')); ?> <span dir="ltr"><?php echo h(Util::fdate($c['finished_at'])); ?></span><?php endif; ?>
     </div>
     <?php if ($waitMsg): ?><div class="alert alert-warn small" id="c-wait"><?php echo h($waitMsg); ?></div><?php endif; ?>
     <?php if ($c['description']): ?><p class="muted"><?php echo nl2br(h($c['description'])); ?></p><?php endif; ?>
@@ -57,10 +57,16 @@ $waitMsg = $c['last_error'] && strpos($c['last_error'], 'wait:') === 0 ? t('wait
     <h3><?php echo h(t('summary')); ?></h3>
     <dl class="dl">
       <dt><?php echo h(t('default_audio')); ?></dt><dd><?php echo $audio ? h($audio['name']) . ' (' . Util::formatDuration($audio['duration_sec']) . ') <audio controls preload="none" src="' . View::url('/audio/' . $audio['id'] . '/play') . '"></audio>' : '<span class="muted">' . h(t('none_per_contact')) . '</span>'; ?></dd>
-      <dt><?php echo h(t('concurrent')); ?></dt><dd><?php echo (int)$c['concurrent']; ?> · <?php echo h(t('gap_ms')); ?> <?php echo (int)$c['gap_ms']; ?> · <?php echo h(t('ring_timeout')); ?> <?php echo (int)$c['ring_timeout']; ?>s</dd>
-      <dt><?php echo h(t('retries')); ?></dt><dd><?php echo (int)$c['max_retries']; ?> × <?php echo (int)$c['retry_delay_min']; ?>min (<?php echo h($c['retry_on'] ? $c['retry_on'] : '-'); ?>)</dd>
-      <dt><?php echo h(t('schedule')); ?></dt><dd dir="ltr"><?php echo h(($c['start_at'] ? $c['start_at'] : '…') . ' → ' . ($c['end_at'] ? $c['end_at'] : '…')); ?> · <?php echo h(($c['work_start'] ? $c['work_start'] : Settings::get('work_start')) . '–' . ($c['work_end'] ? $c['work_end'] : Settings::get('work_end'))); ?><?php echo $c['work_days'] ? ' · ' . h($c['work_days']) : ''; ?></dd>
-      <dt><?php echo h(t('channel')); ?></dt><dd dir="ltr"><code><?php echo h(Campaign::channelFor($eff, '09XXXXXXXXX')); ?></code> · CID <?php echo h($eff['callerid_name']); ?> &lt;<?php echo h($eff['callerid_number']); ?>&gt;</dd>
+      <dt><?php echo h(t('concurrent')); ?></dt><dd><bdi><?php echo (int)$c['concurrent']; ?></bdi></dd>
+      <dt><?php echo h(t('gap_ms')); ?></dt><dd><bdi><?php echo (int)$c['gap_ms']; ?></bdi></dd>
+      <dt><?php echo h(t('ring_timeout')); ?></dt><dd><bdi><?php echo (int)$c['ring_timeout']; ?></bdi></dd>
+      <dt><?php echo h(t('retries')); ?></dt><dd><bdi><?php echo (int)$c['max_retries']; ?></bdi> × <bdi><?php echo (int)$c['retry_delay_min']; ?></bdi> <?php echo h(t('minutes')); ?><?php if ($c['retry_on']): ?> <small class="muted">(<?php echo h(implode(t('list_sep'), array_map(function ($x) { return t('st_' . trim($x)); }, explode(',', $c['retry_on'])))); ?>)</small><?php endif; ?></dd>
+      <dt><?php echo h(t('schedule')); ?></dt><dd>
+        <?php if ($c['start_at'] || $c['end_at']): ?><bdi><?php echo h(Util::fdate($c['start_at']) ?: '…'); ?></bdi> → <bdi><?php echo h(Util::fdate($c['end_at']) ?: '…'); ?></bdi> · <?php else: ?><span class="muted"><?php echo h(t('no_date_limit')); ?></span> · <?php endif; ?>
+        <bdi><?php echo h(($c['work_start'] ? $c['work_start'] : Settings::get('work_start')) . '–' . ($c['work_end'] ? $c['work_end'] : Settings::get('work_end'))); ?></bdi>
+        <?php if ($c['work_days']): $dn = array(t('day_sun'), t('day_mon'), t('day_tue'), t('day_wed'), t('day_thu'), t('day_fri'), t('day_sat')); ?> · <?php echo h(implode(t('list_sep'), array_map(function ($d) use ($dn) { return $dn[(int)$d]; }, explode(',', $c['work_days'])))); ?><?php endif; ?>
+      </dd>
+      <dt><?php echo h(t('channel')); ?></dt><dd dir="ltr" class="ltr-cell"><code><?php echo h(Campaign::channelFor($eff, '09XXXXXXXXX')); ?></code><br><small class="muted">CID <?php echo h(Dialer::callerIdString($eff['callerid_name'], $eff['callerid_number'])); ?></small></dd>
       <dt><?php echo h(t('ivr_keys')); ?></dt><dd>
         <?php if (!$ivr['digits']): ?><span class="muted"><?php echo h(t('none')); ?></span><?php endif; ?>
         <?php foreach ($ivr['digits'] as $k => $d): ?><span class="chip"><b><?php echo h($k); ?></b> <?php echo h(t('ivr_' . $d['action'])); ?><?php echo $d['action'] === 'transfer' ? ' → ' . h($d['target']) : ''; ?><?php echo $d['tag'] ? ' [' . h($d['tag']) . ']' : ''; ?></span> <?php endforeach; ?>

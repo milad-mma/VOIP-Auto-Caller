@@ -21,7 +21,7 @@ $p = $ref->getProperty('instance');
 $p->setAccessible(true);
 $p->setValue(null, new MockDb());
 
-$_SESSION['uid'] = 1;
+$_SESSION['uid'] = getenv('NOLOGIN') ? 0 : 1;
 $_SESSION['csrf'] = 'tok';
 $_SESSION['pwd_stamp'] = null;
 $_POST['_csrf'] = 'tok';

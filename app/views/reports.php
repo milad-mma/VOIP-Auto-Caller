@@ -31,8 +31,7 @@ foreach ($hours as $hh) { $maxHour = max($maxHour, $hh['total']); }
 <div class="row2">
   <div class="card">
     <h3><?php echo h(t('calls_per_day')); ?></h3>
-    <?php if (!$byDay): ?><p class="muted"><?php echo h(t('nothing_here')); ?></p><?php endif; ?>
-    <div class="chart" dir="ltr">
+    <div class="chart" dir="ltr" data-empty="<?php echo h(t('nothing_here')); ?>">
       <?php foreach ($byDay as $d): $ht = (int)round($d['total'] * 100 / $maxDay); $ha = (int)round($d['answered'] * 100 / $maxDay); ?>
         <div class="col" title="<?php echo h($d['d']); ?>: <?php echo (int)$d['total']; ?> / <?php echo (int)$d['answered']; ?>"><div class="b1" style="height:<?php echo $ht; ?>%"></div><div class="b2" style="height:<?php echo $ha; ?>%"></div><span><?php echo substr($d['d'], 5); ?></span></div>
       <?php endforeach; ?>

@@ -4,8 +4,8 @@
     <h3><?php echo h(t('dialer_daemon')); ?> <span class="badge <?php echo $alive ? 'badge-running' : 'badge-stopped'; ?>"><?php echo h($alive ? t('running') : t('not_running')); ?></span></h3>
     <dl class="dl">
       <dt>PID</dt><dd><?php echo h($daemon['pid'] ?: '-'); ?></dd>
-      <dt><?php echo h(t('started_at')); ?></dt><dd dir="ltr"><?php echo h($daemon['started_at']); ?></dd>
-      <dt>Heartbeat</dt><dd dir="ltr"><?php echo h($daemon['heartbeat_at']); ?> <?php echo $age !== null ? '(' . $age . 's)' : ''; ?></dd>
+      <dt><?php echo h(t('started_at')); ?></dt><dd dir="ltr"><?php echo h(Util::fdate($daemon['started_at'])); ?></dd>
+      <dt>Heartbeat</dt><dd dir="ltr"><?php echo h(Util::fdate($daemon['heartbeat_at'])); ?> <?php echo $age !== null ? '(' . $age . 's)' : ''; ?></dd>
       <dt>AMI</dt><dd><span class="badge <?php echo $daemon['ami_connected'] ? 'badge-running' : 'badge-stopped'; ?>"><?php echo $daemon['ami_connected'] ? h(t('connected')) : h(t('disconnected')); ?></span></dd>
       <dt><?php echo h(t('live_calls')); ?></dt><dd><?php echo (int)$daemon['active_calls']; ?></dd>
       <dt><?php echo h(t('last_error')); ?></dt><dd dir="ltr"><?php echo h($daemon['last_error'] ?: '-'); ?></dd>

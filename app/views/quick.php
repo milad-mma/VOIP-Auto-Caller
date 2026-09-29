@@ -18,7 +18,7 @@
       <thead><tr><th><?php echo h(t('phone')); ?></th><th><?php echo h(t('status')); ?></th><th><?php echo h(t('dtmf')); ?></th><th><?php echo h(t('duration')); ?></th><th><?php echo h(t('time')); ?></th></tr></thead>
       <tbody>
       <?php if (!$recent): ?><tr><td colspan="5" class="muted center"><?php echo h(t('nothing_here')); ?></td></tr><?php endif; ?>
-      <?php foreach ($recent as $r): ?><tr><td dir="ltr"><a href="<?php echo View::url('/campaigns/' . $r['id']); ?>"><?php echo h($r['phone']); ?></a></td><td><span class="badge badge-<?php echo h($r['cstatus']); ?>"><?php echo h(t('st_' . $r['cstatus'])); ?></span></td><td><?php echo h($r['dtmf']); ?></td><td><?php echo Util::formatDuration($r['duration_sec']); ?></td><td dir="ltr"><small><?php echo h($r['created_at']); ?></small></td></tr><?php endforeach; ?>
+      <?php foreach ($recent as $r): ?><tr><td dir="ltr"><a href="<?php echo View::url('/campaigns/' . $r['id']); ?>"><?php echo h($r['phone']); ?></a></td><td><span class="badge badge-<?php echo h($r['cstatus']); ?>"><?php echo h(t('st_' . $r['cstatus'])); ?></span></td><td><?php echo h($r['dtmf']); ?></td><td><?php echo Util::formatDuration($r['duration_sec']); ?></td><td dir="ltr"><small><?php echo h(Util::fdate($r['created_at'])); ?></small></td></tr><?php endforeach; ?>
       </tbody>
     </table>
   </div>

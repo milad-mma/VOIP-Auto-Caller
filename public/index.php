@@ -71,6 +71,7 @@ $r->get('/settings', 'SettingsController@index');
 $r->post('/settings', 'SettingsController@save');
 $r->post('/settings/test-ami', 'SettingsController@testAmi');
 $r->post('/settings/holidays/add', 'SettingsController@holidayAdd');
+$r->post('/settings/holidays/iran', 'SettingsController@holidayImportIran');
 $r->post('/settings/holidays/{id}/delete', 'SettingsController@holidayDelete');
 
 // users & api keys

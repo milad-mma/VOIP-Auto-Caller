@@ -118,6 +118,25 @@ class SettingsController extends Controller
         $this->redirect('/settings#holidays');
     }
 
+    public function holidayImportIran()
+    {
+        $this->requireRole(Auth::ROLE_ADMIN);
+        $this->csrf();
+        $jy = Request::int('jy', 0, 1300, 1500);
+        if (!$jy) {
+            Flash::set('error', t('invalid_input'));
+            $this->redirect('/settings#holidays');
+        }
+        $n = 0;
+        foreach (Jalali::iranHolidays($jy) as $h) {
+            $title = $h['title'] . ($h['lunar'] ? ' ' . t('lunar_mark') : '');
+            $n += $this->db->exec('INSERT IGNORE INTO holidays (hdate, title) VALUES (?, ?)', array($h['date'], mb_substr($title, 0, 128, 'UTF-8')));
+        }
+        Audit::log('holidays.import_iran', 'settings', $jy, "$n added");
+        Flash::set('success', t('iran_holidays_added', $n, $jy));
+        $this->redirect('/settings#holidays');
+    }
+
     public function holidayDelete($p)
     {
         $this->requireRole(Auth::ROLE_ADMIN);

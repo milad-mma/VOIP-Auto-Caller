@@ -10,6 +10,7 @@ return array(
     'role_admin' => 'مدیر', 'role_operator' => 'اپراتور', 'role_viewer' => 'بیننده',
     'role_admin_desc' => 'دسترسی کامل: تنظیمات، کاربران، حذف کمپین.', 'role_operator_desc' => 'ساخت و اجرای کمپین، فایل صوتی، لیست سیاه، کلید API.', 'role_viewer_desc' => 'فقط مشاهده‌ی کمپین‌ها و گزارش‌ها.',
     // common
+    'minutes' => 'دقیقه', 'list_sep' => '، ', 'no_date_limit' => 'بدون محدودیت تاریخ',
     'save' => 'ذخیره', 'saved' => 'ذخیره شد', 'cancel' => 'انصراف', 'delete' => 'حذف', 'deleted' => 'حذف شد', 'edit' => 'ویرایش', 'create' => 'ایجاد', 'add' => 'افزودن', 'done' => 'انجام شد', 'yes' => 'بله', 'no' => 'خیر', 'on' => 'فعال', 'off' => 'غیرفعال',
     'name' => 'نام', 'description' => 'توضیحات', 'status' => 'وضعیت', 'search' => 'جستجو…', 'filter' => 'فیلتر', 'all' => 'همه', 'all_statuses' => 'همه‌ی وضعیت‌ها', 'nothing_here' => 'هنوز چیزی اینجا نیست', 'none' => 'هیچ',
     'created_at' => 'ایجاد', 'created_by' => 'توسط', 'started_at' => 'شروع', 'finished_at' => 'پایان', 'time' => 'زمان', 'count' => 'تعداد', 'title' => 'عنوان', 'key' => 'کلید', 'tag' => 'برچسب', 'target' => 'مقصد', 'action' => 'عملیات',
@@ -49,6 +50,7 @@ return array(
     // reports
     'from' => 'از', 'to' => 'تا', 'all_campaigns' => 'همه‌ی کمپین‌ها', 'total_calls' => 'تماس‌ها', 'avg' => 'میانگین', 'calls_per_day' => 'تماس در روز', 'calls_per_hour' => 'تماس بر حسب ساعت روز', 'by_campaign' => 'به تفکیک کمپین', 'dtmf_distribution' => 'کلیدهای فشرده‌شده',
     // settings
+    'import_iran_holidays' => 'افزودن تعطیلات رسمی ایران', 'import_iran_holidays_hint' => 'تعطیلات شمسی دقیق‌اند؛ تعطیلات قمری (مذهبی) بر اساس تقویم هجری جدولی محاسبه می‌شوند و ممکن است یک روز با تاریخ اعلام‌شده فاصله داشته باشند — بررسی و در صورت نیاز اصلاح کنید.', 'iran_holidays_added' => '%d تعطیلی برای سال %d اضافه شد', 'lunar_mark' => '(قمری)', 'toggle_theme' => 'حالت تیره / روشن',
     'outbound_settings' => 'تماس خروجی', 'via_dialplan' => 'از طریق مسیرهای خروجی Issabel', 'custom_template' => 'الگوی دلخواه', 'channel_tech_hint' => 'Local = استفاده از Outbound Route و failover ترانک خود Issabel (پیشنهادی). SIP/PJSIP = تماس مستقیم از یک ترانک.', 'channel_template' => 'الگوی کانال دلخواه', 'outbound_context' => 'کانتکست خروجی',
     'dial_prefix_hint' => 'به ابتدای همه‌ی شماره‌ها اضافه می‌شود (مثلاً 9 اگر مسیر خروجی لازم دارد)', 'country_code' => 'کد کشور', 'detected_trunks' => 'ترانک‌های پیدا شده در Issabel', 'disabled' => 'غیرفعال',
     'capacity_defaults' => 'ظرفیت و پیش‌فرض‌ها', 'global_max_concurrent' => 'حداکثر تماس هم‌زمان (کل کمپین‌ها)', 'global_max_hint' => 'از تعداد کانال ترانک بیشتر نگذارید', 'default_concurrent' => 'پیش‌فرض هر کمپین', 'default_gap_ms' => 'فاصله پیش‌فرض (میلی‌ثانیه)', 'default_ring_timeout' => 'مهلت زنگ پیش‌فرض (ثانیه)', 'default_max_retries' => 'تلاش مجدد پیش‌فرض', 'default_retry_delay_min' => 'فاصله تلاش مجدد پیش‌فرض (دقیقه)',

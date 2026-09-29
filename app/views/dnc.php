@@ -11,7 +11,7 @@
       <tbody>
       <?php if (!$rows): ?><tr><td colspan="5" class="muted center"><?php echo h(t('nothing_here')); ?></td></tr><?php endif; ?>
       <?php foreach ($rows as $r): ?>
-        <tr><td dir="ltr"><strong><?php echo h($r['phone']); ?></strong></td><td><?php echo h($r['reason']); ?></td><td><span class="badge badge-muted"><?php echo h($r['source']); ?></span> <small class="muted"><?php echo h($r['username']); ?></small></td><td dir="ltr"><small><?php echo h($r['created_at']); ?></small></td>
+        <tr><td dir="ltr"><strong><?php echo h($r['phone']); ?></strong></td><td><?php echo h($r['reason']); ?></td><td><span class="badge badge-muted"><?php echo h($r['source']); ?></span> <small class="muted"><?php echo h($r['username']); ?></small></td><td dir="ltr"><small><?php echo h(Util::fdate($r['created_at'])); ?></small></td>
         <?php if ($op): ?><td><form method="post" action="<?php echo View::url('/dnc/' . $r['id'] . '/delete'); ?>" class="inline"><?php echo Auth::csrfField(); ?><button class="btn btn-sm btn-ghost" type="submit">✕</button></form></td><?php endif; ?></tr>
       <?php endforeach; ?>
       </tbody>

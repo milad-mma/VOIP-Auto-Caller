@@ -32,6 +32,33 @@
     }
   }
 
+  // ---- wrap every table so it scrolls horizontally on small screens instead of breaking the layout ----
+  $$('table.table').forEach(function (t) {
+    if (t.parentNode && t.parentNode.classList && t.parentNode.classList.contains('table-wrap')) return;
+    var w = document.createElement('div'); w.className = 'table-wrap';
+    t.parentNode.insertBefore(w, t); w.appendChild(t);
+  });
+
+  // ---- Jalali date display for the Persian UI (dates coming from JSON) ----
+  var RTL = document.documentElement.getAttribute('dir') === 'rtl';
+  function toJalali(gy, gm, gd) { return window.AC_J.toJalali(gy, gm, gd); }
+  function fdate(s) {
+    if (!s) return '';
+    var m = /^(\d{4})-(\d{2})-(\d{2})(?:[ T](\d{2}):(\d{2}))?/.exec(s);
+    if (!m) return s;
+    var d = RTL ? (function () { var j = toJalali(+m[1], +m[2], +m[3]); return j[0] + '/' + ('0' + j[1]).slice(-2) + '/' + ('0' + j[2]).slice(-2); })() : m[1] + '-' + m[2] + '-' + m[3];
+    return m[4] ? d + ' ' + m[4] + ':' + m[5] : d;
+  }
+  window.AC_fdate = fdate;
+
+  // ---- theme toggle ----
+  var tt = $('#theme-toggle');
+  if (tt) tt.addEventListener('click', function () {
+    var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    if (dark) document.documentElement.removeAttribute('data-theme'); else document.documentElement.setAttribute('data-theme', 'dark');
+    try { localStorage.setItem('ac-theme', dark ? 'light' : 'dark'); } catch (e) {}
+  });
+
   // ---- daemon pill in header (all pages) ----
   var pill = $('#daemon-pill');
   function refreshPill(d) {
@@ -105,7 +132,7 @@
         else {
           tb.innerHTML = j.rows.map(function (r) {
             var note = r.last_error || '';
-            if (r.next_attempt_at && r.status === 'pending') note = '⏱ ' + r.next_attempt_at;
+            if (r.next_attempt_at && r.status === 'pending') note = '⏱ ' + fdate(r.next_attempt_at);
             if (r.hangup_cause && r.status !== 'completed') note = (note ? note + ' · ' : '') + r.hangup_cause;
             var act = '';
             if (window.AC_CAN_OP) {
@@ -116,7 +143,7 @@
               if (['dialing', 'answered'].indexOf(r.status) === -1) act += '<button class="btn btn-sm btn-ghost" data-do="delete" data-id="' + r.id + '" title="delete">🗑</button>';
               act += '</td>';
             }
-            return '<tr><td dir="ltr"><strong>' + esc(r.phone) + '</strong></td><td>' + esc(r.name) + '</td><td><span class="badge badge-' + esc(r.status) + '">' + esc(window.AC_ST[r.status] || r.status) + '</span>' + (r.amd_result ? ' <small class="muted">' + esc(r.amd_result) + '</small>' : '') + '</td><td>' + r.attempts + '</td><td dir="ltr"><small>' + esc(r.last_attempt_at || '') + '</small></td><td>' + (r.duration_sec ? fmtDur(r.duration_sec) : '') + '</td><td>' + esc(r.dtmf || '') + '</td><td>' + esc(r.result_tag || '') + '</td><td><small class="muted">' + esc(note) + '</small></td>' + act + '</tr>';
+            return '<tr><td dir="ltr"><strong>' + esc(r.phone) + '</strong></td><td>' + esc(r.name) + '</td><td><span class="badge badge-' + esc(r.status) + '">' + esc(window.AC_ST[r.status] || r.status) + '</span>' + (r.amd_result ? ' <small class="muted">' + esc(r.amd_result) + '</small>' : '') + '</td><td>' + r.attempts + '</td><td dir="ltr"><small>' + esc(fdate(r.last_attempt_at)) + '</small></td><td>' + (r.duration_sec ? fmtDur(r.duration_sec) : '') + '</td><td>' + esc(r.dtmf || '') + '</td><td>' + esc(r.result_tag || '') + '</td><td><small class="muted">' + esc(note) + '</small></td>' + act + '</tr>';
           }).join('');
         }
         var pages = Math.max(1, Math.ceil(j.total / j.per)), pg = $('#ct-pager'), html = '';
@@ -150,6 +177,13 @@
 
   // ---- settings ----
   if (window.AC_PAGE === 'settings') {
+    var ct = document.querySelector('select[name=channel_tech]');
+    function updCt() {
+      var v = ct.value, ft = $('#f-trunk'), fp = $('#f-template');
+      if (ft) ft.style.opacity = (v === 'sip' || v === 'pjsip' || v === 'custom') ? '1' : '.45';
+      if (fp) fp.hidden = (v !== 'custom');
+    }
+    if (ct) { ct.addEventListener('change', updCt); updCt(); }
     var tb = $('#test-ami');
     if (tb) tb.addEventListener('click', function () {
       $('#test-ami-result').textContent = '…';

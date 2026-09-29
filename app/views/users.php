@@ -19,14 +19,14 @@
         <td><span class="badge <?php echo $iu['state'] === 'local' ? 'badge-paused' : ($iu['state'] === 'linked' ? 'badge-completed' : 'badge-muted'); ?>"><?php echo h(t('access_' . $iu['state'])); ?></span></td>
         <?php if ($iu['state'] === 'local'): ?>
           <td><?php echo h(t('role_' . $iu['role'])); ?></td><td><?php echo h($iu['active'] ? t('yes') : t('no')); ?></td>
-          <td dir="ltr"><small><?php echo h($iu['last_login_at']); ?></small></td><td><small class="muted"><?php echo h(t('managed_below')); ?></small></td>
+          <td dir="ltr"><small><?php echo h(Util::fdate($iu['last_login_at'])); ?></small></td><td><small class="muted"><?php echo h(t('managed_below')); ?></small></td>
         <?php elseif (!$super && $iu['role'] === 'admin' && !$isMe): ?>
           <td><?php echo h(t('role_' . $iu['role'])); ?></td><td><?php echo h($iu['active'] ? t('yes') : t('no')); ?></td>
-          <td dir="ltr"><small><?php echo h($iu['last_login_at']); ?></small></td><td><small class="muted"><?php echo h(t('only_root_manages_admins')); ?></small></td>
+          <td dir="ltr"><small><?php echo h(Util::fdate($iu['last_login_at'])); ?></small></td><td><small class="muted"><?php echo h(t('only_root_manages_admins')); ?></small></td>
         <?php else: ?>
           <td><select name="role" <?php echo $isMe ? 'disabled' : ''; ?>><?php foreach (array('admin', 'operator', 'viewer') as $r): if ($r === 'admin' && !$super && $iu['role'] !== 'admin') continue; ?><option value="<?php echo $r; ?>" <?php echo $iu['role'] === $r ? 'selected' : ''; ?>><?php echo h(t('role_' . $r)); ?></option><?php endforeach; ?></select></td>
           <td><select name="is_active" <?php echo $isMe ? 'disabled' : ''; ?>><option value="1" <?php echo $iu['active'] ? 'selected' : ''; ?>><?php echo h(t('yes')); ?></option><option value="0" <?php echo !$iu['active'] ? 'selected' : ''; ?>><?php echo h(t('no')); ?></option></select></td>
-          <td dir="ltr"><small><?php echo h($iu['last_login_at']); ?></small></td>
+          <td dir="ltr"><small><?php echo h(Util::fdate($iu['last_login_at'])); ?></small></td>
           <td class="actions"><?php if ($super && !$isMe): ?><input type="password" name="password" placeholder="<?php echo h(t('app_password')); ?><?php echo !empty($iu['has_pw']) ? ' ✓' : ''; ?>" size="10" autocomplete="new-password" title="<?php echo h(t('app_password_hint')); ?>"><?php endif; ?> <?php if (!$isMe): ?><button class="btn btn-sm" type="submit"><?php echo h(t('save')); ?></button><?php endif; ?><?php if ($super && !$isMe && $iu['state'] === 'linked'): ?> <button class="btn btn-sm btn-ghost" type="submit" name="reset" value="1" title="<?php echo h(t('reset_issabel_user_hint')); ?>" onclick="return confirm('<?php echo h(t('reset_issabel_user_hint')); ?>')">↺</button><?php endif; ?></td>
         <?php endif; ?>
         </form>
@@ -51,7 +51,7 @@
           <td><?php if ($locked || $isRoot): ?><?php echo h(t('role_' . $u['role'])); ?><?php else: ?><select name="role"><?php foreach (array('admin', 'operator', 'viewer') as $r): if ($r === 'admin' && !$super && $u['role'] !== 'admin') continue; ?><option value="<?php echo $r; ?>" <?php echo $u['role'] === $r ? 'selected' : ''; ?>><?php echo h(t('role_' . $r)); ?></option><?php endforeach; ?></select><?php endif; ?></td>
           <td><span class="badge badge-muted"><?php echo h($u['auth_source']); ?></span><?php if ($u['auth_source'] === 'issabel' && $u['password_hash'] !== ''): ?> <small class="muted">+<?php echo h(t('app_password')); ?></small><?php endif; ?></td>
           <td><?php if ($locked || $isRoot): ?><?php echo h($u['is_active'] ? t('yes') : t('no')); ?><?php else: ?><select name="is_active"><option value="1" <?php echo $u['is_active'] ? 'selected' : ''; ?>><?php echo h(t('yes')); ?></option><option value="0" <?php echo !$u['is_active'] ? 'selected' : ''; ?>><?php echo h(t('no')); ?></option></select><?php endif; ?></td>
-          <td dir="ltr"><small><?php echo h($u['last_login_at']); ?><br><?php echo h($u['last_login_ip']); ?></small></td>
+          <td dir="ltr"><small><?php echo h(Util::fdate($u['last_login_at'])); ?><br><?php echo h($u['last_login_ip']); ?></small></td>
           <td class="actions"><?php if ($isRoot && !$super): ?><small class="muted"><?php echo h(t('root_protected')); ?></small><?php elseif ($peerAdmin): ?><small class="muted"><?php echo h(t('only_root_manages_admins')); ?></small><?php else: ?><?php if ($canPw && (int)$u['id'] !== (int)$me['id']): ?><input type="password" name="password" placeholder="<?php echo h(t('new_password')); ?>" size="10" autocomplete="new-password"> <?php endif; ?><button class="btn btn-sm" type="submit"><?php echo h(t('save')); ?></button><?php endif; ?></td>
           </form>
         </tr>

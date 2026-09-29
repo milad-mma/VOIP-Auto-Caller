@@ -26,7 +26,7 @@
         <td><span class="badge badge-<?php echo h($c['status']); ?>"><?php echo h(t('cs_' . $c['status'])); ?></span></td>
         <td><div class="bar"><div class="bar-in" style="width:<?php echo $pct; ?>%"></div></div><small><?php echo (int)$c['cnt_done']; ?>/<?php echo (int)$c['total_contacts']; ?> (<?php echo $pct; ?>%)</small></td>
         <td><?php echo (int)$c['cnt_answered']; ?></td>
-        <td dir="ltr"><small><?php echo h($c['created_at']); ?></small></td>
+        <td dir="ltr"><small><?php echo h(Util::fdate($c['created_at'])); ?></small></td>
         <td><small><?php echo h($c['creator']); ?></small></td>
       </tr>
     <?php endforeach; ?>

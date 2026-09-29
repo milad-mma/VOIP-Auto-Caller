@@ -44,7 +44,7 @@
     <thead><tr><th><?php echo h(t('name')); ?></th><th><?php echo h(t('status')); ?></th><th><?php echo h(t('contacts')); ?></th><th><?php echo h(t('answered')); ?></th><th><?php echo h(t('finished_at')); ?></th></tr></thead>
     <tbody>
     <?php foreach ($recent as $c): ?>
-      <tr><td><a href="<?php echo View::url('/campaigns/' . $c['id']); ?>"><?php echo h($c['name']); ?></a></td><td><span class="badge badge-<?php echo h($c['status']); ?>"><?php echo h(t('cs_' . $c['status'])); ?></span></td><td><?php echo (int)$c['total_contacts']; ?></td><td><?php echo (int)$c['cnt_answered']; ?></td><td dir="ltr"><?php echo h($c['finished_at']); ?></td></tr>
+      <tr><td><a href="<?php echo View::url('/campaigns/' . $c['id']); ?>"><?php echo h($c['name']); ?></a></td><td><span class="badge badge-<?php echo h($c['status']); ?>"><?php echo h(t('cs_' . $c['status'])); ?></span></td><td><?php echo (int)$c['total_contacts']; ?></td><td><?php echo (int)$c['cnt_answered']; ?></td><td dir="ltr"><?php echo h(Util::fdate($c['finished_at'])); ?></td></tr>
     <?php endforeach; ?>
     </tbody>
   </table>

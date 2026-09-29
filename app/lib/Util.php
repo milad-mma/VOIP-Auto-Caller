@@ -167,6 +167,30 @@ class Util
         return $text;
     }
 
+    /** Gregorian Y-m-d -> Jalali array(y,m,d) (exact, leap-year aware) */
+    public static function toJalali($gy, $gm, $gd)
+    {
+        return Jalali::toJalali($gy, $gm, $gd);
+    }
+
+    /** Display a datetime: Jalali in Persian UI, unchanged otherwise. '' for empty. */
+    public static function fdate($dt, $withTime = true)
+    {
+        if ($dt === null || $dt === '' || $dt === '0000-00-00 00:00:00') {
+            return '';
+        }
+        $ts = is_numeric($dt) ? (int)$dt : strtotime($dt);
+        if ($ts === false) {
+            return (string)$dt;
+        }
+        if (!class_exists('I18n', false) || !I18n::isRtl()) {
+            return date($withTime ? 'Y-m-d H:i' : 'Y-m-d', $ts);
+        }
+        list($y, $m, $d) = self::toJalali(date('Y', $ts), date('n', $ts), date('j', $ts));
+        $out = sprintf('%04d/%02d/%02d', $y, $m, $d);
+        return $withTime ? $out . ' ' . date('H:i', $ts) : $out;
+    }
+
     public static function formatDuration($sec)
     {
         $sec = (int)$sec;

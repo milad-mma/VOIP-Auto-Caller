@@ -10,6 +10,7 @@ return array(
     'role_admin' => 'Administrator', 'role_operator' => 'Operator', 'role_viewer' => 'Viewer',
     'role_admin_desc' => 'Everything, including settings, users and deleting campaigns.', 'role_operator_desc' => 'Create/run campaigns, audio, DNC, API keys.', 'role_viewer_desc' => 'Read-only access to campaigns and reports.',
     // common
+    'minutes' => 'min', 'list_sep' => ', ', 'no_date_limit' => 'no start/end date',
     'save' => 'Save', 'saved' => 'Saved', 'cancel' => 'Cancel', 'delete' => 'Delete', 'deleted' => 'Deleted', 'edit' => 'Edit', 'create' => 'Create', 'add' => 'Add', 'done' => 'Done', 'yes' => 'Yes', 'no' => 'No', 'on' => 'On', 'off' => 'Off',
     'name' => 'Name', 'description' => 'Description', 'status' => 'Status', 'search' => 'Search…', 'filter' => 'Filter', 'all' => 'All', 'all_statuses' => 'All statuses', 'nothing_here' => 'Nothing here yet', 'none' => 'None',
     'created_at' => 'Created', 'created_by' => 'By', 'started_at' => 'Started', 'finished_at' => 'Finished', 'time' => 'Time', 'count' => 'Count', 'title' => 'Title', 'key' => 'Key', 'tag' => 'Tag', 'target' => 'Target', 'action' => 'Action',
@@ -49,6 +50,7 @@ return array(
     // reports
     'from' => 'From', 'to' => 'To', 'all_campaigns' => 'All campaigns', 'total_calls' => 'Calls', 'avg' => 'avg', 'calls_per_day' => 'Calls per day', 'calls_per_hour' => 'Calls by hour of day', 'by_campaign' => 'By campaign', 'dtmf_distribution' => 'Keys pressed',
     // settings
+    'import_iran_holidays' => 'Add official holidays of Iran', 'import_iran_holidays_hint' => 'Solar holidays are exact; lunar (religious) ones follow the tabular Hijri calendar and may be one day off the announced date - check and adjust.', 'iran_holidays_added' => '%d holidays added for %d', 'lunar_mark' => '(lunar)', 'toggle_theme' => 'Dark / light mode',
     'outbound_settings' => 'Outbound calling', 'via_dialplan' => 'via Issabel outbound routes', 'custom_template' => 'Custom template', 'channel_tech_hint' => 'Local = use Issabel outbound routes/trunk failover (recommended). SIP/PJSIP = dial one trunk directly.', 'channel_template' => 'Custom channel template', 'outbound_context' => 'Outbound context',
     'dial_prefix_hint' => 'prepended to every number (e.g. 9 if your outbound route requires it)', 'country_code' => 'Country code', 'detected_trunks' => 'Trunks found in Issabel', 'disabled' => 'disabled',
     'capacity_defaults' => 'Capacity & defaults', 'global_max_concurrent' => 'Max concurrent calls (all campaigns)', 'global_max_hint' => 'never exceed your trunk channel count', 'default_concurrent' => 'Default per campaign', 'default_gap_ms' => 'Default gap (ms)', 'default_ring_timeout' => 'Default ring timeout (s)', 'default_max_retries' => 'Default retries', 'default_retry_delay_min' => 'Default retry delay (min)',

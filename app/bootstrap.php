@@ -30,7 +30,7 @@ spl_autoload_register(function ($class) {
         'Campaign' => 'Campaign', 'CallStatus' => 'Campaign', 'Schedule' => 'Campaign',
         'Importer' => 'Importer', 'XlsxReader' => 'Importer',
         'Exporter' => 'Exporter', 'XlsxWriter' => 'Exporter',
-        'Audio' => 'Audio',
+        'Audio' => 'Audio', 'Jalali' => 'Jalali',
         'Dnc' => 'Dnc',
         'Controller' => 'Router',
     );
@@ -67,7 +67,7 @@ set_error_handler(function ($no, $str, $file, $line) {
 
 if (!AC_CLI) {
     Auth::startSession();
-    $lang = isset($_SESSION['lang']) ? $_SESSION['lang'] : null;
+    $lang = getenv('AC_LANG') ? getenv('AC_LANG') : (isset($_SESSION['lang']) ? $_SESSION['lang'] : null);
     if (!$lang) {
         $lang = Settings::get('ui_lang', Config::get('app', 'lang', 'fa'));
     }
