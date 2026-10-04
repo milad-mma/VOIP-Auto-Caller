@@ -1,0 +1,21 @@
+CREATE TABLE IF NOT EXISTS phonebook_groups (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(64) NOT NULL,
+  created_at DATETIME NOT NULL,
+  UNIQUE KEY uq_name (name)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+CREATE TABLE IF NOT EXISTS phonebook (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  group_id INT UNSIGNED NULL,
+  name VARCHAR(128) NOT NULL DEFAULT '',
+  phone VARCHAR(20) NOT NULL,
+  notes VARCHAR(255) NOT NULL DEFAULT '',
+  extra TEXT NULL,
+  created_by INT UNSIGNED NULL,
+  created_at DATETIME NOT NULL,
+  updated_at DATETIME NOT NULL,
+  UNIQUE KEY uq_phone_group (phone, group_id),
+  KEY ix_group (group_id),
+  KEY ix_name (name)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;

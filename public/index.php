@@ -62,6 +62,19 @@ $r->post('/dnc/import', 'DncController@import');
 $r->get('/dnc/export', 'DncController@export');
 $r->post('/dnc/{id}/delete', 'DncController@delete');
 
+// phonebook
+$r->get('/phonebook', 'PhonebookController@index');
+$r->post('/phonebook/add', 'PhonebookController@add');
+$r->post('/phonebook/import', 'PhonebookController@import');
+$r->post('/phonebook/bulk', 'PhonebookController@bulk');
+$r->get('/phonebook/export', 'PhonebookController@export');
+$r->get('/phonebook/search.json', 'PhonebookController@search');
+$r->post('/phonebook/groups', 'PhonebookController@groupSave');
+$r->post('/phonebook/groups/{id}/delete', 'PhonebookController@groupDelete');
+$r->post('/phonebook/{id}/update', 'PhonebookController@update');
+$r->post('/phonebook/{id}/delete', 'PhonebookController@delete');
+$r->post('/campaigns/{id}/import/phonebook', 'PhonebookController@toCampaign');
+
 // reports
 $r->get('/reports', 'ReportController@index');
 $r->get('/reports/export', 'ReportController@export');

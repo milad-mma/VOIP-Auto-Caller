@@ -6,18 +6,35 @@ class QuickCallController extends Controller
         $this->requireRole(Auth::ROLE_OPERATOR);
         $audio = $this->db->all('SELECT id, name, duration_sec FROM audio_files ORDER BY name');
         $recent = $this->db->all("SELECT c.id, c.name, c.status, c.created_at, cc.phone, cc.status cstatus, cc.dtmf, cc.duration_sec, cc.hangup_cause FROM campaigns c JOIN campaign_contacts cc ON cc.campaign_id = c.id WHERE c.kind = 'quick' ORDER BY c.id DESC LIMIT 15");
-        $this->view('quick', array('audio' => $audio, 'recent' => $recent));
+        // one-time form token: a re-submitted (back/refresh/double-click) form is rejected
+        $_SESSION['quick_token'] = Util::token(8);
+        $this->view('quick', array('audio' => $audio, 'recent' => $recent, 'formToken' => $_SESSION['quick_token']));
     }
 
     public function call()
     {
         $this->requireRole(Auth::ROLE_OPERATOR);
         $this->csrf();
+        $tok = Request::str('form_token', '', 32);
+        if ($tok === '' || empty($_SESSION['quick_token']) || !hash_equals($_SESSION['quick_token'], $tok)) {
+            Flash::set('error', t('form_resubmitted'));
+            $this->redirect('/quick');
+        }
+        unset($_SESSION['quick_token']);
         $phone = Util::normalizePhone(Request::str('phone', '', 32), Settings::get('country_code', '98'));
         $audioId = Request::int('audio_id', 0, 0);
         if ($phone === '' || !$this->db->val('SELECT id FROM audio_files WHERE id = ?', array($audioId))) {
             Flash::set('error', t('invalid_input'));
             $this->redirect('/quick');
+        }
+        // same number already in progress, or finished seconds ago: refuse unless explicitly forced
+        $dup = $this->db->one(
+            "SELECT cc.status, cc.updated_at FROM campaign_contacts cc WHERE cc.phone = ? AND (cc.status IN ('pending','dialing','answered') OR cc.updated_at > DATE_SUB(NOW(), INTERVAL 30 SECOND)) ORDER BY cc.updated_at DESC LIMIT 1",
+            array($phone)
+        );
+        if ($dup && Request::int('force', 0, 0, 1) !== 1) {
+            Flash::set('error', in_array($dup['status'], array('pending', 'dialing', 'answered'), true) ? t('quick_dup_active', $phone) : t('quick_dup_recent', $phone));
+            $this->redirect('/quick?phone=' . urlencode($phone) . '&dup=1');
         }
         $transfer = Util::dialSafe(Request::str('transfer', '', 32));
         $id = self::create($phone, $audioId, $transfer, Auth::user()['id'], Request::str('name', '', 128));

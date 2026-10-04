@@ -175,6 +175,45 @@
     setInterval(function () { if (auto.checked && !document.hidden) loadContacts(); }, 4000);
   }
 
+  // ---- phonebook inline edit ----
+  if (window.AC_PAGE === 'phonebook') {
+    var all = $('#pb-all'); if (all) all.addEventListener('change', function () { $$('#pb-table input[name="ids[]"]').forEach(function (c) { c.checked = all.checked; }); });
+    var tmr = {};
+    $$('#pb-table .pb-f').forEach(function (f) {
+      f.addEventListener('change', function () {
+        var tr = f.closest('tr'), id = tr.getAttribute('data-id'), data = {};
+        $$('.pb-f', tr).forEach(function (x) { data[x.getAttribute('data-f')] = x.value; });
+        clearTimeout(tmr[id]);
+        tmr[id] = setTimeout(function () { xhr('POST', BASE + '/phonebook/' + id + '/update', data, function (j) { tr.style.outline = j && j.ok ? '2px solid var(--ok)' : '2px solid var(--bad)'; setTimeout(function () { tr.style.outline = ''; }, 800); }); }, 250);
+      });
+    });
+    $$('#pb-table .pb-del').forEach(function (b) {
+      b.addEventListener('click', function () { if (!confirm('?')) return; var tr = b.closest('tr'); xhr('POST', BASE + '/phonebook/' + tr.getAttribute('data-id') + '/delete', {}, function (j) { if (j && j.ok) tr.parentNode.removeChild(tr); }); });
+    });
+  }
+
+  // ---- quick call: phonebook suggestions ----
+  if (window.AC_PAGE === 'quick') {
+    var qp = $('#quick-phone'), qs = $('#quick-suggest'), qt = null;
+    if (qp && qs) {
+      qp.addEventListener('input', function () {
+        clearTimeout(qt); var v = qp.value.trim(); if (v.length < 2) { qs.hidden = true; return; }
+        qt = setTimeout(function () {
+          xhr('GET', BASE + '/phonebook/search.json?q=' + encodeURIComponent(v), null, function (j) {
+            if (!j || !j.ok || !j.rows.length) { qs.hidden = true; return; }
+            qs.innerHTML = j.rows.map(function (r) { return '<div class="suggest-item" data-phone="' + esc(r.phone) + '" data-name="' + esc(r.name) + '"><b dir="ltr">' + esc(r.phone) + '</b> ' + esc(r.name) + (r.notes ? ' <small class="muted">' + esc(r.notes) + '</small>' : '') + '</div>'; }).join('');
+            qs.hidden = false;
+          });
+        }, 200);
+      });
+      qs.addEventListener('mousedown', function (e) {
+        var it = e.target.closest('.suggest-item'); if (!it) return;
+        qp.value = it.getAttribute('data-phone'); var n = document.querySelector('#quick-form input[name=name]'); if (n && !n.value) n.value = it.getAttribute('data-name'); qs.hidden = true;
+      });
+      qp.addEventListener('blur', function () { setTimeout(function () { qs.hidden = true; }, 150); });
+    }
+  }
+
   // ---- settings ----
   if (window.AC_PAGE === 'settings') {
     var ct = document.querySelector('select[name=channel_tech]');

@@ -28,6 +28,21 @@
     <div class="btn-row"><a class="btn btn-ghost" href="<?php echo View::url('/campaigns/' . $c['id']); ?>"><?php echo h(t('skip_for_now')); ?></a></div>
   </div>
 </div>
+<div class="card">
+  <h3><?php echo h(t('pb_from_phonebook')); ?></h3>
+  <?php if (!$pbGroups && !$pbUngrouped): ?><p class="muted"><?php echo h(t('pb_empty')); ?> <a href="<?php echo View::url('/phonebook'); ?>"><?php echo h(t('nav_phonebook')); ?></a></p>
+  <?php else: ?>
+  <form method="post" action="<?php echo View::url('/campaigns/' . $c['id'] . '/import/phonebook'); ?>"><?php echo Auth::csrfField(); ?>
+    <div class="check-row">
+      <label class="inline"><input type="checkbox" name="all" value="1"> <b><?php echo h(t('all')); ?></b></label>
+      <?php if ($pbUngrouped): ?><label class="inline"><input type="checkbox" name="groups[]" value="0"> <?php echo h(t('pb_ungrouped')); ?> (<?php echo $pbUngrouped; ?>)</label><?php endif; ?>
+      <?php foreach ($pbGroups as $g): ?><label class="inline"><input type="checkbox" name="groups[]" value="<?php echo $g['id']; ?>"> <?php echo h($g['name']); ?> (<?php echo (int)$g['n']; ?>)</label><?php endforeach; ?>
+    </div>
+    <label class="check"><input type="checkbox" name="skip_dnc" value="1" checked> <?php echo h(t('skip_dnc')); ?></label>
+    <button class="btn btn-primary" type="submit"><?php echo h(t('pb_add_to_campaign')); ?></button>
+  </form>
+  <?php endif; ?>
+</div>
 
 <?php else: ?>
 <div class="card">

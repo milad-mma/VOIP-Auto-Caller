@@ -346,7 +346,9 @@ class CampaignController extends Controller
     {
         $this->requireRole(Auth::ROLE_OPERATOR);
         $c = $this->load($p['id']);
-        $this->view('campaigns/import', array('c' => $c, 'step' => 1, 'stats' => Campaign::stats($c['id'])));
+        $groups = $this->db->tableExists('phonebook_groups') ? $this->db->all('SELECT g.*, (SELECT COUNT(*) FROM phonebook p WHERE p.group_id = g.id) n FROM phonebook_groups g ORDER BY g.name') : array();
+        $ungrouped = $this->db->tableExists('phonebook') ? (int)$this->db->val('SELECT COUNT(*) FROM phonebook WHERE group_id IS NULL') : 0;
+        $this->view('campaigns/import', array('c' => $c, 'step' => 1, 'stats' => Campaign::stats($c['id']), 'pbGroups' => $groups, 'pbUngrouped' => $ungrouped));
     }
 
     public function importUpload($p)
