@@ -1,0 +1,1 @@
+ALTER TABLE trunks ADD COLUMN callerid VARCHAR(64) NOT NULL DEFAULT '' AFTER dial_prefix;
