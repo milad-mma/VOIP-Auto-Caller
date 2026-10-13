@@ -81,7 +81,8 @@ fetch_source() {
     tar -xzf "$TMP_SRC/src.tgz" -C "$TMP_SRC" || die "cannot extract archive"
     # the tree may be at the repo root or inside a sub folder (autocaller/)
     local found
-    found="$(find "$TMP_SRC" -maxdepth 4 -name bootstrap.php -path '*/app/bootstrap.php' | head -1)"
+    # shallowest match wins (a stray nested copy of the tree deeper inside must not be picked)
+    found="$(find "$TMP_SRC" -maxdepth 5 -name bootstrap.php -path '*/app/bootstrap.php' | awk '{ print gsub("/","/") "\t" $0 }' | sort -n | head -1 | cut -f2-)"
     [ -n "$found" ] || die "source tree not found in the downloaded archive"
     SRC_DIR="$(cd "$(dirname "$found")/.." && pwd)"
     ok "source ready ($SRC_DIR, $(ls "$SRC_DIR/sql" | wc -l) migrations, newest: $(ls "$SRC_DIR/sql" | sort | tail -1))"
