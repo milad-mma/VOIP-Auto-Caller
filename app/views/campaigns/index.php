@@ -24,7 +24,7 @@
         <td class="muted"><?php echo (int)$c['id']; ?></td>
         <td><a href="<?php echo View::url('/campaigns/' . $c['id']); ?>"><strong><?php echo h($c['name']); ?></strong></a></td>
         <td><span class="badge badge-<?php echo h($c['status']); ?>"><?php echo h(t('cs_' . $c['status'])); ?></span></td>
-        <td><div class="bar"><div class="bar-in" style="width:<?php echo $pct; ?>%"></div></div><small><?php echo (int)$c['cnt_done']; ?>/<?php echo (int)$c['total_contacts']; ?> (<?php echo $pct; ?>%)</small></td>
+        <td><div class="bar"><div class="bar-in" style="width:<?php echo $pct; ?>%"></div></div><small dir="ltr" style="display:inline-block"><?php echo (int)$c['cnt_done']; ?>/<?php echo (int)$c['total_contacts']; ?> (<?php echo $pct; ?>%)</small></td>
         <td><?php echo (int)$c['cnt_answered']; ?></td>
         <td dir="ltr"><small><?php echo h(Util::fdate($c['created_at'])); ?></small></td>
         <td><small><?php echo h($c['creator']); ?></small></td>

@@ -31,7 +31,8 @@ foreach ($hours as $hh) { $maxHour = max($maxHour, $hh['total']); }
 <div class="row2">
   <div class="card">
     <h3><?php echo h(t('calls_per_day')); ?></h3>
-    <div class="chart" dir="ltr" data-empty="<?php echo h(t('nothing_here')); ?>">
+    <div class="chart" dir="ltr">
+      <?php if (!$byDay): ?><div class="chart-empty"><?php echo h(t('nothing_here')); ?></div><?php endif; ?>
       <?php foreach ($byDay as $d): $ht = (int)round($d['total'] * 100 / $maxDay); $ha = (int)round($d['answered'] * 100 / $maxDay); ?>
         <div class="col" title="<?php echo h($d['d']); ?>: <?php echo (int)$d['total']; ?> / <?php echo (int)$d['answered']; ?>"><div class="b1" style="height:<?php echo $ht; ?>%"></div><div class="b2" style="height:<?php echo $ha; ?>%"></div><span><?php echo substr($d['d'], 5); ?></span></div>
       <?php endforeach; ?>
@@ -41,6 +42,7 @@ foreach ($hours as $hh) { $maxHour = max($maxHour, $hh['total']); }
   <div class="card">
     <h3><?php echo h(t('calls_per_hour')); ?></h3>
     <div class="chart" dir="ltr">
+      <?php if (!$byHour): ?><div class="chart-empty"><?php echo h(t('nothing_here')); ?></div><?php endif; ?>
       <?php foreach ($hours as $hIdx => $hh): $ht = (int)round($hh['total'] * 100 / $maxHour); $ha = (int)round($hh['answered'] * 100 / $maxHour); ?>
         <div class="col" title="<?php echo $hIdx; ?>:00 — <?php echo $hh['total']; ?> / <?php echo $hh['answered']; ?>"><div class="b1" style="height:<?php echo $ht; ?>%"></div><div class="b2" style="height:<?php echo $ha; ?>%"></div><span><?php echo $hIdx % 3 === 0 ? $hIdx : ''; ?></span></div>
       <?php endforeach; ?>

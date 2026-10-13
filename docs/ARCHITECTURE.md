@@ -12,3 +12,9 @@
 * **Issabel integration**: manager user in `manager_custom.conf`, dialplan in `extensions_custom.conf` (both between `; BEGIN/END autocaller` markers, idempotent), Apache alias file `zz-autocaller.conf` (Issabel's own conf untouched), MySQL root password read from `/etc/issabel.conf` for: Issabel-user login (`acl` db), trunk list (`asterisk.trunks`), CDR enrichment (`asteriskcdrdb.cdr`).
 * **Adding a migration**: create `sql/002_something.sql`, run `console.php migrate`.
 * **Adding a language**: copy `app/lang/en.php`.
+
+## Trunk health (005)
+
+* `Trunks::recordResult()` runs on every finished attempt: `failed`/`congestion` increment `fail_streak`; `answered`/`busy`/`noanswer`/`invalid` reset it (the far end was reached, so the trunk works). When the streak reaches `trunk_fail_streak` (default 3) the trunk gets `cooldown_until = now + trunk_cooldown_min * 2^(cooldown_count-1)` capped at `trunk_cooldown_max_min`; `pickFree()` skips it. A later success clears `cooldown_count`.
+* `Trunks::probe(Ami)` every `trunk_probe_sec` (default 60, dialer only when channel_tech=pool): `sip show peer <id>` (Status / Username / ToHost / Addr->IP) + `sip show registry` (matched by username, then host/IP), `pjsip show contacts` + `pjsip show registrations`. Result in `reg_state`: `ok | unreachable | reg_failed | missing | unmonitored | ''`; `unreachable`/`reg_failed` are skipped by `pickFree()` when `trunk_block_down=1`. Empty AMI output keeps the previous state. Custom-tech trunks are never probed.
+* `Trunks::$lastReason` (`busy|cooldown|down|none`) becomes the campaign's `wait:trunks_<reason>` message. Dashboard banner = `Trunks::alerts()`; Settings → trunk row shows a health badge + *Restore* (`POST /settings/trunks/{id}/reset` → `clearCooldown`). Console: `trunk:probe`.

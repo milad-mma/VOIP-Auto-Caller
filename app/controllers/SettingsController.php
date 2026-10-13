@@ -12,6 +12,7 @@ class SettingsController extends Controller
             'default_max_retries' => array('int', 0, 10), 'default_retry_delay_min' => array('int', 1, 1440), 'default_concurrent' => array('int', 1, 200),
             'work_start' => array('hm'), 'work_end' => array('hm'), 'work_days' => array('days'), 'respect_holidays' => array('bool'),
             'cdr_lookup' => array('bool'), 'amd_enabled' => array('bool'), 'stale_call_minutes' => array('int', 2, 120),
+            'trunk_fail_streak' => array('int', 1, 50), 'trunk_cooldown_min' => array('int', 1, 1440), 'trunk_cooldown_max_min' => array('int', 1, 10080), 'trunk_probe_sec' => array('int', 0, 3600), 'trunk_block_down' => array('select', array('0', '1')),
             'login_max_attempts' => array('int', 0, 100), 'login_lock_minutes' => array('int', 1, 1440), 'issabel_login' => array('bool'),
             'issabel_admin_role' => array('select', array('admin', 'operator', 'viewer')), 'api_enabled' => array('bool'),
             'ui_lang' => array('select', array('fa', 'en')), 'retention_days' => array('int', 0, 3650),
@@ -173,6 +174,16 @@ class SettingsController extends Controller
         $this->csrf();
         $this->db->exec('DELETE FROM trunks WHERE id = ?', array((int)$p['id']));
         Audit::log('trunk.delete', 'trunk', (int)$p['id']);
+        $this->redirect('/settings#trunk-pool');
+    }
+
+    public function trunkReset($p)
+    {
+        $this->requireRole(Auth::ROLE_ADMIN);
+        $this->csrf();
+        Trunks::clearCooldown((int)$p['id']);
+        Audit::log('trunk.reset', 'trunk', (int)$p['id']);
+        Flash::set('success', t('saved'));
         $this->redirect('/settings#trunk-pool');
     }
 

@@ -257,7 +257,7 @@ class Campaign
         switch ($eff['channel_tech']) {
             case 'pool':
                 // resolved by the dialer per call (Trunks::pickFree); shown here only for display
-                return 'SIP/{' . (Settings::get('ui_lang') === 'fa' ? 'ترانک آزاد از استخر' : 'free trunk from pool') . '}/' . $num;
+                return 'SIP/<trunk>/' . $num;
             case 'sip':
                 return $trunk !== '' ? 'SIP/' . $trunk . '/' . $num : $local;
             case 'pjsip':

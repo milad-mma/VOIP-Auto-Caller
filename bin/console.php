@@ -13,6 +13,7 @@
  *   php bin/console.php cleanup                 apply retention_days
  *   php bin/console.php audio:import <dir>      import wav/mp3 files as audio prompts (e.g. from v1)
  *   php bin/console.php setting <key> [value]
+ *   php bin/console.php trunk:probe              ask Asterisk about every pool trunk and print the health table
  */
 define('AC_CLI', true);
 require dirname(__DIR__) . '/app/bootstrap.php';
@@ -176,6 +177,22 @@ switch ($cmd) {
             out("$k set");
         } else {
             out((string)Settings::get($k));
+        }
+        break;
+
+    case 'trunk:probe':
+        try {
+            $ami = Ami::fromConfig();
+            $ami->connect(5);
+            $n = Trunks::probe($ami);
+            $ami->close();
+            out("probed; $n state change(s)");
+            foreach (Trunks::all() as $t) {
+                $h = Trunks::healthOf($t);
+                out(sprintf('%-12s %-6s %-14s %-24s streak=%d cooldown=%s  %s', $t['name'], $t['tech'], $t['channel_id'], $t['reg_state'] !== '' ? $t['reg_state'] : '-', (int)$t['fail_streak'], $t['cooldown_until'] ? $t['cooldown_until'] : '-', $t['reg_detail']));
+            }
+        } catch (Exception $e) {
+            fail('probe FAILED: ' . $e->getMessage());
         }
         break;
 

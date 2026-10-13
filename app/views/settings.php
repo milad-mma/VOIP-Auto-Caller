@@ -86,9 +86,9 @@ $bool = function ($name, $cur) { return '<select name="' . $name . '"><option va
   <p class="hint"><?php echo h(t('trunk_pool_hint')); ?> <?php echo h(t('trunk_cid_hint')); ?></p>
   <?php if ($s['channel_tech'] !== 'pool'): ?><p class="alert alert-info"><?php echo h(t('trunk_pool_inactive')); ?></p><?php endif; ?>
   <table class="table compact">
-    <thead><tr><th><?php echo h(t('name')); ?></th><th><?php echo h(t('tech')); ?></th><th><?php echo h(t('trunk_channel_id')); ?></th><th><?php echo h(t('dial_prefix')); ?></th><th><?php echo h(t('callerid_number')); ?></th><th><?php echo h(t('channels')); ?></th><th><?php echo h(t('active')); ?></th><th><?php echo h(t('live_calls')); ?></th><th><?php echo h(t('total_calls')); ?></th><th></th></tr></thead>
+    <thead><tr><th><?php echo h(t('name')); ?></th><th><?php echo h(t('tech')); ?></th><th><?php echo h(t('trunk_channel_id')); ?></th><th><?php echo h(t('dial_prefix')); ?></th><th><?php echo h(t('callerid_number')); ?></th><th><?php echo h(t('channels')); ?></th><th><?php echo h(t('active')); ?></th><th><?php echo h(t('live_calls')); ?></th><th><?php echo h(t('trunk_health')); ?></th><th><?php echo h(t('total_calls')); ?></th><th></th></tr></thead>
     <tbody>
-    <?php if (!$pool): ?><tr><td colspan="10" class="muted center"><?php echo h(t('nothing_here')); ?></td></tr><?php endif; ?>
+    <?php if (!$pool): ?><tr><td colspan="11" class="muted center"><?php echo h(t('nothing_here')); ?></td></tr><?php endif; ?>
     <?php foreach ($pool as $t): ?>
       <tr>
         <form method="post" action="<?php echo View::url('/settings/trunks'); ?>"><?php echo Auth::csrfField(); ?><input type="hidden" name="id" value="<?php echo (int)$t['id']; ?>">
@@ -100,9 +100,11 @@ $bool = function ($name, $cur) { return '<select name="' . $name . '"><option va
         <td><input type="number" name="max_channels" value="<?php echo (int)$t['max_channels']; ?>" min="1" max="500" style="width:70px"></td>
         <td><select name="is_enabled"><option value="1" <?php echo $t['is_enabled'] ? 'selected' : ''; ?>><?php echo h(t('yes')); ?></option><option value="0" <?php echo !$t['is_enabled'] ? 'selected' : ''; ?>><?php echo h(t('no')); ?></option></select></td>
         <td><span class="badge <?php echo $t['active'] ? 'badge-running' : 'badge-muted'; ?>"><?php echo (int)$t['active']; ?>/<?php echo (int)$t['max_channels']; ?></span></td>
-        <td><small><?php echo (int)$t['calls_total']; ?><?php if ($t['calls_failed']): ?> · <span class="muted"><?php echo (int)$t['calls_failed']; ?> ✕</span><?php endif; ?><?php if ($t['last_error']): ?><br><span class="muted" dir="ltr"><?php echo h($t['last_error']); ?></span><?php endif; ?></small></td>
+        <td><?php $hs = Trunks::healthOf($t); ?><span class="badge badge-<?php echo h($hs['cls']); ?>" title="<?php echo h($t['reg_detail'] . ($t['reg_checked_at'] ? ' · ' . Util::fdate($t['reg_checked_at']) : '')); ?>"><?php echo h($hs['label']); ?></span><?php if ($t['fail_streak']): ?> <small class="muted" title="<?php echo h(t('fail_streak')); ?>"><?php echo (int)$t['fail_streak']; ?>✕</small><?php endif; ?></td>
+        <td><small><?php echo (int)$t['calls_total']; ?> <?php echo h(t('calls_short')); ?><?php if ($t['calls_failed']): ?> · <span class="muted"><?php echo (int)$t['calls_failed']; ?> <?php echo h(t('failed_short')); ?></span><?php endif; ?><?php if ($t['last_error']): ?><br><span class="muted" dir="ltr"><?php echo h($t['last_error']); ?></span><?php endif; ?></small></td>
         <td class="actions"><button class="btn btn-sm" type="submit"><?php echo h(t('save')); ?></button></form>
-          <form method="post" class="inline" action="<?php echo View::url('/settings/trunks/' . $t['id'] . '/delete'); ?>" onsubmit="return confirm('<?php echo h(t('confirm_delete')); ?>')"><?php echo Auth::csrfField(); ?><button class="btn btn-sm btn-ghost" type="submit">✕</button></form></td>
+          <form method="post" class="inline" action="<?php echo View::url('/settings/trunks/' . $t['id'] . '/delete'); ?>" onsubmit="return confirm('<?php echo h(t('confirm_delete')); ?>')"><?php echo Auth::csrfField(); ?><button class="btn btn-sm btn-ghost" type="submit">✕</button></form><?php if (Trunks::isCoolingDown($t) || $t['cooldown_count'] || $t['fail_streak']): ?>
+          <form method="post" class="inline" action="<?php echo View::url('/settings/trunks/' . $t['id'] . '/reset'); ?>"><?php echo Auth::csrfField(); ?><button class="btn btn-sm btn-ghost" type="submit" title="<?php echo h(t('trunk_reset_hint')); ?>"><?php echo h(t('trunk_reset')); ?></button></form><?php endif; ?></td>
       </tr>
     <?php endforeach; ?>
       <tr class="sub">
@@ -114,12 +116,24 @@ $bool = function ($name, $cur) { return '<select name="' . $name . '"><option va
         <td><input type="text" name="callerid" size="10" dir="ltr" placeholder="<?php echo h(t('trunk_cid_placeholder')); ?>"></td>
         <td><input type="number" name="max_channels" value="1" min="1" max="500" style="width:70px"></td>
         <td><input type="hidden" name="is_enabled" value="1"><?php echo h(t('yes')); ?></td>
-        <td colspan="2"></td>
+        <td colspan="3"></td>
         <td><button class="btn btn-sm btn-primary" type="submit">+ <?php echo h(t('add')); ?></button></td>
         </form>
       </tr>
     </tbody>
   </table>
+  <form method="post" action="<?php echo View::url('/settings'); ?>" class="health-form"><?php echo Auth::csrfField(); ?>
+    <h4><?php echo h(t('trunk_health_settings')); ?></h4>
+    <p class="hint"><?php echo h(t('trunk_health_hint')); ?></p>
+    <div class="row3">
+      <label><?php echo h(t('trunk_fail_streak')); ?><input type="number" name="trunk_fail_streak" value="<?php echo (int)$s['trunk_fail_streak']; ?>" min="1" max="50"></label>
+      <label><?php echo h(t('trunk_cooldown_min')); ?><input type="number" name="trunk_cooldown_min" value="<?php echo (int)$s['trunk_cooldown_min']; ?>" min="1" max="1440"></label>
+      <label><?php echo h(t('trunk_cooldown_max_min')); ?><input type="number" name="trunk_cooldown_max_min" value="<?php echo (int)$s['trunk_cooldown_max_min']; ?>" min="1" max="10080"></label>
+      <label><?php echo h(t('trunk_probe_sec')); ?><input type="number" name="trunk_probe_sec" value="<?php echo (int)$s['trunk_probe_sec']; ?>" min="0" max="3600"></label>
+      <label><?php echo h(t('trunk_block_down')); ?><select name="trunk_block_down"><option value="1" <?php echo $s['trunk_block_down'] === '1' ? 'selected' : ''; ?>><?php echo h(t('enabled')); ?></option><option value="0" <?php echo $s['trunk_block_down'] !== '1' ? 'selected' : ''; ?>><?php echo h(t('disabled')); ?></option></select></label>
+    </div>
+    <button class="btn btn-sm" type="submit"><?php echo h(t('save')); ?></button>
+  </form>
 </div>
 
 <div class="card" id="holidays">

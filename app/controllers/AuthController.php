@@ -59,7 +59,8 @@ class DashboardController extends Controller
             "SELECT COUNT(*) total, SUM(answered_at IS NOT NULL) answered, SUM(result='busy') busy, SUM(result='noanswer') noanswer, SUM(result IN ('failed','congestion')) failed, SUM(duration_sec) talk FROM call_attempts WHERE started_at >= CURDATE()"
         );
         $daemon = $this->db->one('SELECT * FROM daemon_status WHERE id = 1');
-        $this->view('dashboard', array('campaigns' => $campaigns, 'recent' => $recent, 'today' => $today, 'daemon' => $daemon));
+        $alerts = Settings::get('channel_tech') === 'pool' && $this->db->tableExists('trunks') ? Trunks::alerts() : array();
+        $this->view('dashboard', array('campaigns' => $campaigns, 'recent' => $recent, 'today' => $today, 'daemon' => $daemon, 'trunkAlerts' => $alerts));
     }
 
     public function live()

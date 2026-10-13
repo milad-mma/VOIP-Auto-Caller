@@ -220,7 +220,7 @@
     function updCt() {
       var v = ct.value, ft = $('#f-trunk'), fp = $('#f-template');
       if (ft) ft.style.opacity = (v === 'sip' || v === 'pjsip' || v === 'custom') ? '1' : '.45';
-      var tp = $('#trunk-pool'); if (tp) tp.style.outline = v === 'pool' ? '2px solid var(--pri)' : '';
+      var tp = $('#trunk-pool'); if (tp) tp.classList.toggle('card-dim', v !== 'pool');
       if (fp) fp.hidden = (v !== 'custom');
     }
     if (ct) { ct.addEventListener('change', updCt); updCt(); }
@@ -240,6 +240,24 @@
     });
   }
 
+  // styled file inputs (native "Choose File" is browser-language only)
+  (function () {
+    var inputs = document.querySelectorAll('input[type=file]');
+    var tChoose = document.body.getAttribute('data-t-choose') || 'Choose file';
+    var tNone = document.body.getAttribute('data-t-nofile') || 'No file chosen';
+    for (var i = 0; i < inputs.length; i++) {
+      (function (inp) {
+        var wrap = document.createElement('span'); wrap.className = 'file-pick';
+        var btn = document.createElement('span'); btn.className = 'btn btn-sm'; btn.textContent = tChoose;
+        var name = document.createElement('span'); name.className = 'file-name muted'; name.textContent = tNone;
+        inp.parentNode.insertBefore(wrap, inp); wrap.appendChild(inp); wrap.appendChild(btn); wrap.appendChild(name);
+        inp.addEventListener('change', function () {
+          var f = inp.files; name.textContent = f && f.length ? (f.length === 1 ? f[0].name : f.length + ' ×') : tNone;
+          name.className = f && f.length ? 'file-name' : 'file-name muted';
+        });
+      })(inputs[i]);
+    }
+  })();
   // closest() polyfill for old browsers
   if (!Element.prototype.closest) {
     Element.prototype.closest = function (s) { var el = this; while (el && el.nodeType === 1) { if (el.matches ? el.matches(s) : el.msMatchesSelector(s)) return el; el = el.parentElement; } return null; };

@@ -86,6 +86,7 @@ $r->post('/settings/test-ami', 'SettingsController@testAmi');
 $r->post('/settings/trunks', 'SettingsController@trunkSave');
 $r->post('/settings/trunks/import', 'SettingsController@trunkImport');
 $r->post('/settings/trunks/{id}/delete', 'SettingsController@trunkDelete');
+$r->post('/settings/trunks/{id}/reset', 'SettingsController@trunkReset');
 $r->post('/settings/holidays/add', 'SettingsController@holidayAdd');
 $r->post('/settings/holidays/iran', 'SettingsController@holidayImportIran');
 $r->post('/settings/holidays/{id}/delete', 'SettingsController@holidayDelete');

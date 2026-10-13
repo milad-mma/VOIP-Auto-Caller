@@ -103,6 +103,11 @@ class Settings
             'cdr_lookup' => '1',            // enrich with asteriskcdrdb after hangup
             'amd_enabled' => '0',           // answering machine detection (needs app_amd)
             'stale_call_minutes' => '10',
+            'trunk_fail_streak' => '3',     // consecutive provider failures before a trunk leaves the pool
+            'trunk_cooldown_min' => '5',    // first cooldown (doubles each time, capped)
+            'trunk_cooldown_max_min' => '60',
+            'trunk_probe_sec' => '60',      // ask Asterisk about peer/registration state every N s (0 = off)
+            'trunk_block_down' => '1',      // skip trunks Asterisk reports unreachable / unregistered
             'login_max_attempts' => '5',
             'login_lock_minutes' => '15',
             'issabel_login' => '1',

@@ -75,7 +75,7 @@ input[type=number],input[type=date],input[type=time],input[type=datetime-local],
 @media (max-width:1000px){.ivr select.ivr-action{min-width:150px}}
 .ltr-cell{text-align:left}.dl dd bdi{unicode-bidi:isolate}
 .empty{color:var(--muted);text-align:center;padding:22px 0}
-.chart:empty::after{content:attr(data-empty);color:var(--muted);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:13px}
+.chart-empty{color:var(--muted);position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:13px}.card-dim{opacity:.6}
 .side nav a span{white-space:nowrap}
 .card-head .filters input[type=text]{min-width:140px}
 .form-actions{position:sticky;bottom:0;background:linear-gradient(to top,var(--bg) 70%,transparent);padding:12px 0;margin:0;z-index:3}
@@ -130,3 +130,6 @@ html[data-theme=dark] input:focus,html[data-theme=dark] select:focus,html[data-t
 .pb-newgroup{display:flex;gap:4px;margin-top:10px}.pb-newgroup input{margin:0}.pb-gedit form{display:flex;gap:4px;align-items:center;margin:6px 0;flex-wrap:wrap}.pb-gedit input[type=text]{margin:0;flex:1}
 .pb-bulkbar{margin-top:10px;padding-top:10px;border-top:1px solid var(--line)}#pb-table .pb-f{margin:0}
 label{position:relative}.suggest{position:absolute;inset-inline:0;top:100%;background:var(--card);border:1px solid var(--line);border-radius:8px;box-shadow:0 8px 24px rgba(0,0,0,.14);z-index:30;max-height:240px;overflow:auto}.suggest-item{padding:8px 10px;cursor:pointer;font-weight:400}.suggest-item:hover{background:var(--hover)}
+
+.file-pick{display:flex;align-items:center;gap:8px;margin-top:4px;position:relative;min-height:36px}.file-pick input[type=file]{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer;margin:0}.file-pick .file-name{font-size:13px;direction:ltr;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.file-pick .btn{pointer-events:none}
+.trunk-alerts .chip{margin:2px 4px}.health-form{margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}.health-form h4{margin:0 0 4px}

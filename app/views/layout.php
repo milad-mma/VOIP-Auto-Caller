@@ -27,7 +27,7 @@ $nav = array(
 <meta name="base" content="<?php echo h(View::url('')); ?>">
 <script>(function(){try{var t=localStorage.getItem('ac-theme');if(!t&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches)t='dark';if(t==='dark')document.documentElement.setAttribute('data-theme','dark');}catch(e){}})();</script>
 </head>
-<body>
+<body data-t-choose="<?php echo h(t('choose_file')); ?>" data-t-nofile="<?php echo h(t('no_file_chosen')); ?>">
 <div class="app">
 <aside class="side">
   <div class="brand"><span class="dot"></span> AutoCaller <small>v<?php echo AC_VERSION; ?></small></div>

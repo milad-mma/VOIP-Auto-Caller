@@ -1,4 +1,10 @@
 <?php View::$title = t('nav_dashboard'); ?>
+<?php if (!empty($trunkAlerts)): ?>
+<div class="alert alert-warn trunk-alerts"><strong>⚠ <?php echo h(t('trunk_alerts')); ?>:</strong>
+  <?php foreach ($trunkAlerts as $ta): $hs = Trunks::healthOf($ta); ?><span class="chip"><span class="badge badge-<?php echo h($hs['cls']); ?>"><?php echo h($hs['label']); ?></span> <?php echo h($ta['name']); ?> <small dir="ltr" class="muted"><?php echo h($ta['reg_detail'] !== '' ? $ta['reg_detail'] : $ta['last_error']); ?></small></span> <?php endforeach; ?>
+  <?php if (Auth::can(Auth::ROLE_ADMIN)): ?><a href="<?php echo View::url('/settings#trunk-pool'); ?>"><?php echo h(t('nav_settings')); ?> →</a><?php endif; ?>
+</div>
+<?php endif; ?>
 <div class="grid stats" id="today-stats">
   <div class="card stat"><div class="stat-v" data-k="total"><?php echo (int)$today['total']; ?></div><div class="stat-l"><?php echo h(t('calls_today')); ?></div></div>
   <div class="card stat ok"><div class="stat-v" data-k="answered"><?php echo (int)$today['answered']; ?></div><div class="stat-l"><?php echo h(t('answered')); ?></div></div>

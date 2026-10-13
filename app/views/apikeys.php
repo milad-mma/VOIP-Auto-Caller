@@ -14,7 +14,7 @@
     </table>
     <form method="post" action="<?php echo View::url('/apikeys'); ?>" class="filters"><?php echo Auth::csrfField(); ?>
       <input type="text" name="name" placeholder="<?php echo h(t('key_name')); ?>" required>
-      <input type="text" name="allowed_ips" dir="ltr" placeholder="<?php echo h(t('allowed_ips_placeholder')); ?>">
+      <input type="text" name="allowed_ips" dir="auto" placeholder="<?php echo h(t('allowed_ips_placeholder')); ?>">
       <button class="btn btn-primary btn-sm" type="submit"><?php echo h(t('create_key')); ?></button>
     </form>
   </div>

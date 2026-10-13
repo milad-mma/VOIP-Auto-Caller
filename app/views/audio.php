@@ -10,7 +10,7 @@
         <tr>
           <td><strong><?php echo h($a['name']); ?></strong><br><small class="muted"><?php echo h($a['original_name']); ?> · <?php echo h($a['uploader']); ?></small></td>
           <td><?php echo Util::formatDuration($a['duration_sec']); ?></td>
-          <td><?php echo Util::humanSize($a['size_bytes']); ?></td>
+          <td dir="ltr"><?php echo Util::humanSize($a['size_bytes']); ?></td>
           <td><?php echo (int)$a['used']; ?></td>
           <td><audio controls preload="none" src="<?php echo View::url('/audio/' . $a['id'] . '/play'); ?>"></audio></td>
           <?php if ($op): ?><td class="actions">

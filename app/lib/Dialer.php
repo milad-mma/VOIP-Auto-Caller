@@ -17,6 +17,7 @@ class Dialer
     private $running = true;
     private $lastHeartbeat = 0;
     private $lastStaleCheck = 0;
+    private $lastTrunkProbe = 0;
     private $lastFinishCheck = 0;
     private $lastReconnect = 0;
     private $reconnectDelay = 2;
@@ -146,6 +147,16 @@ class Dialer
             $this->checkStale();
         }
 
+        $probeEvery = (int)Settings::get('trunk_probe_sec', 60);
+        if ($probeEvery > 0 && $now - $this->lastTrunkProbe >= $probeEvery && Settings::get('channel_tech') === 'pool') {
+            $this->lastTrunkProbe = $now;
+            try {
+                Trunks::probe($this->ami);
+            } catch (Exception $e) {
+                Logger::warn('trunk probe: ' . $e->getMessage());
+            }
+        }
+
         $this->dialStep();
 
         if ($now - $this->lastFinishCheck >= 10) {
@@ -223,9 +234,10 @@ class Dialer
         if ($eff['channel_tech'] === 'pool') {
             $trunk = Trunks::pickFree();
             if (!$trunk) {
-                // every trunk channel is busy (or none defined): wait, do not touch the contact
-                if ($c['last_error'] !== 'wait:trunks_busy') {
-                    $this->db->update('campaigns', array('last_error' => 'wait:trunks_busy'), 'id = ?', array((int)$c['id']));
+                // every trunk channel is busy / cooling down / down (or none defined): wait, do not touch the contact
+                $why = 'wait:trunks_' . Trunks::$lastReason;
+                if ($c['last_error'] !== $why) {
+                    $this->db->update('campaigns', array('last_error' => $why), 'id = ?', array((int)$c['id']));
                 }
                 return false;
             }
@@ -442,9 +454,7 @@ class Dialer
             );
         }
         if (!empty($att['trunk_id'])) {
-            $failed = in_array($status, array(CallStatus::FAILED, CallStatus::CONGESTION, CallStatus::INVALID), true);
-            $this->db->run('UPDATE trunks SET calls_total = calls_total + 1' . ($failed ? ', calls_failed = calls_failed + 1, last_error = ?' : '') . ' WHERE id = ?',
-                $failed ? array(Util::oneLine($status . ' ' . (isset($extra['hangup_cause']) ? $extra['hangup_cause'] : ''), 120), (int)$att['trunk_id']) : array((int)$att['trunk_id']));
+            Trunks::recordResult((int)$att['trunk_id'], $status, trim($status . ' ' . (isset($extra['hangup_cause']) ? $extra['hangup_cause'] : '')));
         }
         Logger::info("attempt #$attemptId finished: $status (" . (isset($extra['hangup_cause']) ? $extra['hangup_cause'] : '') . ")");
 
