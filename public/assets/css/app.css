@@ -1,4 +1,8 @@
-:root{--bg:#f3f5f8;--card:#fff;--ink:#1c2430;--muted:#6b7686;--line:#e3e7ee;--pri:#1f6feb;--pri-d:#1758bd;--ok:#1e9e5a;--warn:#d98a0c;--bad:#d64545;--side:#141c27;--side-ink:#b7c1d1;--radius:10px;--font:"Vazirmatn","Segoe UI",Tahoma,"IRANSans",Arial,sans-serif}
+/* Vazirmatn (SIL OFL) bundled locally - the panel never loads anything from the internet */
+@font-face{font-family:"Vazirmatn";font-style:normal;font-weight:400;font-display:swap;src:url("../fonts/Vazirmatn-Regular.woff2") format("woff2")}
+@font-face{font-family:"Vazirmatn";font-style:normal;font-weight:500;font-display:swap;src:url("../fonts/Vazirmatn-Medium.woff2") format("woff2")}
+@font-face{font-family:"Vazirmatn";font-style:normal;font-weight:700;font-display:swap;src:url("../fonts/Vazirmatn-Bold.woff2") format("woff2")}
+:root{--bg:#f3f5f8;--card:#fff;--ink:#1c2430;--muted:#6b7686;--line:#e3e7ee;--pri:#1f6feb;--pri-d:#1758bd;--ok:#1e9e5a;--warn:#d98a0c;--bad:#d64545;--side:#141c27;--side-ink:#b7c1d1;--radius:10px;--font:"Vazirmatn","Segoe UI",Tahoma,Arial,sans-serif}
 *{box-sizing:border-box}html,body{margin:0;padding:0}
 body{font-family:var(--font);background:var(--bg);color:var(--ink);font-size:14px;line-height:1.55}
 a{color:var(--pri);text-decoration:none}a:hover{text-decoration:underline}

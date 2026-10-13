@@ -136,11 +136,12 @@
             if (r.hangup_cause && r.status !== 'completed') note = (note ? note + ' · ' : '') + r.hangup_cause;
             var act = '';
             if (window.AC_CAN_OP) {
+              var T = window.AC_T || {cancel: 'cancel', retry: 'retry', dnc: 'DNC', delete: 'delete'};
               act = '<td class="ct-actions">';
-              if (r.status === 'pending') act += '<button class="btn btn-sm btn-ghost" data-do="cancel" data-id="' + r.id + '" title="cancel">✕</button>';
-              if (['pending', 'dialing', 'answered'].indexOf(r.status) === -1) act += '<button class="btn btn-sm btn-ghost" data-do="retry" data-id="' + r.id + '" title="retry">↻</button>';
-              act += '<button class="btn btn-sm btn-ghost" data-do="dnc" data-id="' + r.id + '" title="DNC">⛔</button>';
-              if (['dialing', 'answered'].indexOf(r.status) === -1) act += '<button class="btn btn-sm btn-ghost" data-do="delete" data-id="' + r.id + '" title="delete">🗑</button>';
+              if (r.status === 'pending') act += '<button class="btn btn-sm btn-ghost" data-do="cancel" data-id="' + r.id + '" title="' + esc(T.cancel) + '">✕</button>';
+              if (['pending', 'dialing', 'answered'].indexOf(r.status) === -1) act += '<button class="btn btn-sm btn-ghost" data-do="retry" data-id="' + r.id + '" title="' + esc(T.retry) + '">↻</button>';
+              act += '<button class="btn btn-sm btn-ghost" data-do="dnc" data-id="' + r.id + '" title="' + esc(T.dnc) + '">⛔</button>';
+              if (['dialing', 'answered'].indexOf(r.status) === -1) act += '<button class="btn btn-sm btn-ghost" data-do="delete" data-id="' + r.id + '" title="' + esc(T.delete) + '">🗑</button>';
               act += '</td>';
             }
             return '<tr><td dir="ltr"><strong>' + esc(r.phone) + '</strong></td><td>' + esc(r.name) + '</td><td><span class="badge badge-' + esc(r.status) + '">' + esc(window.AC_ST[r.status] || r.status) + '</span>' + (r.amd_result ? ' <small class="muted">' + esc(r.amd_result) + '</small>' : '') + '</td><td>' + r.attempts + '</td><td dir="ltr"><small>' + esc(fdate(r.last_attempt_at)) + '</small></td><td>' + (r.duration_sec ? fmtDur(r.duration_sec) : '') + '</td><td>' + esc(r.dtmf || '') + '</td><td>' + esc(r.result_tag || '') + '</td><td><small class="muted">' + esc(note) + '</small></td>' + act + '</tr>';
@@ -240,6 +241,13 @@
     });
   }
 
+  // campaign form: rarely used IVR keys are collapsed
+  (function () {
+    var more = $('#ivr-more'); if (!more) return;
+    var rows = document.querySelectorAll('tr.ivr-rare');
+    if (!rows.length) { more.hidden = true; return; }
+    more.addEventListener('click', function () { for (var i = 0; i < rows.length; i++) rows[i].hidden = false; more.hidden = true; });
+  })();
   // styled file inputs (native "Choose File" is browser-language only)
   (function () {
     var inputs = document.querySelectorAll('input[type=file]');

@@ -135,4 +135,5 @@ $waitMsg = $c['last_error'] && strpos($c['last_error'], 'wait:') === 0 ? t('wait
 </div>
 <?php endif; ?>
 <script>window.AC_PAGE = 'campaign-show'; window.AC_CAMPAIGN = <?php echo (int)$c['id']; ?>; window.AC_CAN_OP = <?php echo ($op && $c['kind'] !== 'quick') ? 'true' : 'false'; ?>;
-window.AC_ST = <?php $m = array(); foreach (CallStatus::all() as $st) { $m[$st] = t('st_' . $st); } echo Util::json($m); ?>;</script>
+window.AC_ST = <?php $m = array(); foreach (CallStatus::all() as $st) { $m[$st] = t('st_' . $st); } echo Util::json($m); ?>;
+window.AC_T = <?php echo Util::json(array('cancel' => t('cancel'), 'retry' => t('ct_retry'), 'dnc' => t('ct_dnc'), 'delete' => t('delete'))); ?>;</script>

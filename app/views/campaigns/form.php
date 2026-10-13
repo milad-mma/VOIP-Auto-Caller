@@ -94,8 +94,9 @@ $fmtDt = function ($v) { return $v ? date('Y-m-d\TH:i', strtotime($v)) : ''; };
       <?php foreach (array('1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '*', '#') as $k):
         $key = $k === '*' ? 'star' : ($k === '#' ? 'hash' : $k);
         $cfg = isset($ivr['digits'][$k]) ? $ivr['digits'][$k] : array('action' => 'none', 'target' => '', 'context' => 'from-internal', 'audio_id' => 0, 'tag' => '');
-        $act = $cfg['action']; ?>
-        <tr class="ivr-row" data-key="<?php echo $key; ?>">
+        $act = $cfg['action'];
+        $rare = !in_array($k, array('1', '2', '3'), true) && $act === 'none'; ?>
+        <tr class="ivr-row<?php echo $rare ? ' ivr-rare' : ''; ?>" data-key="<?php echo $key; ?>"<?php echo $rare ? ' hidden' : ''; ?>>
           <td class="key"><?php echo $k; ?></td>
           <td>
             <select name="ivr_action_<?php echo $key; ?>" class="ivr-action">
@@ -119,6 +120,7 @@ $fmtDt = function ($v) { return $v ? date('Y-m-d\TH:i', strtotime($v)) : ''; };
       <?php endforeach; ?>
       </tbody>
     </table>
+    <button type="button" class="btn btn-sm btn-ghost" id="ivr-more"><?php echo h(t('ivr_more_keys')); ?></button>
   </div>
 </div>
 

@@ -424,6 +424,7 @@ Alias $WEB_PATH $APP_DIR/public
     </IfModule>
 </Directory>
 <Directory "$APP_DIR/public/assets">
+    AddType font/woff2 .woff2
     <IfModule mod_expires.c>
         ExpiresActive On
         ExpiresDefault "access plus 7 days"

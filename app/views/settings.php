@@ -130,7 +130,7 @@ $bool = function ($name, $cur) { return '<select name="' . $name . '"><option va
       <label><?php echo h(t('trunk_cooldown_min')); ?><input type="number" name="trunk_cooldown_min" value="<?php echo (int)$s['trunk_cooldown_min']; ?>" min="1" max="1440"></label>
       <label><?php echo h(t('trunk_cooldown_max_min')); ?><input type="number" name="trunk_cooldown_max_min" value="<?php echo (int)$s['trunk_cooldown_max_min']; ?>" min="1" max="10080"></label>
       <label><?php echo h(t('trunk_probe_sec')); ?><input type="number" name="trunk_probe_sec" value="<?php echo (int)$s['trunk_probe_sec']; ?>" min="0" max="3600"></label>
-      <label><?php echo h(t('trunk_block_down')); ?><select name="trunk_block_down"><option value="1" <?php echo $s['trunk_block_down'] === '1' ? 'selected' : ''; ?>><?php echo h(t('enabled')); ?></option><option value="0" <?php echo $s['trunk_block_down'] !== '1' ? 'selected' : ''; ?>><?php echo h(t('disabled')); ?></option></select></label>
+      <label><?php echo h(t('trunk_block_down')); ?><select name="trunk_block_down"><option value="1" <?php echo $s['trunk_block_down'] === '1' ? 'selected' : ''; ?>><?php echo h(t('on')); ?></option><option value="0" <?php echo $s['trunk_block_down'] !== '1' ? 'selected' : ''; ?>><?php echo h(t('off')); ?></option></select></label>
     </div>
     <button class="btn btn-sm" type="submit"><?php echo h(t('save')); ?></button>
   </form>

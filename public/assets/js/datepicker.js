@@ -154,7 +154,7 @@
     hidden.type = 'hidden'; hidden.name = orig.name; hidden.value = orig.value;
     var input = document.createElement('input');
     input.type = 'text'; input.className = (orig.className ? orig.className + ' ' : '') + 'ac-date'; input.setAttribute('dir', 'ltr'); input.autocomplete = 'off';
-    input.placeholder = RTL ? (withTime ? '1404/07/07 09:00' : '1404/07/07') : (withTime ? 'YYYY-MM-DD HH:MM' : 'YYYY-MM-DD');
+    var tc = fmtCal(todayCal()); input.placeholder = withTime ? tc + ' 09:00' : tc;
     if (orig.required) input.required = true;
     if (orig.id) input.id = orig.id;
     var c = isoToCal(orig.value);
