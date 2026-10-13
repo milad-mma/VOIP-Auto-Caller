@@ -59,10 +59,23 @@ fetch_source() {
     command -v curl >/dev/null 2>&1 || yum install -y curl >/dev/null 2>&1 || die "curl not found"
     command -v tar >/dev/null 2>&1 || die "tar not found"
     TMP_SRC="$(mktemp -d /tmp/autocaller-src.XXXXXX)"
-    # cache-buster: GitHub's CDN may serve a tarball a few minutes old right after a push
-    local url="https://codeload.github.com/$REPO/tar.gz/refs/heads/$BRANCH?t=$(date +%s)"
+    # Branch tarballs can be served stale for a while after a push (GitHub CDN, or a caching proxy on the way),
+    # so resolve the branch to its commit first and download that exact commit: a SHA URL can never be stale.
+    local ref="refs/heads/$BRANCH" sha=""
+    if command -v git >/dev/null 2>&1; then
+        sha="$(git ls-remote "https://github.com/$REPO.git" "refs/heads/$BRANCH" 2>/dev/null | cut -f1 | head -c 40)"
+    fi
+    if [ -z "$sha" ]; then
+        sha="$(curl -fsSL --retry 2 -H 'Cache-Control: no-cache' -H 'Accept: application/vnd.github.sha' "https://api.github.com/repos/$REPO/commits/$BRANCH?t=$(date +%s)" 2>/dev/null | head -c 40)"
+    fi
+    if printf '%s' "$sha" | grep -qE '^[0-9a-f]{40}$'; then
+        ref="$sha"; say "latest commit on $BRANCH: ${sha:0:10}"
+    else
+        warn "could not resolve the latest commit of $BRANCH; downloading the branch archive (may be a few minutes stale)"
+    fi
+    local url="https://codeload.github.com/$REPO/tar.gz/$ref?t=$(date +%s)"
     if ! curl -fsSL --retry 3 -H 'Cache-Control: no-cache' "$url" -o "$TMP_SRC/src.tgz"; then
-        url="https://github.com/$REPO/archive/refs/heads/$BRANCH.tar.gz?t=$(date +%s)"
+        url="https://github.com/$REPO/archive/$ref.tar.gz?t=$(date +%s)"
         curl -fsSL --retry 3 -H 'Cache-Control: no-cache' "$url" -o "$TMP_SRC/src.tgz" || die "download failed ($url). Check internet/DNS access to github.com, or download the zip manually and run ./install.sh from it."
     fi
     tar -xzf "$TMP_SRC/src.tgz" -C "$TMP_SRC" || die "cannot extract archive"
@@ -191,7 +204,8 @@ legacy_remove() {
     pkill -f "$LEGACY_DIR/asyncCall.php" 2>/dev/null || true
     # dialplan: the v1 installer appended "[callblaster]" + one exten line to both files
     for f in /etc/asterisk/extensions.conf /etc/asterisk/extensions_custom.conf; do
-        [ -f "$f" ] && sed -i '/^\[callblaster\]$/,/^exten => 333,1,AGI(.*callblaster\.php)$/d' "$f"
+        # drop the whole [callblaster] context (up to the next [section] or EOF)
+        [ -f "$f" ] && awk 'BEGIN{skip=0} /^\[callblaster\]/{skip=1;next} /^\[/{skip=0} !skip{print}' "$f" > "$f.ac.tmp" && cat "$f.ac.tmp" > "$f" && rm -f "$f.ac.tmp"
     done
     # v1 replaced Issabel's own Apache config with its copy (and disabled the https redirect); restore the original
     for c in issabel elastix; do
