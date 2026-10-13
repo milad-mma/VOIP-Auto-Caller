@@ -241,6 +241,29 @@
     });
   }
 
+  // settings: tabs (client-side; the save form spans several panes)
+  (function () {
+    var nav = $('#settings-tabs'); if (!nav) return;
+    var links = nav.querySelectorAll('a[data-tab]');
+    var panes = document.querySelectorAll('[data-pane]');
+    var anchors = { 'trunk-pool': 'trunks', holidays: 'capacity', trunks: 'trunks', outbound: 'outbound', capacity: 'capacity', security: 'security' };
+    function show(tab, push) {
+      for (var i = 0; i < links.length; i++) links[i].classList.toggle('active', links[i].getAttribute('data-tab') === tab);
+      for (var j = 0; j < panes.length; j++) {
+        var list = panes[j].getAttribute('data-pane').split(' ');
+        panes[j].hidden = list.indexOf(tab) === -1;
+      }
+      try { localStorage.setItem('ac-settings-tab', tab); } catch (e) {}
+      if (push && history.replaceState) history.replaceState(null, '', '#' + tab);
+    }
+    var h = (location.hash || '').replace('#', '');
+    var start = anchors[h] || (function () { try { return localStorage.getItem('ac-settings-tab'); } catch (e) { return null; } })() || 'trunks';
+    show(start, false);
+    if (anchors[h] && h !== start) { var el = document.getElementById(h); if (el) el.scrollIntoView(); }
+    for (var k = 0; k < links.length; k++) {
+      links[k].addEventListener('click', function (e) { e.preventDefault(); show(this.getAttribute('data-tab'), true); window.scrollTo(0, 0); });
+    }
+  })();
   // campaign form: rarely used IVR keys are collapsed
   (function () {
     var more = $('#ivr-more'); if (!more) return;

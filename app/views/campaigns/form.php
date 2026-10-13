@@ -22,67 +22,6 @@ $fmtDt = function ($v) { return $v ? date('Y-m-d\TH:i', strtotime($v)) : ''; };
       </select>
     </label>
     <p class="hint"><?php echo h(t('audio_hint')); ?> <a href="<?php echo View::url('/audio'); ?>" target="_blank"><?php echo h(t('nav_audio')); ?></a></p>
-    <div class="row3">
-      <label><?php echo h(t('priority')); ?><input type="number" name="priority" min="1" max="10" value="<?php echo (int)$c['priority']; ?>"></label>
-      <label><?php echo h(t('max_repeats')); ?><input type="number" name="max_repeats" min="0" max="5" value="<?php echo (int)$c['max_repeats']; ?>"><small class="hint"><?php echo h(t('max_repeats_hint')); ?></small></label>
-      <label><?php echo h(t('ivr_timeout')); ?><input type="number" name="ivr_timeout" min="1" max="30" value="<?php echo (int)$ivr['timeout_sec']; ?>"></label>
-    </div>
-  </div>
-
-  <div class="card">
-    <h3><?php echo h(t('dialing')); ?></h3>
-    <div class="row3">
-      <label><?php echo h(t('concurrent')); ?><input type="number" name="concurrent" min="1" max="200" value="<?php echo (int)$c['concurrent']; ?>"><small class="hint"><?php echo h(t('concurrent_hint', $s['global_max_concurrent'])); ?></small></label>
-      <label><?php echo h(t('gap_ms')); ?><input type="number" name="gap_ms" min="0" step="100" value="<?php echo (int)$c['gap_ms']; ?>"></label>
-      <label><?php echo h(t('ring_timeout')); ?><input type="number" name="ring_timeout" min="5" max="120" value="<?php echo (int)$c['ring_timeout']; ?>"></label>
-    </div>
-    <div class="row3">
-      <label><?php echo h(t('max_retries')); ?><input type="number" name="max_retries" min="0" max="10" value="<?php echo (int)$c['max_retries']; ?>"></label>
-      <label><?php echo h(t('retry_delay_min')); ?><input type="number" name="retry_delay_min" min="1" max="1440" value="<?php echo (int)$c['retry_delay_min']; ?>"></label>
-      <label><?php echo h(t('amd')); ?><select name="amd"><option value="0" <?php echo !$c['amd'] ? 'selected' : ''; ?>><?php echo h(t('off')); ?></option><option value="1" <?php echo $c['amd'] ? 'selected' : ''; ?>><?php echo h(t('on')); ?></option></select></label>
-    </div>
-    <div class="check-row"><span><?php echo h(t('retry_on')); ?>:</span>
-      <?php foreach (CallStatus::retryable() as $st): ?>
-        <label class="inline"><input type="checkbox" name="retry_on[]" value="<?php echo $st; ?>" <?php echo in_array($st, $retryOn, true) ? 'checked' : ''; ?>> <?php echo h(t('st_' . $st)); ?></label>
-      <?php endforeach; ?>
-    </div>
-    <details <?php echo ($c['callerid_name'] !== null || $c['callerid_number'] !== null || $c['trunk_name'] !== null || $c['dial_prefix'] !== null) ? 'open' : ''; ?>>
-      <summary><?php echo h(t('advanced_overrides')); ?></summary>
-      <div class="row3">
-        <label><?php echo h(t('callerid_name')); ?><input type="text" name="callerid_name" value="<?php echo h($c['callerid_name']); ?>" placeholder="<?php echo h($s['callerid_name']); ?>"></label>
-        <label><?php echo h(t('callerid_number')); ?><input type="text" name="callerid_number" dir="ltr" value="<?php echo h($c['callerid_number']); ?>" placeholder="<?php echo h($s['callerid_number']); ?>"></label>
-        <label><?php echo h(t('channel_tech')); ?>
-          <select name="channel_tech"><option value="">— <?php echo h(t('global')); ?> (<?php echo h($s['channel_tech']); ?>) —</option>
-          <?php foreach (array('pool', 'local', 'sip', 'pjsip', 'custom') as $ct): ?><option value="<?php echo $ct; ?>" <?php echo $c['channel_tech'] === $ct ? 'selected' : ''; ?>><?php echo $ct === 'pool' ? h(t('trunk_pool')) : strtoupper($ct); ?></option><?php endforeach; ?></select>
-        </label>
-      </div>
-      <div class="row3">
-        <label><?php echo h(t('trunk_name')); ?><input type="text" name="trunk_name" dir="ltr" value="<?php echo h($c['trunk_name']); ?>" placeholder="<?php echo h($s['trunk_name']); ?>"></label>
-        <label class="check"><input type="checkbox" name="use_global_prefix" value="1" <?php echo $c['dial_prefix'] === null ? 'checked' : ''; ?> onchange="document.getElementById('dial_prefix').disabled=this.checked"> <?php echo h(t('use_global_prefix')); ?> (<?php echo h($s['dial_prefix'] === '' ? t('none') : $s['dial_prefix']); ?>)</label>
-        <label><?php echo h(t('dial_prefix')); ?><input type="text" id="dial_prefix" name="dial_prefix" dir="ltr" value="<?php echo h($c['dial_prefix']); ?>" <?php echo $c['dial_prefix'] === null ? 'disabled' : ''; ?>></label>
-      </div>
-    </details>
-  </div>
-</div>
-
-<div class="row2">
-  <div class="card">
-    <h3><?php echo h(t('schedule')); ?></h3>
-    <div class="row2">
-      <label><?php echo h(t('start_at')); ?><input type="datetime-local" name="start_at" dir="ltr" value="<?php echo $fmtDt($c['start_at']); ?>"><small class="hint"><?php echo h(t('start_at_hint')); ?></small></label>
-      <label><?php echo h(t('end_at')); ?><input type="datetime-local" name="end_at" dir="ltr" value="<?php echo $fmtDt($c['end_at']); ?>"><small class="hint"><?php echo h(t('end_at_hint')); ?></small></label>
-    </div>
-    <label class="check"><input type="checkbox" name="use_global_window" value="1" <?php echo $useGlobalWindow ? 'checked' : ''; ?> onchange="document.getElementById('win').classList.toggle('disabled', this.checked)"> <?php echo h(t('use_global_window')); ?> (<?php echo h($s['work_start'] . '–' . $s['work_end']); ?>)</label>
-    <div id="win" class="<?php echo $useGlobalWindow ? 'disabled' : ''; ?>">
-      <div class="row2">
-        <label><?php echo h(t('work_start')); ?><input type="time" name="work_start" dir="ltr" value="<?php echo h($c['work_start'] !== null ? $c['work_start'] : $s['work_start']); ?>"></label>
-        <label><?php echo h(t('work_end')); ?><input type="time" name="work_end" dir="ltr" value="<?php echo h($c['work_end'] !== null ? $c['work_end'] : $s['work_end']); ?>"></label>
-      </div>
-      <div class="check-row"><span><?php echo h(t('work_days')); ?>:</span>
-        <?php foreach ($weekOrder as $d): ?><label class="inline"><input type="checkbox" name="work_days[]" value="<?php echo $d; ?>" <?php echo in_array($d, $days, true) ? 'checked' : ''; ?>> <?php echo h($dayNames[$d]); ?></label><?php endforeach; ?>
-      </div>
-    </div>
-    <label class="check"><input type="checkbox" name="respect_holidays" value="1" <?php echo $c['respect_holidays'] ? 'checked' : ''; ?>> <?php echo h(t('respect_holidays')); ?></label>
   </div>
 
   <div class="card">
@@ -121,6 +60,70 @@ $fmtDt = function ($v) { return $v ? date('Y-m-d\TH:i', strtotime($v)) : ''; };
       </tbody>
     </table>
     <button type="button" class="btn btn-sm btn-ghost" id="ivr-more"><?php echo h(t('ivr_more_keys')); ?></button>
+  </div>
+</div>
+
+<div class="row2">
+  <div class="card">
+    <h3><?php echo h(t('schedule')); ?></h3>
+    <div class="row2">
+      <label><?php echo h(t('start_at')); ?><input type="datetime-local" name="start_at" dir="ltr" value="<?php echo $fmtDt($c['start_at']); ?>"><small class="hint"><?php echo h(t('start_at_hint')); ?></small></label>
+      <label><?php echo h(t('end_at')); ?><input type="datetime-local" name="end_at" dir="ltr" value="<?php echo $fmtDt($c['end_at']); ?>"><small class="hint"><?php echo h(t('end_at_hint')); ?></small></label>
+    </div>
+    <label class="check"><input type="checkbox" name="use_global_window" value="1" <?php echo $useGlobalWindow ? 'checked' : ''; ?> onchange="document.getElementById('win').classList.toggle('disabled', this.checked)"> <?php echo h(t('use_global_window')); ?> (<?php echo h($s['work_start'] . '–' . $s['work_end']); ?>)</label>
+    <div id="win" class="<?php echo $useGlobalWindow ? 'disabled' : ''; ?>">
+      <div class="row2">
+        <label><?php echo h(t('work_start')); ?><input type="time" name="work_start" dir="ltr" value="<?php echo h($c['work_start'] !== null ? $c['work_start'] : $s['work_start']); ?>"></label>
+        <label><?php echo h(t('work_end')); ?><input type="time" name="work_end" dir="ltr" value="<?php echo h($c['work_end'] !== null ? $c['work_end'] : $s['work_end']); ?>"></label>
+      </div>
+      <div class="check-row"><span><?php echo h(t('work_days')); ?>:</span>
+        <?php foreach ($weekOrder as $d): ?><label class="inline"><input type="checkbox" name="work_days[]" value="<?php echo $d; ?>" <?php echo in_array($d, $days, true) ? 'checked' : ''; ?>> <?php echo h($dayNames[$d]); ?></label><?php endforeach; ?>
+      </div>
+    </div>
+    <label class="check"><input type="checkbox" name="respect_holidays" value="1" <?php echo $c['respect_holidays'] ? 'checked' : ''; ?>> <?php echo h(t('respect_holidays')); ?></label>
+  </div>
+
+<?php $advOpen = !$isNew && ((int)$c['concurrent'] !== (int)$s['default_concurrent'] || (int)$c['max_retries'] !== (int)$s['default_max_retries'] || (int)$c['ring_timeout'] !== (int)$s['default_ring_timeout'] || (int)$c['gap_ms'] !== (int)$s['default_gap_ms'] || (int)$c['amd'] === 1); ?>
+  <div class="card adv-card">
+    <details class="adv" <?php echo $advOpen ? 'open' : ''; ?>>
+    <summary><h3><?php echo h(t('dialing')); ?></h3><small class="muted"><?php echo h(t('dialing_defaults_hint')); ?></small></summary>
+    <div class="row3">
+      <label><?php echo h(t('priority')); ?><input type="number" name="priority" min="1" max="10" value="<?php echo (int)$c['priority']; ?>"></label>
+      <label><?php echo h(t('max_repeats')); ?><input type="number" name="max_repeats" min="0" max="5" value="<?php echo (int)$c['max_repeats']; ?>"><small class="hint"><?php echo h(t('max_repeats_hint')); ?></small></label>
+      <label><?php echo h(t('ivr_timeout')); ?><input type="number" name="ivr_timeout" min="1" max="30" value="<?php echo (int)$ivr['timeout_sec']; ?>"></label>
+    </div>
+    <div class="row3">
+      <label><?php echo h(t('concurrent')); ?><input type="number" name="concurrent" min="1" max="200" value="<?php echo (int)$c['concurrent']; ?>"><small class="hint"><?php echo h(t('concurrent_hint', $s['global_max_concurrent'])); ?></small></label>
+      <label><?php echo h(t('gap_ms')); ?><input type="number" name="gap_ms" min="0" step="100" value="<?php echo (int)$c['gap_ms']; ?>"></label>
+      <label><?php echo h(t('ring_timeout')); ?><input type="number" name="ring_timeout" min="5" max="120" value="<?php echo (int)$c['ring_timeout']; ?>"></label>
+    </div>
+    <div class="row3">
+      <label><?php echo h(t('max_retries')); ?><input type="number" name="max_retries" min="0" max="10" value="<?php echo (int)$c['max_retries']; ?>"></label>
+      <label><?php echo h(t('retry_delay_min')); ?><input type="number" name="retry_delay_min" min="1" max="1440" value="<?php echo (int)$c['retry_delay_min']; ?>"></label>
+      <label><?php echo h(t('amd')); ?><select name="amd"><option value="0" <?php echo !$c['amd'] ? 'selected' : ''; ?>><?php echo h(t('off')); ?></option><option value="1" <?php echo $c['amd'] ? 'selected' : ''; ?>><?php echo h(t('on')); ?></option></select></label>
+    </div>
+    <div class="check-row"><span><?php echo h(t('retry_on')); ?>:</span>
+      <?php foreach (CallStatus::retryable() as $st): ?>
+        <label class="inline"><input type="checkbox" name="retry_on[]" value="<?php echo $st; ?>" <?php echo in_array($st, $retryOn, true) ? 'checked' : ''; ?>> <?php echo h(t('st_' . $st)); ?></label>
+      <?php endforeach; ?>
+    </div>
+    <details <?php echo ($c['callerid_name'] !== null || $c['callerid_number'] !== null || $c['trunk_name'] !== null || $c['dial_prefix'] !== null) ? 'open' : ''; ?>>
+      <summary><?php echo h(t('advanced_overrides')); ?></summary>
+      <div class="row3">
+        <label><?php echo h(t('callerid_name')); ?><input type="text" name="callerid_name" value="<?php echo h($c['callerid_name']); ?>" placeholder="<?php echo h($s['callerid_name']); ?>"></label>
+        <label><?php echo h(t('callerid_number')); ?><input type="text" name="callerid_number" dir="ltr" value="<?php echo h($c['callerid_number']); ?>" placeholder="<?php echo h($s['callerid_number']); ?>"></label>
+        <label><?php echo h(t('channel_tech')); ?>
+          <select name="channel_tech"><option value="">— <?php echo h(t('global')); ?> (<?php echo h($s['channel_tech']); ?>) —</option>
+          <?php foreach (array('pool', 'local', 'sip', 'pjsip', 'custom') as $ct): ?><option value="<?php echo $ct; ?>" <?php echo $c['channel_tech'] === $ct ? 'selected' : ''; ?>><?php echo $ct === 'pool' ? h(t('trunk_pool')) : strtoupper($ct); ?></option><?php endforeach; ?></select>
+        </label>
+      </div>
+      <div class="row3">
+        <label><?php echo h(t('trunk_name')); ?><input type="text" name="trunk_name" dir="ltr" value="<?php echo h($c['trunk_name']); ?>" placeholder="<?php echo h($s['trunk_name']); ?>"></label>
+        <label class="check"><input type="checkbox" name="use_global_prefix" value="1" <?php echo $c['dial_prefix'] === null ? 'checked' : ''; ?> onchange="document.getElementById('dial_prefix').disabled=this.checked"> <?php echo h(t('use_global_prefix')); ?> (<?php echo h($s['dial_prefix'] === '' ? t('none') : $s['dial_prefix']); ?>)</label>
+        <label><?php echo h(t('dial_prefix')); ?><input type="text" id="dial_prefix" name="dial_prefix" dir="ltr" value="<?php echo h($c['dial_prefix']); ?>" <?php echo $c['dial_prefix'] === null ? 'disabled' : ''; ?>></label>
+      </div>
+    </details>
+    </details>
   </div>
 </div>
 

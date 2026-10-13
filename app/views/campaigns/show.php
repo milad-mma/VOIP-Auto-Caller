@@ -59,8 +59,9 @@ $waitMsg = $c['last_error'] && strpos($c['last_error'], 'wait:') === 0 ? t('wait
 <div class="card slim"><div class="bar big"><div class="bar-in" id="c-bar" style="width:<?php echo $stats['pct']; ?>%"></div></div><small class="muted" id="c-pct"><?php echo $stats['pct']; ?>%</small></div>
 
 <div class="row2">
-  <div class="card">
-    <h3><?php echo h(t('summary')); ?></h3>
+  <div class="card adv-card">
+    <details class="adv">
+    <summary><h3><?php echo h(t('summary')); ?></h3><small class="muted"><?php echo $audio ? h($audio['name']) : ''; ?></small></summary>
     <dl class="dl">
       <dt><?php echo h(t('default_audio')); ?></dt><dd><?php echo $audio ? h($audio['name']) . ' (' . Util::formatDuration($audio['duration_sec']) . ') <audio controls preload="none" src="' . View::url('/audio/' . $audio['id'] . '/play') . '"></audio>' : '<span class="muted">' . h(t('none_per_contact')) . '</span>'; ?></dd>
       <dt><?php echo h(t('concurrent')); ?></dt><dd><bdi><?php echo (int)$c['concurrent']; ?></bdi></dd>
@@ -78,6 +79,7 @@ $waitMsg = $c['last_error'] && strpos($c['last_error'], 'wait:') === 0 ? t('wait
         <?php foreach ($ivr['digits'] as $k => $d): ?><span class="chip"><b><?php echo h($k); ?></b> <?php echo h(t('ivr_' . $d['action'])); ?><?php echo $d['action'] === 'transfer' ? ' → ' . h($d['target']) : ''; ?><?php echo $d['tag'] ? ' [' . h($d['tag']) . ']' : ''; ?></span> <?php endforeach; ?>
       </dd>
     </dl>
+    </details>
   </div>
   <div class="card">
     <h3><?php echo h(t('responses')); ?></h3>
@@ -115,22 +117,23 @@ $waitMsg = $c['last_error'] && strpos($c['last_error'], 'wait:') === 0 ? t('wait
 
 <?php if ($op && $c['kind'] !== 'quick'): ?>
 <div class="row2">
-  <div class="card">
-    <h3><?php echo h(t('add_numbers_manually')); ?></h3>
+  <div class="card adv-card">
+    <details class="adv"><summary><h3><?php echo h(t('add_numbers_manually')); ?></h3></summary>
     <form method="post" action="<?php echo View::url('/campaigns/' . $c['id'] . '/contacts/add'); ?>"><?php echo Auth::csrfField(); ?>
       <textarea name="numbers" rows="4" dir="ltr" placeholder="09121234567 Ali&#10;09351234567&#10;02188776655 Company"></textarea>
       <button class="btn btn-sm" type="submit"><?php echo h(t('add')); ?></button>
     </form>
+    </details>
   </div>
-  <div class="card">
-    <h3><?php echo h(t('requeue')); ?></h3>
-    <p class="hint"><?php echo h(t('requeue_hint')); ?></p>
+  <div class="card adv-card">
+    <details class="adv"><summary><h3><?php echo h(t('requeue')); ?></h3><small class="muted"><?php echo h(t('requeue_hint')); ?></small></summary>
     <form method="post" action="<?php echo View::url('/campaigns/' . $c['id'] . '/action'); ?>"><?php echo Auth::csrfField(); ?><input type="hidden" name="do" value="requeue">
       <div class="check-row">
       <?php foreach (array('noanswer', 'busy', 'congestion', 'failed', 'machine', 'cancelled') as $st): ?><label class="inline"><input type="checkbox" name="statuses[]" value="<?php echo $st; ?>" <?php echo in_array($st, array('noanswer', 'busy'), true) ? 'checked' : ''; ?>> <?php echo h(t('st_' . $st)); ?> (<?php echo (int)$stats[$st]; ?>)</label><?php endforeach; ?>
       </div>
       <button class="btn btn-sm" type="submit"><?php echo h(t('requeue')); ?></button>
     </form>
+    </details>
   </div>
 </div>
 <?php endif; ?>

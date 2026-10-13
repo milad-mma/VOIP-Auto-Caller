@@ -6,8 +6,14 @@ $days = array_map('intval', explode(',', $s['work_days']));
 $sel = function ($name, array $opts, $cur) { $o = '<select name="' . $name . '">'; foreach ($opts as $k => $v) { $o .= '<option value="' . h($k) . '"' . ((string)$cur === (string)$k ? ' selected' : '') . '>' . h($v) . '</option>'; } return $o . '</select>'; };
 $bool = function ($name, $cur) { return '<select name="' . $name . '"><option value="1"' . ($cur === '1' ? ' selected' : '') . '>' . h(t('on')) . '</option><option value="0"' . ($cur !== '1' ? ' selected' : '') . '>' . h(t('off')) . '</option></select>'; };
 ?>
+<nav class="tabs" id="settings-tabs">
+  <a href="#trunks" data-tab="trunks"><?php echo h(t('tab_trunks')); ?></a>
+  <a href="#outbound" data-tab="outbound"><?php echo h(t('tab_outbound')); ?></a>
+  <a href="#capacity" data-tab="capacity"><?php echo h(t('tab_capacity')); ?></a>
+  <a href="#security" data-tab="security"><?php echo h(t('tab_security')); ?></a>
+</nav>
 <form method="post" action="<?php echo View::url('/settings'); ?>" class="form"><?php echo Auth::csrfField(); ?>
-<div class="row2">
+<section data-pane="outbound">
   <div class="card">
     <h3><?php echo h(t('outbound_settings')); ?></h3>
     <div class="row2">
@@ -28,6 +34,8 @@ $bool = function ($name, $cur) { return '<select name="' . $name . '"><option va
     </div>
     <?php if ($trunks): ?><details><summary><?php echo h(t('detected_trunks')); ?></summary><table class="table compact" dir="ltr"><?php foreach ($trunks as $tr): ?><tr><td><?php echo (int)$tr['trunkid']; ?></td><td><?php echo h($tr['name']); ?></td><td><?php echo h($tr['tech']); ?></td><td><code><?php echo h($tr['channelid']); ?></code></td><td><?php echo $tr['disabled'] === 'on' ? h(t('disabled')) : ''; ?></td></tr><?php endforeach; ?></table></details><?php endif; ?>
   </div>
+</section>
+<section data-pane="capacity">
   <div class="card">
     <h3><?php echo h(t('capacity_defaults')); ?></h3>
     <div class="row3">
@@ -53,7 +61,8 @@ $bool = function ($name, $cur) { return '<select name="' . $name . '"><option va
     </div>
     <div class="check-row"><span><?php echo h(t('work_days')); ?>:</span><?php foreach ($weekOrder as $d): ?><label class="inline"><input type="checkbox" name="work_days[]" value="<?php echo $d; ?>" <?php echo in_array($d, $days, true) ? 'checked' : ''; ?>> <?php echo h($dayNames[$d]); ?></label><?php endforeach; ?></div>
   </div>
-</div>
+</section>
+<section data-pane="security">
 <div class="row2">
   <div class="card">
     <h3><?php echo h(t('security_ui')); ?></h3>
@@ -76,14 +85,16 @@ $bool = function ($name, $cur) { return '<select name="' . $name . '"><option va
     <button class="btn btn-sm" type="button" id="test-ami"><?php echo h(t('test_ami')); ?></button> <span id="test-ami-result" class="muted small"></span>
   </div>
 </div>
-<div class="form-actions"><button class="btn btn-primary" type="submit"><?php echo h(t('save')); ?></button></div>
+</section>
+<div class="form-actions" data-pane="outbound capacity security"><button class="btn btn-primary" type="submit"><?php echo h(t('save')); ?></button></div>
 </form>
 
+<section data-pane="trunks">
 <div class="card" id="trunk-pool">
   <div class="card-head"><h3><?php echo h(t('trunk_pool')); ?> <span class="badge badge-muted"><?php echo count($pool); ?></span></h3>
     <?php if ($issabelTrunks): ?><form method="post" action="<?php echo View::url('/settings/trunks/import'); ?>" class="inline"><?php echo Auth::csrfField(); ?><button class="btn btn-sm" type="submit"><?php echo h(t('import_pbx_trunks')); ?></button></form><?php endif; ?>
   </div>
-  <p class="hint"><?php echo h(t('trunk_pool_hint')); ?> <?php echo h(t('trunk_cid_hint')); ?></p>
+  <details class="help"><summary><?php echo h(t('help')); ?></summary><p class="hint"><?php echo h(t('trunk_pool_hint')); ?> <?php echo h(t('trunk_cid_hint')); ?></p></details>
   <?php if ($s['channel_tech'] !== 'pool'): ?><p class="alert alert-info"><?php echo h(t('trunk_pool_inactive')); ?></p><?php endif; ?>
   <table class="table compact">
     <thead><tr><th><?php echo h(t('name')); ?></th><th><?php echo h(t('tech')); ?></th><th><?php echo h(t('trunk_channel_id')); ?></th><th><?php echo h(t('dial_prefix')); ?></th><th><?php echo h(t('callerid_number')); ?></th><th><?php echo h(t('channels')); ?></th><th><?php echo h(t('active')); ?></th><th><?php echo h(t('live_calls')); ?></th><th><?php echo h(t('trunk_health')); ?></th><th><?php echo h(t('total_calls')); ?></th><th></th></tr></thead>
@@ -124,7 +135,7 @@ $bool = function ($name, $cur) { return '<select name="' . $name . '"><option va
   </table>
   <form method="post" action="<?php echo View::url('/settings'); ?>" class="health-form"><?php echo Auth::csrfField(); ?>
     <h4><?php echo h(t('trunk_health_settings')); ?></h4>
-    <p class="hint"><?php echo h(t('trunk_health_hint')); ?></p>
+    <details class="help"><summary><?php echo h(t('help')); ?></summary><p class="hint"><?php echo h(t('trunk_health_hint')); ?></p></details>
     <div class="row3">
       <label><?php echo h(t('trunk_fail_streak')); ?><input type="number" name="trunk_fail_streak" value="<?php echo (int)$s['trunk_fail_streak']; ?>" min="1" max="50"></label>
       <label><?php echo h(t('trunk_cooldown_min')); ?><input type="number" name="trunk_cooldown_min" value="<?php echo (int)$s['trunk_cooldown_min']; ?>" min="1" max="1440"></label>
@@ -135,12 +146,14 @@ $bool = function ($name, $cur) { return '<select name="' . $name . '"><option va
     <button class="btn btn-sm" type="submit"><?php echo h(t('save')); ?></button>
   </form>
 </div>
+</section>
 
+<section data-pane="capacity">
 <div class="card" id="holidays">
   <div class="card-head"><h3><?php echo h(t('holidays')); ?></h3>
     <form method="post" action="<?php echo View::url('/settings/holidays/add'); ?>" class="filters"><?php echo Auth::csrfField(); ?><input type="date" name="hdate" dir="ltr" required><input type="text" name="title" placeholder="<?php echo h(t('title')); ?>"><button class="btn btn-sm" type="submit"><?php echo h(t('add')); ?></button></form>
   </div>
-  <p class="hint"><?php echo h(t('holidays_hint')); ?></p>
+  <details class="help"><summary><?php echo h(t('help')); ?></summary><p class="hint"><?php echo h(t('holidays_hint')); ?></p></details>
   <form method="post" action="<?php echo View::url('/settings/holidays/iran'); ?>" class="filters"><?php echo Auth::csrfField(); ?>
     <?php $jy = Jalali::toJalali(date('Y'), date('n'), date('j')); $jy = $jy[0]; ?>
     <select name="jy"><?php for ($y = $jy - 1; $y <= $jy + 2; $y++): ?><option value="<?php echo $y; ?>" <?php echo $y === $jy ? 'selected' : ''; ?>><?php echo $y; ?></option><?php endfor; ?></select>
@@ -153,3 +166,4 @@ $bool = function ($name, $cur) { return '<select name="' . $name . '"><option va
   </div>
 </div>
 <script>window.AC_PAGE = 'settings';</script>
+</section>
