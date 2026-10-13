@@ -46,6 +46,8 @@ SRC_DIR=""
 if [ -n "$SELF" ] && [ -f "$SELF" ]; then
     SRC_DIR="$(cd "$(dirname "$(readlink -f "$SELF")")" && pwd)"
     [ -f "$SRC_DIR/app/bootstrap.php" ] || SRC_DIR=""
+    # running the copy that lives in /opt/autocaller: that IS the installed (old) code, so fetch the latest instead
+    [ "$SRC_DIR" = "$APP_DIR" ] && SRC_DIR=""
 fi
 TMP_SRC=""
 cleanup_tmp() { [ -n "$TMP_SRC" ] && rm -rf "$TMP_SRC"; }
@@ -57,10 +59,11 @@ fetch_source() {
     command -v curl >/dev/null 2>&1 || yum install -y curl >/dev/null 2>&1 || die "curl not found"
     command -v tar >/dev/null 2>&1 || die "tar not found"
     TMP_SRC="$(mktemp -d /tmp/autocaller-src.XXXXXX)"
-    local url="https://codeload.github.com/$REPO/tar.gz/refs/heads/$BRANCH"
-    if ! curl -fsSL --retry 3 "$url" -o "$TMP_SRC/src.tgz"; then
-        url="https://github.com/$REPO/archive/refs/heads/$BRANCH.tar.gz"
-        curl -fsSL --retry 3 "$url" -o "$TMP_SRC/src.tgz" || die "download failed ($url). Check internet/DNS access to github.com, or download the zip manually and run ./install.sh from it."
+    # cache-buster: GitHub's CDN may serve a tarball a few minutes old right after a push
+    local url="https://codeload.github.com/$REPO/tar.gz/refs/heads/$BRANCH?t=$(date +%s)"
+    if ! curl -fsSL --retry 3 -H 'Cache-Control: no-cache' "$url" -o "$TMP_SRC/src.tgz"; then
+        url="https://github.com/$REPO/archive/refs/heads/$BRANCH.tar.gz?t=$(date +%s)"
+        curl -fsSL --retry 3 -H 'Cache-Control: no-cache' "$url" -o "$TMP_SRC/src.tgz" || die "download failed ($url). Check internet/DNS access to github.com, or download the zip manually and run ./install.sh from it."
     fi
     tar -xzf "$TMP_SRC/src.tgz" -C "$TMP_SRC" || die "cannot extract archive"
     # the tree may be at the repo root or inside a sub folder (autocaller/)
@@ -68,7 +71,7 @@ fetch_source() {
     found="$(find "$TMP_SRC" -maxdepth 4 -name bootstrap.php -path '*/app/bootstrap.php' | head -1)"
     [ -n "$found" ] || die "source tree not found in the downloaded archive"
     SRC_DIR="$(cd "$(dirname "$found")/.." && pwd)"
-    ok "source ready ($SRC_DIR)"
+    ok "source ready ($SRC_DIR, $(ls "$SRC_DIR/sql" | wc -l) migrations, newest: $(ls "$SRC_DIR/sql" | sort | tail -1))"
 }
 
 # ------------------------------------------------------------------ detection
@@ -253,7 +256,7 @@ do_install() {
         [ -d "$APP_DIR/storage" ] || cp -a "$SRC_DIR/storage" "$APP_DIR/"
     fi
     for d in audio uploads tmp logs run; do mkdir -p "$APP_DIR/storage/$d"; done
-    ok "files in place"
+    ok "files in place ($(ls "$APP_DIR/sql" | wc -l) migrations in $APP_DIR/sql)"
 
     if [ "$UPGRADE" -eq 0 ]; then
         say "Creating database"
